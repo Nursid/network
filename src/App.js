@@ -110,7 +110,6 @@ function App() {
 }, []); // Removed nodes from the dependency array
 
 
-// console.log("fisrtNode----", fisrtNode)
 
   // Assign addNode function to the first node's onSelect
   const setInitialOnSelect = useCallback(() => {
@@ -132,6 +131,10 @@ function App() {
     setInitialOnSelect();
   }, [setInitialOnSelect]);
 
+
+  console.log("fisrtNode----", nodes)
+  console.log("edges----", edges)
+  
 
   return (
     <ReactFlowProvider>
