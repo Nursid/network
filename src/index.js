@@ -5,13 +5,15 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import HorizontalFlow from './HorizontalFlow';
 import Flow from './flow';
+import NewFlow from './newflow';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     {/* <HorizontalFlow /> */}
     {/* <App /> */}
-    <Flow />
+    {/* <Flow /> */}
+    <NewFlow />
   </React.StrictMode>
 );
 

@@ -328,57 +328,18 @@ export const initialNodes = [
         "data": {
             "label": "Hello"
         },
-        "position": {
-            "x": 0,
-            "y": 0
-        },
         "type": "CustomNode",
         "measured": {
             "width": 141,
             "height": 66
         },
-        "selected": false
+        "selected": false,
+        "dragging": false
     },
     {
         "id": "2",
         "data": {
             "label": "Node 3"
-        },
-        "position": {
-            "x": -150,
-            "y": 100
-        },
-        "type": "CustomNode",
-        "measured": {
-            "width": 141,
-            "height": 66
-        },
-        "selected": false
-    },
-    {
-        "id": "3",
-        "data": {
-            "label": "Node 4"
-        },
-        "position": {
-            "x": 150,
-            "y": 100
-        },
-        "type": "CustomNode",
-        "measured": {
-            "width": 141,
-            "height": 66
-        },
-        "selected": true
-    },
-    {
-        "id": "4",
-        "data": {
-            "label": "Node 5"
-        },
-        "position": {
-            "x": -300,
-            "y": 200
         },
         "type": "CustomNode",
         "measured": {
@@ -387,14 +348,36 @@ export const initialNodes = [
         }
     },
     {
+        "id": "3",
+        "data": {
+            "label": "Node 4"
+        },
+        
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        }
+    },
+    {
+        "id": "4",
+        "data": {
+            "label": "Node 5"
+        },
+        
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        },
+        "selected": false
+    },
+    {
         "id": "5",
         "data": {
             "label": "Node 6"
         },
-        "position": {
-            "x": 0,
-            "y": 200
-        },
+        
         "type": "CustomNode",
         "measured": {
             "width": 141,
@@ -406,10 +389,7 @@ export const initialNodes = [
         "data": {
             "label": "Node 7"
         },
-        "position": {
-            "x": -450,
-            "y": 200
-        },
+        
         "type": "CustomNode",
         "measured": {
             "width": 141,
@@ -421,24 +401,70 @@ export const initialNodes = [
         "data": {
             "label": "Node 8"
         },
-        "position": {
-            "x": 150,
-            "y": 200
-        },
+       
         "type": "CustomNode",
         "measured": {
             "width": 141,
             "height": 66
-        }
+        },
+        "selected": false,
+        "dragging": false
     },
     {
         "id": "8",
         "data": {
             "label": "Node 9"
         },
-        "position": {
-            "x": 0,
-            "y": 200
+        
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        },
+        "selected": false,
+        "dragging": false
+    },
+    {
+        "id": "9",
+        "data": {
+            "label": "Node 10"
+        },
+        
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        },
+        "selected": false
+    },
+    {
+        "id": "10",
+        "data": {
+            "label": "Node 11"
+        },
+        
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        }
+    },
+    {
+        "id": "11",
+        "data": {
+            "label": "Node 12"
+        },
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        },
+        "selected": false
+    },
+    {
+        "id": "12",
+        "data": {
+            "label": "Node 13"
         },
         "type": "CustomNode",
         "measured": {
@@ -447,13 +473,83 @@ export const initialNodes = [
         }
     },
     {
-        "id": "9",
+        "id": "13",
         "data": {
-            "label": "Node 10"
+            "label": "Node 14"
         },
-        "position": {
-            "x": 300,
-            "y": 200
+        
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        }
+    },
+    {
+        "id": "14",
+        "data": {
+            "label": "Node 15"
+        },
+       
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        }
+    },
+    {
+        "id": "15",
+        "data": {
+            "label": "Node 16"
+        },
+       
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        },
+        "selected": false,
+        "dragging": false
+    },
+    {
+        "id": "16",
+        "data": {
+            "label": "Node 17"
+        },
+        
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        }
+    },
+    {
+        "id": "17",
+        "data": {
+            "label": "Node 18"
+        },
+       
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        }
+    },
+    {
+        "id": "18",
+        "data": {
+            "label": "Node 19"
+        },
+        
+        "type": "CustomNode",
+        "measured": {
+            "width": 141,
+            "height": 66
+        }
+    },
+    {
+        "id": "19",
+        "data": {
+            "label": "Node 20"
         },
         "type": "CustomNode",
         "measured": {
@@ -479,39 +575,99 @@ export const initialEdges = [
         "animated": true
     },
     {
-        "id": "e2-4",
-        "source": "2",
+        "id": "e1-4",
+        "source": "1",
         "target": "4",
         "animated": true
     },
     {
-        "id": "e2-5",
-        "source": "2",
+        "id": "e1-5",
+        "source": "1",
         "target": "5",
         "animated": true
     },
     {
-        "id": "e2-6",
-        "source": "2",
+        "id": "e4-6",
+        "source": "4",
         "target": "6",
         "animated": true
     },
     {
-        "id": "e2-7",
-        "source": "2",
+        "id": "e4-7",
+        "source": "4",
         "target": "7",
         "animated": true
     },
     {
-        "id": "e3-8",
-        "source": "3",
+        "id": "e4-8",
+        "source": "4",
         "target": "8",
         "animated": true
     },
     {
-        "id": "e3-9",
-        "source": "3",
+        "id": "e4-9",
+        "source": "4",
         "target": "9",
+        "animated": true
+    },
+    {
+        "id": "e7-10",
+        "source": "7",
+        "target": "10",
+        "animated": true
+    },
+    {
+        "id": "e7-11",
+        "source": "7",
+        "target": "11",
+        "animated": true
+    },
+    {
+        "id": "e7-12",
+        "source": "7",
+        "target": "12",
+        "animated": true
+    },
+    {
+        "id": "e7-13",
+        "source": "7",
+        "target": "13",
+        "animated": true
+    },
+    {
+        "id": "e8-14",
+        "source": "8",
+        "target": "14",
+        "animated": true
+    },
+    {
+        "id": "e8-15",
+        "source": "8",
+        "target": "15",
+        "animated": true
+    },
+    {
+        "id": "e9-16",
+        "source": "9",
+        "target": "16",
+        "animated": true
+    },
+    {
+        "id": "e9-17",
+        "source": "9",
+        "target": "17",
+        "animated": true
+    },
+    {
+        "id": "e9-18",
+        "source": "9",
+        "target": "18",
+        "animated": true
+    },
+    {
+        "id": "e9-19",
+        "source": "9",
+        "target": "19",
         "animated": true
     }
 ]

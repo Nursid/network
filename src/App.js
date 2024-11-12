@@ -41,6 +41,7 @@ function App() {
 
   const addNode = useCallback((event, parentId) => {
     
+    console.log(parentId)
     const selectedValue = event.target.value;
     const numChildren = selectedValue === '1/2' ? 2 :
                         selectedValue === '1/4' ? 4 :

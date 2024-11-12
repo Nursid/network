@@ -38,6 +38,8 @@ const Flow = () => {
   }])
 
   const [initialEdges, setInitialEdges] = useState([])
+  const [searchId, setSearchId] = useState(''); // State for search input
+  const [highlightedNodes, setHighlightedNodes] = useState(new Set()); // State for highlighted nodes
 
   const getLayoutedElements = (nodes, edges, direction = 'TB') => {
     const isHorizontal = direction === 'LR';
@@ -95,16 +97,6 @@ const Flow = () => {
         ),
       ),
     [],
-  );
-  const onLayout = useCallback(
-    (direction) => {
-      const { nodes: layoutedNodes, edges: layoutedEdges } =
-        getLayoutedElements(nodes, edges, direction);
- 
-      setNodes([...layoutedNodes]);
-      setEdges([...layoutedEdges]);
-    },
-    [nodes, edges],
   );
 
 
@@ -173,10 +165,101 @@ const Flow = () => {
     setInitialOnSelect();
   }, []);
 
+  // const searchConnectedNodes = useCallback(() => {
+  //   const visitedNodes = new Set();
+  //   const connectedNodes = new Set();
+
+  //   const dfs = (nodeId) => {
+  //     if (visitedNodes.has(nodeId)) return;
+  //     visitedNodes.add(nodeId);
+  //     connectedNodes.add(nodeId);
+
+  //     edges.forEach((edge) => {
+  //       if (edge.source === nodeId && !visitedNodes.has(edge.target)) dfs(edge.target);
+  //       if (edge.target === nodeId && !visitedNodes.has(edge.source)) dfs(edge.source);
+  //     });
+  //   };
+
+  //   dfs(searchId);
+  //   console.log("node---",connectedNodes)
+
+  //   // setHighlightedNodes(connectedNodes);
+  // }, [edges, searchId]);
+
+  // useEffect(() => {
+  //   setNodes((nds) =>
+  //     nds.map((node) => ({
+  //       ...node,
+  //       style: {
+  //         ...node.style,
+  //         border: highlightedNodes.has(node.id) ? '2px solid #3498db' : 'none',
+  //         backgroundColor: highlightedNodes.has(node.id) ? '#3498db' : node.style.backgroundColor,
+  //       },
+  //     }))
+  //   );
+  // }, [highlightedNodes]);
+
+
+  function getFlow(startNodeId, nodes, edges) {
+    // Initialize visited nodes and result arrays for nodes and edges in the flow
+    const visitedNodes = new Set();
+    const flowNodes = [];
+    const flowEdges = [];
+
+    // Helper function to perform DFS
+    function dfs(nodeId) {
+        // If the node has already been visited, skip it
+        if (visitedNodes.has(nodeId)) return;
+        
+        // Mark the current node as visited
+        visitedNodes.add(nodeId);
+
+        // Find the node by ID and add it to the flowNodes list
+        const node = nodes.find((n) => n.id === nodeId);
+        if (node) flowNodes.push(node);
+
+        // Find edges where the current node is the source, to continue traversal
+        const connectedEdges = edges.filter((e) => e.source === nodeId);
+
+        // Add these edges to the flowEdges list and perform DFS on each target
+        connectedEdges.forEach((edge) => {
+            flowEdges.push(edge);
+            dfs(edge.target); // Recursively traverse to the target node
+        });
+    }
+
+    // Start DFS from the startNodeId
+    dfs(startNodeId);
+
+    return { flowNodes, flowEdges };
+}
+
+const searchConnectedNodes = () =>{
+  const { flowNodes, flowEdges } = getFlow(searchId, nodes, edges);
+  setEdges(flowEdges)
+  setNodes(flowNodes)
+
+  console.log("Nodes in the flow starting from node ID 3:", flowNodes);
+  console.log("Edges in the flow starting from node ID 3:", flowEdges);
   
+}
+// Get the flow starting from the specified node
+
+  const handleSearchChange = (e) => setSearchId(e.target.value);
  
+  // console.log(nodes)
+  // console.log(edges)
+
   return (
  <div style={{ height: '100vh', width: '100vw', backgroundColor: '#34495e' }}>
+  <input 
+        type="text" 
+        placeholder="Enter Node ID" 
+        value={searchId} 
+        onChange={handleSearchChange}
+        style={{ marginBottom: '10px', padding: '5px' }}
+      />
+      <button onClick={searchConnectedNodes}>Search Connected Nodes</button>
     <ReactFlow
       nodes={nodes}
       edges={edges}
