@@ -13,6 +13,7 @@ import { MdReportProblem } from "react-icons/md";
 import { FcSupport } from "react-icons/fc";
 import { GoReport } from "react-icons/go";
 import { useLocation } from 'react-router-dom';
+import { IoIosGitNetwork } from "react-icons/io";
 
 const AdminNavItems = () => {
     const { userRole } = useUserRoleContext();
@@ -29,9 +30,9 @@ const AdminNavItems = () => {
     { field: "ManagePage", title: "Manage Website", icon: <CgWebsite size={30} /> },
     { field: "Customer", title: "Customer", icon: <FaPeopleCarry size={30} /> },
     { field: "RolesAndPermission", title: "Roles & Permission", icon: <MdOutlinePeople size={30} /> },
-    { field: "Complain", title: "Support", icon: <FcSupport size={30} /> },
     { field: "Availability", title: "Availability", icon: <FaRegClock size={30} /> },
     { field: "OrderReports", title: "Reports", icon: <GoReport size={30} /> },
+    { field: "Network", title: "Network", icon: <IoIosGitNetwork size={30} /> },
   ];
 
   return (

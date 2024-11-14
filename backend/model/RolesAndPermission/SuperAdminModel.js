@@ -134,7 +134,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    Complain: {
+    Network: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
