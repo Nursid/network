@@ -76,9 +76,9 @@ const AdminHeader = () => {
             <div className='shadow border-bottom'>
                 <Row>
                     <Col sm={6} lg={6} className={isMobile ? 'd-flex align-items-center justify-content-center' : 'd-flex align-items-center justify-content-start'}>
-                        <div className="helperLogo">
+                        {/* <div className="helperLogo">
                             <img width={'150px'} src="https://mytotalhelper.com/webcss/images/logo.jpg" alt="" />
-                        </div>
+                        </div> */}
                     </Col>
 
                     <Col sm={6} lg={6} className={isMobile ? 'd-flex justify-content-center' : 'd-flex justify-content-end'}>

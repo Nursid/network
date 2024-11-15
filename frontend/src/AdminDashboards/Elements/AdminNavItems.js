@@ -38,7 +38,7 @@ const AdminNavItems = () => {
   return (
     <div>
       <h3 className='pl-4 pt-4 pb-2 text-white headingBelowBorder fw-bold' style={{ maxWidth: "fit-content" }}>
-        Welcome To Helper Dashboard
+        Welcome To Laxdeep Dashboard
       </h3>
       <div className="AllMenuCards">
         {NavItems.filter(x => userRole ? userRole[x.field] : false).map((item, index) => {

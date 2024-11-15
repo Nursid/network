@@ -17,8 +17,8 @@ import '@xyflow/react/dist/style.css';
  
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
  
-const nodeWidth = 172;
-const nodeHeight = 36;
+const nodeWidth = 200;
+const nodeHeight = 150;
  
 
  
@@ -27,7 +27,7 @@ const Flow = () => {
   const nodeTypes = useMemo(() => ({ CustomNode: CustomNode }), []);
   const [initialNodes, setInitialNodes] = useState([{
     id: '1',
-    data: { label: 'Root : M0124', onSelect: (e) => {} },
+    data: { label: 'EPON : LN00001', onSelect: (e) => {} },
     type: 'CustomNode',
     style: { 
       backgroundColor: '#e74c3c', // Set your background color
@@ -99,7 +99,6 @@ const Flow = () => {
   );
 
 
-
   const addNode = useCallback((event, parentId) => {
     const selectedValue = event.target.value;
     const numChildren = selectedValue === '1/2' ? 2 :
@@ -116,8 +115,10 @@ const Flow = () => {
         for (let i = 0; i < numChildren; i++) {
 
             const newNode = {
-                id: `${idCounter++}`,
-                data: { label: `Node ${idCounter}`, onSelect: (e) => addNode(e, newNode.id) },
+                id: `LN0000${idCounter++}`,
+                data: { label: `Steps ${parentId}`, onSelect: (e) => addNode(e, newNode.id),
+                  onUpdate: (updatedData) => onNodeUpdate(newNode.id, updatedData),
+                 },
                 type: 'CustomNode',
             };
 
@@ -147,7 +148,6 @@ const Flow = () => {
   const setInitialOnSelect = useCallback(() => {
     setNodes((nds) =>
       nds.map((node) => {
-        console.log(node.id === '1')
         if (node.id === '1') {
           return {
             ...node,
@@ -164,6 +164,15 @@ const Flow = () => {
     setInitialOnSelect();
   }, []);
 
+  const onNodeUpdate = useCallback((id, updatedData) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === id
+          ? { ...node, data: { ...node.data, ...updatedData } }
+          : node
+      )
+    );
+  });
   
 
   function getFlow(startNodeId, nodes, edges) {
@@ -198,23 +207,21 @@ const Flow = () => {
     dfs(startNodeId);
 
     return { flowNodes, flowEdges };
-}
+  }
 
-const searchConnectedNodes = () =>{
-  const { flowNodes, flowEdges } = getFlow(searchId, nodes, edges);
-  setEdges(flowEdges)
-  setNodes(flowNodes)
+  const searchConnectedNodes = () =>{
+    const { flowNodes, flowEdges } = getFlow(searchId, nodes, edges);
+    setEdges(flowEdges)
+    setNodes(flowNodes)
 
-  console.log("Nodes in the flow starting from node ID 3:", flowNodes);
-  console.log("Edges in the flow starting from node ID 3:", flowEdges);
-  
-}
+    console.log("Nodes in the flow starting from node ID 3:", flowNodes);
+    console.log("Edges in the flow starting from node ID 3:", flowEdges);
+    
+  }
 // Get the flow starting from the specified node
 
   const handleSearchChange = (e) => setSearchId(e.target.value);
- 
-  // console.log(nodes)
-  // console.log(edges)
+
 
   return (
  <div style={{ height: '100vh', width: '100vw', backgroundColor: '#34495e' }}>

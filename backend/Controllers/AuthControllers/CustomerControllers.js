@@ -1,22 +1,15 @@
-// const CustomerModel = require("../../Models/AuthModels/CustomerModel");
 const jwt = require("jsonwebtoken");
-
 const db = require("../../model/index");
 const CustomerModel = db.CustomerModel;
 const NewCustomerModel = db.NewCustomerModel
 const ServiceProviderModel = db.ServiceProviderModel
 const EmployeeModel = db.EmployeeModel
-
+require("dotenv").config;
 const {isEmail, isMobileNumber, isOptValid} = require("../utils");
-
 const generateCustomerID = db.CustomerID
 // const generateCustomerID = require("../misc/customeridgenerator");
-
 // const generateOrderNo = require("../misc/orderNoGenerator");
 const generateOrderNo = db.OrderNo
-
-
-require("dotenv").config;
 
 const SignupUser = async (req, res) => {
 	const data = req.body;
