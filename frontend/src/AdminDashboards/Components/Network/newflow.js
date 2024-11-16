@@ -115,8 +115,8 @@ const Flow = () => {
         for (let i = 0; i < numChildren; i++) {
 
             const newNode = {
-                id: `LN0000${idCounter++}`,
-                data: { label: `Steps ${parentId}`, onSelect: (e) => addNode(e, newNode.id),
+                id: `${idCounter++}`,
+                data: { label: `PON ${idCounter}`, onSelect: (e) => addNode(e, newNode.id),
                   onUpdate: (updatedData) => onNodeUpdate(newNode.id, updatedData),
                  },
                 type: 'CustomNode',
@@ -224,7 +224,7 @@ const Flow = () => {
 
 
   return (
- <div style={{ height: '100vh', width: '100vw', backgroundColor: '#34495e' }}>
+ <div style={{ height: '100vh', width: '100%', backgroundColor: '#34495e' }}>
   <input 
         type="text" 
         placeholder="Enter Node ID" 

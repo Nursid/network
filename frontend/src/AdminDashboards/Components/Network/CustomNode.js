@@ -28,6 +28,18 @@ const CustomNode = ({ data }) => {
         data.onSelect(event, data.id, numChildren);
   };
 
+  const [showFractionOptions, setShowFractionOptions] = useState(false);
+
+  const handlePrimaryChange = (e) => {
+    const selectedValue = e.target.value;
+    if (['Splitter', 'Switch', 'ONU', 'ONT', 'Copper'].includes(selectedValue)) {
+      setShowFractionOptions(true);
+    } else {
+      setShowFractionOptions(false);
+    }
+  };
+
+
   
 
   return (
@@ -60,13 +72,37 @@ const CustomNode = ({ data }) => {
         style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '9px' }}
       />
 
-      <select onChange={handleChange} defaultValue=""  style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '9px' }}>
-        <option value="" disabled>Select an option</option>
-        <option value="1/2">1/2</option>
-        <option value="1/4">1/4</option>
-        <option value="1/8">1/8</option>
-        <option value="1/16">1/16</option>
+<select
+        onChange={handlePrimaryChange}
+        defaultValue=""
+        style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '12px' }}
+      >
+        <option value="" disabled>
+          Select an option
+        </option>
+        <option value="Splitter">Splitter</option>
+        <option value="Switch">Switch</option>
+        <option value="ONU">ONU</option>
+        <option value="ONT">ONT</option>
+        <option value="Copper">Copper</option>
       </select>
+
+      {/* Conditional Secondary Select */}
+      {showFractionOptions && (
+        <select
+          defaultValue=""
+          style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '12px' }}
+          onChange={handleChange}
+        >
+          <option value="" disabled>
+            Select an option
+          </option>
+          <option value="1/2">1/2</option>
+          <option value="1/4">1/4</option>
+          <option value="1/8">1/8</option>
+          <option value="1/16">1/16</option>
+        </select>
+      )}
       <Handle type="target" position="top" />
       <Handle type="source" position="bottom" />
     </div>
