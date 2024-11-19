@@ -128,7 +128,7 @@ const Flow = () => {
                 id: `e${parentId}-${newNode.id}`,
                 source: parentId,
                 target: newNode.id,
-                type: 'smoothstep',
+                // type: 'smoothstep',
                 animated: true,
             };
             newEdges.push(newEdge);
