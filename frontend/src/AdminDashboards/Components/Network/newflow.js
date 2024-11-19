@@ -213,10 +213,6 @@ const Flow = () => {
     const { flowNodes, flowEdges } = getFlow(searchId, nodes, edges);
     setEdges(flowEdges)
     setNodes(flowNodes)
-
-    console.log("Nodes in the flow starting from node ID 3:", flowNodes);
-    console.log("Edges in the flow starting from node ID 3:", flowEdges);
-    
   }
 // Get the flow starting from the specified node
 
