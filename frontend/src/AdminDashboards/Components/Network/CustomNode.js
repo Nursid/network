@@ -8,6 +8,8 @@ const CustomNode = ({ data }) => {
     title: data.title || '',
     description: data.description || '',
     address: data.address || '',
+    nodeType: data.nodeType || 'Splitter',
+    nodeTypeValue: data.nodeTypeValue || '',
   });
 
   const handleFieldChange = (e) => {
@@ -28,17 +30,20 @@ const CustomNode = ({ data }) => {
         data.onSelect(event, data.id, numChildren);
   };
 
-  const [showFractionOptions, setShowFractionOptions] = useState(false);
+  const [showFractionOptions, setShowFractionOptions] = useState(fields?.nodeType ||false);
 
   const handlePrimaryChange = (e) => {
-    const selectedValue = e.target.value;
-    if (['Splitter', 'Switch', 'ONU', 'ONT', 'Copper'].includes(selectedValue)) {
+    const { name, value } = e.target;
+    if (['Splitter', 'Switch', 'ONU', 'ONT', 'Copper'].includes(value)) {
       setShowFractionOptions(true);
+      setFields((prevFields) => ({ ...prevFields, [name]: value }));
+    if (data.onUpdate) {
+      data.onUpdate({ ...fields, [name]: value });
+    }
     } else {
       setShowFractionOptions(false);
     }
   };
-
 
   
 
@@ -72,15 +77,16 @@ const CustomNode = ({ data }) => {
         style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '9px' }}
       />
 
-<select
+      <select
         onChange={handlePrimaryChange}
         defaultValue=""
         style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '12px' }}
+        value={fields?.nodeType}
       >
         <option value="" disabled>
           Select an option
         </option>
-        <option value="Splitter">Splitter</option>
+        <option value="Splitter" selected>Splitter</option>
         <option value="Switch">Switch</option>
         <option value="ONU">ONU</option>
         <option value="ONT">ONT</option>
