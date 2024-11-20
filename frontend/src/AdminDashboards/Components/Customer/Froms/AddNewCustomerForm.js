@@ -39,6 +39,9 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const [gender, setGender] = useState(null)
 	const [membership, setMembership] = useState('')
 	const [payment_method, setPaymentMethod] = useState('')
+	const [appartment, setAppartment] = useState('')
+	const [block, setBlock] = useState('')
+	const [area, setArea] = useState('')
 
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
@@ -85,25 +88,69 @@ const AddNewCustomerForm = ({prop, data}) => {
 		},
 	];
 
-	const membershipOptions = [
-		{
-			value: "already_joined",
-			label: 'Existing Member'
-		}, {
-			value: "new_member",
-			label: 'New Member'
-		},
+
+	const apartment_options = [
+		{ value: "Shiv Shakti Apartment", label: "Shiv Shakti Apartment" },
+		{ value: "Lottan Apartment", label: "Lottan Apartment" },
+		{ value: "Sai Apartment", label: "Sai Apartment" },
+		{ value: "Geetanjali Apartment", label: "Geetanjali Apartment" },
+		{ value: "Ganga Apartment", label: "Ganga Apartment" },
+		{ value: "Deepmala Apartment", label: "Deepmala Apartment" },
+		{ value: "Yamuna Apartment", label: "Yamuna Apartment" },
+		{ value: "Krishna Apartment", label: "Krishna Apartment" },
+		{ value: "Ashirwad Apartment", label: "Ashirwad Apartment" },
+		{ value: "Swagat Apartment", label: "Swagat Apartment" },
+	];
+	
+	const bill_date_options = [
+		{ value: "1", label: "1" },
+		{ value: "2", label: "2" },
+		{ value: "3", label: "3" },
+		{ value: "4", label: "4" },
+		{ value: "5", label: "5" },
+		{ value: "6", label: "6" },
+		{ value: "7", label: "7" },
+		{ value: "8", label: "8" },
+		{ value: "9", label: "9" },
+		{ value: "10", label: "10" },
 	];
 
-	const house_options = [
-		{
-			value: "Own House",
-			label: 'Own House'
-		}, {
-			value: "Rented House",
-			label: 'Rented House'
-		},
+	const area_option = [
+		{ value: "Tigri", label: "Tigri" },
+		{ value: "Tigri Village", label: "Tigri Village" },
+		{ value: "Tigri Extn.", label: "Tigri Extn." },
+		{ value: "Tigri Camp", label: "Tigri Camp" },
+		{ value: "Karnal Farm Tigri", label: "Karnal Farm Tigri" },
+		{ value: "DDA Flat Tigri", label: "DDA Flat Tigri" },
+		{ value: "Khanpur", label: "Khanpur" },
+		{ value: "Khanpur Extn.", label: "Khanpur Extn." },
+		{ value: "Shiv Park", label: "Shiv Park" },
+		{ value: "Duggal Colony", label: "Duggal Colony" },
+		{ value: "Devli Road", label: "Devli Road" },
+		{ value: "Devli Extension", label: "Devli Extension" },
+		{ value: "Krishna Park", label: "Krishna Park" },
+		{ value: "Jawahar Park", label: "Jawahar Park" },
+		{ value: "Raju Park", label: "Raju Park" },
+		{ value: "Durga Vihar", label: "Durga Vihar" },
+		{ value: "Bandh Road Sangam Vihar", label: "Bandh Road Sangam Vihar" },
+		{ value: "Sangam Vihar", label: "Sangam Vihar" },
+		{ value: "Madangir", label: "Madangir" },
+		{ value: "Dakshinpuri", label: "Dakshinpuri" },
+		{ value: "BSF Campus", label: "BSF Campus" },
+		{ value: "RPS Colony", label: "RPS Colony" },
 	];
+	
+	const block_option = [
+		{ value: "A", label: "A" },
+		{ value: "B", label: "B" },
+		{ value: "C", label: "C" },
+		{ value: "D", label: "D" },
+		{ value: "E", label: "E" },
+		{ value: "F", label: "F" },
+		{ value: "G", label: "G" },
+		{ value: "H", label: "H" },
+	];
+	
 
 	const createCustomer = (e) => {
 	
@@ -114,9 +161,6 @@ const AddNewCustomerForm = ({prop, data}) => {
         if (!inputValue.name) {
 			errors.name = "Name is required";
 		}
-	
-		
-		
 		
 		if (!inputValue.address) {
 			errors.address = "Address is required";
@@ -191,24 +235,22 @@ const AddNewCustomerForm = ({prop, data}) => {
 
 	const handleChange = (e, maxLength) => {
 		const { name, type, checked, value } = e.target;
-
-    // Determine the new value based on input type
-    const newValue = type === 'checkbox' ? checked : value;
-	if (value.length <= maxLength) {
-    // Update the state with the new value
-    setInputValue((prevState) => ({
-      ...prevState,
-      [name]: newValue
-    })); 
-}
-
+			// Determine the new value based on input type
+			const newValue = type === 'checkbox' ? checked : value;
+			if (value.length <= maxLength) {
+			// Update the state with the new value
+			setInputValue((prevState) => ({
+			...prevState,
+			[name]: newValue
+			})); 
+		}
 	};
 
 
 	return (
 		<Fragment>
 			<Row>
-				<Col md={6}>
+			<Col md={6}>
 					<FormGroup>
 						<Label for="name">Name  <span style={{color: "red"}}>*</span></Label>
 						<Input name='name'
@@ -218,428 +260,243 @@ const AddNewCustomerForm = ({prop, data}) => {
 							onKeyPress={handleKeyPress}
 							/>
 							{errors?.name && (
-                        <span className='validationError'>
-                            {errors?.name}
-                        </span>
-                    )}
+						<span className='validationError'>
+							{errors?.name}
+						</span>
+					)}
 					</FormGroup>
 				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="gender">Gender </Label>
-						<SelectBox options={gender_option} setSelcted={setGender} initialValue={gender}/>
-
-						
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="age">Age </Label>
-						<Input
-						type='number'
-						name='age'
-						onChange={(e) => handleChange(e, 2)}
-						value={inputValue?.age}
-						placeholder='Enter Customer Age'/>
-					</FormGroup>
-				</Col>
-				<Col md={6} className='mt-4'>
-
+			<Col md={6}>
 				<FormGroup>
-					<FormControlLabel control={<Checkbox 
-					name="member_id"
-					checked={inputValue.member_id}
+					<Label for="gender">Gender </Label>
+					<SelectBox options={gender_option} setSelcted={setGender} initialValue={gender}/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="address">Address</Label>
+				<Input
+					type="textarea"
+					name="address"
+					value={inputValue?.address}
+					onChange={(e) => handleChange(e, 200)}
+					placeholder="Enter Address"
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="t_address">Temporary Address</Label>
+				<Input
+					type="textarea"
+					name="t_address"
+					value={inputValue?.t_address}
+					onChange={(e) => handleChange(e, 200)}
+					placeholder="Enter Temporary Address"
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="mobile">Mobile No.</Label>
+				<Input
+					type="text"
+					name="mobile"
+					value={inputValue?.mobile}
 					onChange={(e) => handleChange(e, 10)}
-					/>} label="Is Member" labelPlacement='start'/>
-					</FormGroup>
-					{/* <FormGroup className='d-flex'>
-					
-						<Label for="memeber">Member Id </Label>
-						<Input name='member_id' placeholder='Member Id'
-							onChange={(e) => handleChange(e, 10)}
-							value={inputValue?.member_id}
-							type='checkbox'
-							/> */}
+					placeholder="Enter Mobile No."
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="whatsapp_no">WhatsApp No.</Label>
+				<Input
+					type="text"
+					name="whatsapp_no"
+					value={inputValue?.whatsapp_no}
+					onChange={(e) => handleChange(e, 10)}
+					placeholder="Enter WhatsApp No."
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="alternate_no">Alternate No.</Label>
+				<Input
+					type="text"
+					name="alternate_no"
+					value={inputValue?.alternate_no}
+					onChange={(e) => handleChange(e, 10)}
+					placeholder="Enter Alternate No."
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="aadhar_no">Aadhar No.</Label>
+				<Input
+					type="text"
+					name="aadhar_no"
+					value={inputValue?.aadhar_no}
+					onChange={(e) => handleChange(e, 12)}
+					placeholder="Enter Aadhar No."
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="other_id">Other ID</Label>
+				<Input
+					type="text"
+					name="other_id"
+					value={inputValue?.other_id}
+					onChange={(e) => handleChange(e, 50)}
+					placeholder="Enter Other ID"
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="pan_no">PAN No.</Label>
+				<Input
+					type="text"
+					name="pan_no"
+					value={inputValue?.pan_no}
+					onChange={(e) => handleChange(e, 10)}
+					placeholder="Enter PAN No."
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="dob">Date of Birth</Label>
+				<Input
+					type="date"
+					name="dob"
+					value={inputValue?.dob}
+					onChange={(e) => handleChange(e, 50)}
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="doa">Date of Anniversary</Label>
+				<Input
+					type="date"
+					name="doa"
+					value={inputValue?.doa}
+					onChange={(e) => handleChange(e, 50)}
+				/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="area">Area</Label>
+				<SelectBox options={area_option} setSelcted={setArea} initialValue={area}/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="block">Block</Label>
 				
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="address">Address  <span style={{color: "red"}}>*</span></Label>
-						<Input
-						 type='textarea'
-							onChange={(e) => handleChange(e, 200)}
-							value={inputValue?.address}
-							name='address'
-							placeholder='Address'/>
+				<SelectBox options={block_option} setSelcted={setBlock} initialValue={block}/>
 
-						{errors?.address && (
-                        <span className='validationError'>
-                            {errors?.address}
-                        </span>
-                    )}
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="landmark">Land Mark</Label>
-						<Input type='type'
-							onChange={(e) => handleChange(e, 100)}
-							value={inputValue?.land_mark}
-							name='land_mark'
-							placeholder='Landmark'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="email">Email </Label>
-						<Input type='email'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.email}
-							name='email'
-							placeholder='Email'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="location">Location</Label>
-						<Input type='text'
-							onChange={(e) => handleChange(e, 100)}
-							value={inputValue?.location}
-							name='location'
-							placeholder='Location'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="mobno">Mobile No. <span style={{color: "red"}}>*</span></Label>
-						<Input type='number'
-							onChange={(e) => handleChange(e, 10)}
-							value={inputValue?.mobile}
-							name='mobile'
-							placeholder='Mobile No.'/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="apartment">Apartment</Label>
+				<SelectBox options={apartment_options} setSelcted={setAppartment} initialValue={appartment}/>
+				</FormGroup>
+			</Col>
 
-						{errors?.mobile && (
-                        <span className='validationError'>
-                            {errors?.mobile}
-                        </span>
-                    )}
+			<Col md={6}>
+				<FormGroup>
+				<Label for="bill_date">Bill Date</Label>
+				<Input
+					type="date"
+					name="bill_date"
+					value={inputValue?.bill_date}
+					onChange={(e) => handleChange(e, 50)}
+				/>
+				</FormGroup>
+			</Col>
 
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="telno">Tel No.</Label>
-						<Input type='tel'
-							onChange={(e) => handleChange(e, 10)}
-							value={inputValue?.tel_no}
-							name='tel_no'
-							placeholder='Tel No'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="officeno">Office No</Label>
-						<Input type='number' name='office_no' placeholder='Office No'
-							onChange={(e) => handleChange(e, 10)}
-							value={inputValue?.office_no}
-							
-							/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="alternateno">Alternate No</Label>
-						<Input type='tel'
-							onChange={(e) => handleChange(e, 10)}
-							value={inputValue?.alternate_no}
-							name='alternate_no'
-							placeholder='Alternate No'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="aadharno">Aadhar No </Label>
-						<Input type='number'
-							onChange={(e) => handleChange(e, 12)}
-							value={inputValue?.aadhar_no}
-							name='aadhar_no'
-							placeholder='Aadhar No'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="occupation">Occupation</Label>
-						<Input type='text'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.occupation}
-							name='occupation'
-							placeholder='Occupation'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="designation">Designation</Label>
-						<Input type='text'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.designation}
-							name='designation'
-							placeholder='Designation Name'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="designation">Own house / Rented</Label>
-						<SelectBox options={house_options} setSelcted={setHouse}/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="dob">Date of Birth  </Label>
-						<Input 
-						onChange={(e) => handleChange(e, 50)}
-						value={inputValue?.dob}
-						name='dob'
-							type="date"/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="doa">DOA </Label>
-						<Input type="date"	
-						onChange={(e) => handleChange(e, 50)}
-						value={inputValue?.doa}
-						name='doa'
-							/>
-						
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="image">Image (Image jpg , jpeg , png , only)  </Label>
-						<Input type="file" name="image" id="image"
-							onChange={
-								(e)=>(handleImageChange(e))
-							}
-						/>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="image">Upload Image</Label>
+				<Input type="file" name="image" onChange={handleImageChange} />
+				</FormGroup>
+			</Col>
 
-					</FormGroup>
-				</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="payment">Payment</Label>
+				<Input
+					type="text"
+					name="payment"
+					value={inputValue?.payment}
+					onChange={(e) => handleChange(e, 10)}
+					placeholder="Enter Payment Amount"
+				/>
+				</FormGroup>
+			</Col>
 
-				<Col md={6}>
-					<FormGroup>
-						<Label for="membership">Type of Membership </Label>
-						<SelectBox options={membershipOptions} setSelcted={setMembership} initialValue={membership}/>
-					</FormGroup>
-				</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="payment_method">Payment Method</Label>
+				<SelectBox
+					options={payment_options}
+					setSelcted={setPaymentMethod}
+					initialValue={payment_method}
+				/>
+				</FormGroup>
+			</Col>
 
-				<Col md={6}>
-					<FormGroup>
-						<Label for="sdob">Spouse Name-1</Label>
-						<Input type='text'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.spouse_name1}
-							name='spouse_name1'
-							placeholder='Spouse Name -1'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="sdob">Spouse DOB-1</Label>
-						<Input type='date'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.spouse_dob1}
-							name='spouse_dob1'
-							placeholder='Spouse spouse_dob1 -1'/>
-					</FormGroup>
-				</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="front_aadhar_image">Front Aadhar Image</Label>
+				<Input type="file" name="front_aadhar_image" />
+				</FormGroup>
+			</Col>
 
-				<Col md={6}>
-					<FormGroup>
-						<Label for="sdob">Spouse Name-2</Label>
-						<Input type='text'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.spouse_name2}
-							name='spouse_name2'
-							placeholder='Spouse Name -1'/>
-					</FormGroup>
-				</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="back_aadhar_image">Back Aadhar Image</Label>
+				<Input type="file" name="back_aadhar_image" />
+				</FormGroup>
+			</Col>
 
-				<Col md={6}>
-					<FormGroup>
-						<Label for="sdob">Spouse DOB-2</Label>
-						<Input type='date'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.spouse_dob2}
-							name='spouse_dob2'
-							placeholder='Spouse spouse_dob 2'/>
-					</FormGroup>
-				</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="pan_image">PAN Image</Label>
+				<Input type="file" name="pan_image" />
+				</FormGroup>
+			</Col>
 
-				{/* <Col md={6}>
-					<FormGroup>
-						<Label for="sdob">Spouse Name-3</Label>
-						<Input type='text'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.spouse_name3}
-							name='spouse_name3'
-							placeholder='Spouse Name -3'/>
-					</FormGroup>
-				</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="other_id_image">Other ID Image</Label>
+				<Input type="file" name="other_id_image" />
+				</FormGroup>
+			</Col>
 
-				<Col md={6}>
-					<FormGroup>
-						<Label for="sdob">Spouse DOB-3</Label>
-						<Input type='date'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.spouse_dob3}
-							name='spouse_dob3'
-							placeholder='Spouse spouse_dob3 '/>
-					</FormGroup>
-				</Col> */}
+			<Col md={6}>
+				<FormGroup>
+				<Label for="signature">Signature</Label>
+				<Input type="file" name="signature" />
+				</FormGroup>
+			</Col>
 
-
-
-				<Col md={6}>
-					<FormGroup>
-						<Label for="fom">Family Member</Label>
-						<Input type='text'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.familyMember}
-							name='familyMember'
-							placeholder='Family Member '/>
-					</FormGroup>
-				</Col>
-				
-				<Col md={6}>
-					<FormGroup>
-						<Label for="ref">Reference By</Label>
-						<Input type='text'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.refrence}
-							name='refrence'
-							placeholder='Referance By '/>
-					</FormGroup>
-				</Col>
-				
-				
-				<h6 className='fs-5 fw-bold py-3 px-3'>For Payment Section</h6>
-
-				<Col md={6}>
-					<FormGroup>
-						<Label for="pamount">Payment Method </Label>
-						<SelectBox options={payment_options}  setSelcted={setPaymentMethod} initialValue={payment_method}/>
-					</FormGroup>
-				</Col>
-
-				<Col md={6}>
-					<FormGroup>
-						<Label for="payment">Payment </Label>
-						<Input type='number'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.payment}
-							name='payment'
-							placeholder='500'/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="damount">Discount Amount  </Label>
-						<Input type='number'
-							onChange={(e) => handleChange(e, 10)}
-							value={inputValue?.discount_amount}
-							name='discount_amount'
-							placeholder='Enter Discount Amount'/>
-							
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="recieved_amount">Received Amount  </Label>
-						<Input type='number'
-							onChange={(e) => handleChange(e, 10)}
-							value={inputValue?.recieved_amount}
-							name='recieved_amount'
-							placeholder='Please Enter Received Amount'/>
-							
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="bamount">Balance Amount </Label>
-						<Input type='number'
-							onChange={(e) => handleChange(e, 10)}
-							value={inputValue?.balance_amount}
-							name='balance_amount'
-							placeholder='Please Enter Balance Amount'/>
-					</FormGroup>
-				</Col>
-
-				<Col md={6}>
-					<FormGroup>
-						<Label for="service1">Free Service - 1</Label>
-						<Input type="text" id="service1"
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.service1}
-							name='service1'
-							placeholder='Free service 1'
-							/>
-					</FormGroup>
-				</Col>
-
-				<Col md={6}>
-					<FormGroup>
-						<Label for="freeService2">Free Service - 2</Label>
-						<Input type="text" id="freeService2"
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.service2}
-							name='service2'
-							placeholder='Free service 2'
-							
-							/>
-					</FormGroup>
-				</Col> 
-				<Col md={6}>
-					<FormGroup>
-						<Label for="freeService2">Free Service - 3</Label>
-						<Input type="text" id="freeService3"
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.service3}
-							name='service3'
-							placeholder='Free service 3'
-							
-							/>
-					</FormGroup>
-				</Col> 
-				<Col md={6}>
-					<FormGroup>
-						<Label for="freeService2">Free Service - 4</Label>
-						<Input type="text" id="freeService4"
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.service4}
-							name='service4'
-							placeholder='Free service 4'
-							/>
-					</FormGroup>
-				</Col> 
-				<Col md={6}>
-					<FormGroup>
-						<Label for="freeService2">Free Service - 5</Label>
-						<Input type="text" id="freeService4"
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.service5}
-							name='service5'
-							placeholder='Free service 5'
-							/>
-					</FormGroup>
-				</Col> 
-
-				<Button className='bg-primary h-fit text-blue'
-					onClick={createCustomer} 
-					disabled={isLoading}
-					>
-					Submit</Button>
+			<Button
+				className="bg-primary h-fit text-blue"
+				onClick={createCustomer}
+				disabled={isLoading}
+			>
+				Submit
+			</Button>
 			</Row>
-
 		</Fragment>
 	)
 }
