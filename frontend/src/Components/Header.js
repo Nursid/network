@@ -68,12 +68,12 @@ function Header() {
   return (
     <Navbar className="bgColour" expand="lg">
       <Container fluid>
-        <Navbar.Brand className="animate__animated animate__flipInY">
+        {/* <Navbar.Brand className="animate__animated animate__flipInY">
           <img src={Logo} alt="MainLogo" onClick={() => {
                 navigate('/');
                 window.scrollTo(0, 0);  // Scroll to the top
             }}   style={{ cursor: 'pointer' }}/>
-        </Navbar.Brand>
+        </Navbar.Brand> */}
 
         <Navbar.Toggle />
         <Navbar.Collapse>

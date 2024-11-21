@@ -144,7 +144,7 @@ function AdminSignIn() {
     // </Container>
 <>
 <Navbar/>
-    <Header/>
+    {/* <Header/> */}
     <Container
       sx={{ display: "grid", placeItems: "center", position: "relative", }}
     >
@@ -176,7 +176,7 @@ function AdminSignIn() {
         </Grid>
         <Grid className="animate__animated animate__zoomIn" item lg={4} xs={12}>
           <div className="text-center">
-            <img src={WeLogo} alt="Logo" />
+            {/* <img src={WeLogo} alt="Logo" /> */}
             <Typography fontWeight={600} sx={{ mt: 1 }} variant="h5">
               {selectedRole === "super"
                 ? "Super Admin "

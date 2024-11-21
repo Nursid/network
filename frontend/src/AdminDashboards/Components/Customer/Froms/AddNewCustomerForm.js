@@ -186,9 +186,9 @@ const AddNewCustomerForm = ({prop, data}) => {
 		  const data ={
 			...inputValue,
 			image: image,
-			own_house: house?.value,
 			gender: gender?.value,
-			membership: membership?.value,
+			block: block?.value,
+			area: area?.value,
 			payment_method: payment_method?.value
 		  }
 
