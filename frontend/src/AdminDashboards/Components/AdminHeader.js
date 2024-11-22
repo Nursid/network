@@ -44,39 +44,10 @@ const AdminHeader = () => {
     return (
         <Fragment>
 
-            {/* <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <a class="navbar-brand" href="/">
-                    <img src="https://mytotalhelper.com/webcss/images/logo.jpg" alt="" />
-                </a>
-                <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarNavDropdown">
-                    <Dropdown className='ml-lg-auto px-2' isOpen={dropdownOpen} toggle={toggleDropdown}>
-                        <DropdownToggle className='dropdownMenu-btn-header' >
-                            <div id="drop-menu" className="AdminDash_UserInfo d-flex align-items-center">
-                                <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=".." />
-                                <div className='mx-1'>
-                                    <h6 className='d-none d-md-block'>{currentUser && currentUser.name ? currentUser.name : "yourName "}</h6>
-                                    <small>{currentUser && currentUser.role ? currentUser.role : ""}</small>
-                                </div>
-                                <FaChevronDown />
-                            </div>
-                        </DropdownToggle>
-                        <DropdownMenu className='dropDownMenu-header'>
-                            <DropdownItem className='cursor-p hover-secondary w-100 h-100'><FiUser /> &nbsp;&nbsp; Profile</DropdownItem>
-                            <DropdownItem divider />
-                            <DropdownItem onClick={() => { LogOutFuction() }} className='cursor-p hover-secondary w-100 h-100'> <FiLogOut /> &nbsp;&nbsp; Log Out</DropdownItem>
-                        </DropdownMenu>
-                    </Dropdown>
-                </div>
-            </nav> */}
-
-
             <div className='shadow border-bottom'>
                 <Row>
                     <Col sm={6} lg={6} className={isMobile ? 'd-flex align-items-center justify-content-center' : 'd-flex align-items-center justify-content-start'}>
-                        <div className="helperLogo">
+                        <div className="">
                             <img width={'150px'} src="/images.png" alt="" height={'30px'}/>
                         </div>
                     </Col>

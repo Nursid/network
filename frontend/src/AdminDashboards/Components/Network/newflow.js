@@ -182,7 +182,7 @@ const Flow = () => {
     const flowNodes = [];
     const flowEdges = [];
 
-    // Helper function to perform DFS
+
     function dfs(nodeId) {
         // If the node has already been visited, skip it
         if (visitedNodes.has(nodeId)) return;

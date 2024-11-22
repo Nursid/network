@@ -85,7 +85,7 @@ const LandingPage = () => {
     <>
       <Navbar />
       <Header />
-      <Button href='https://www.facebook.com/mytotal.helper?ref=br_rs' target='_blank' variant="primary" className="me-2 floating-buttonT">
+      <Button href='#' target='_blank' variant="primary" className="me-2 floating-buttonT">
         <BsFacebook color='#0777ff' size={25} />
       </Button>
 
