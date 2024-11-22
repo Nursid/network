@@ -83,19 +83,19 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true
           },
-          front_aadhar_image: {
+          frontAadharImage: {
             type: DataTypes.STRING,
             allowNull: true
           },
-          back_aadhar_image: {
+          backAadharImage: {
             type: DataTypes.STRING,
             allowNull: true
           },
-          pan_image: {
+          panImage: {
             type: DataTypes.STRING,
             allowNull: true
           },
-          other_id_image: {
+          otherIdImage: {
             type: DataTypes.STRING,
             allowNull: true
           },
