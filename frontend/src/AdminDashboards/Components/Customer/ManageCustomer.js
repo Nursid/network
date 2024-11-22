@@ -86,7 +86,7 @@ const ManageCustomer = () => {
     }
     
     const [blockStatus, setBlockStatus] = useState({});
-    const [isMember, setIsmember] = useState(false)
+ 
 
     // Set initial block status when data changes
     useEffect(() => {
@@ -166,12 +166,10 @@ const ManageCustomer = () => {
     
 
     const column = [
-        { field: "id", headerName: "Sr No", flex: 1, minWidth: 50, editable: true },
+        { field: "id", headerName: "Sr No", minWidth: 50, editable: true },
         { field: "member_id", headerName: "Member Id", minWidth: 120, editable: true },
         { field: "name", headerName: "Name", minWidth: 120, editable: true },
         { field: "mobileno", headerName: "Mobile No.", minWidth: 120, editable: true },
-        { field: "email", headerName: "Email", minWidth: 250, editable: true },
-        { field: 'age', headerName: "Age" },
         { field: "date", headerName: "To Date.", minWidth: 120, editable: true },
         { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 120, editable: true },
         { field: "address", headerName: "Address", minWidth: 250, editable: true },
