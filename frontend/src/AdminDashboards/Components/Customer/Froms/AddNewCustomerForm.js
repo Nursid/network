@@ -30,7 +30,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const [inputValue, setInputValue] = useState([]);
     const [errors, setErrors]= useState([]);
     const [isLoading, SetIsLoading]= useState(false)
-	const [house, setHouse] = useState('')
 	const [image, setImage] = useState(null)
 	const [frontAadharImage, setFrontAadharImage] = useState(null);
 	const [backAadharImage, setBackAadharImage] = useState(null);
@@ -38,7 +37,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const [otherIdImage, setOtherIdImage] = useState(null);
 	const [signature, setSignature] = useState(null);
 	const [gender, setGender] = useState(null)
-	const [membership, setMembership] = useState('')
 	const [payment_method, setPaymentMethod] = useState('')
 	const [appartment, setAppartment] = useState('')
 	const [block, setBlock] = useState('')
@@ -189,6 +187,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 			gender: gender?.value,
 			block: block?.value,
 			area: area?.value,
+			apartment: appartment?.value,
 			payment_method: payment_method?.value
 		  }
 
