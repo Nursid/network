@@ -71,7 +71,11 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true
           },
-          payment: {
+          cash: {
+            type: DataTypes.BIGINT,
+            allowNull: true
+          },
+          online: {
             type: DataTypes.BIGINT,
             allowNull: true
           },

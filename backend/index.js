@@ -44,7 +44,7 @@ app.use("/uploads", express.static("uploads"));
 app.use(
   cookieSession({
     name: "session",
-    keys: ["networks"],
+    keys: ["helpers"],
     maxAge: 24 * 60 * 60 * 1000, // Fixed: Correct the maxAge value to milliseconds
   })
 );

@@ -145,7 +145,6 @@ const ForgetPassword = async (req, res) => {
 
 		const templatePath = path.join(__dirname, '../../helpers/otp_template.ejs');
 
-
 		const emailData = await ejs.renderFile(templatePath, {otp: isReqStored.otp.toString()});
 
 		Transporter.transporter.sendMail({from: "nursid299@gmail.com", to: email, subject: "OTP to Forgot Password", html: emailData});

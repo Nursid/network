@@ -69,8 +69,8 @@ const AddNewCustomerForm = ({prop, data}) => {
 			value: "Online"
 		}, 
 		{
-			label: "Cheque",
-			value: "Cheque"
+			label: "both",
+			value: "Both"
 		}
 	];
 
@@ -468,20 +468,36 @@ const AddNewCustomerForm = ({prop, data}) => {
 			</Col>
 
 
+			{(payment_method?.value === "both" || payment_method?.value === "Online") && 
+				<Col md={6}>
+					<FormGroup>
+					<Label for="payment">Online Amount</Label>
+					<Input
+						type="text"
+						name="online"
+						value={inputValue?.online}
+						onChange={(e) => handleChange(e, 10)}
+						placeholder="Enter Payment Amount"
+					/>
+					</FormGroup>
+				</Col>
+				}
+				
+			{(payment_method?.value === "both" || payment_method?.value === "cash") && 
 			<Col md={6}>
 				<FormGroup>
-				<Label for="payment">Payment</Label>
+				<Label for="payment">Cash Amount</Label>
 				<Input
 					type="text"
-					name="payment"
-					value={inputValue?.payment}
+					name="cash"
+					value={inputValue?.cash}
 					onChange={(e) => handleChange(e, 10)}
 					placeholder="Enter Payment Amount"
 				/>
 				</FormGroup>
 			</Col>
-
-			<Col md={6}>
+			}
+						<Col md={6}>
 				<FormGroup>
 				<Label for="payment_method">Payment Method</Label>
 				<SelectBox

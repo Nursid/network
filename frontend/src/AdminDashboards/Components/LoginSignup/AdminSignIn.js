@@ -100,7 +100,9 @@ function AdminSignIn() {
               {selectedRole === "super"
                 ? "Super Admin "
                 : selectedRole === "admin"
-                  ? "Admin "
+                  ? "Admin / Staff"
+                  : selectedRole === "customer"
+                  ? "Customer"
                       : selectedRole === "office" && "Office "}
               Sign in {otpid && `00:${timeRemaining}`}
             </Typography>
@@ -264,11 +266,18 @@ function AdminSignIn() {
               Super Admin Login
             </Button>
             <Button
-              onClick={() => setSelectedRole(roles.admin)}
+              // onClick={() => setSelectedRole(roles.admin)}
               variant={selectedRole === roles.admin ? "contained" : "outlined"}
               color="primary"
             >
-              Admin Login
+              Admin/Staff Login
+            </Button>
+            <Button
+              // onClick={() => setSelectedRole(roles.admin)}
+              variant={selectedRole === roles.admin ? "contained" : "outlined"}
+              color="primary"
+            >
+              Customer Login
             </Button>
           </div>
         </Grid>
