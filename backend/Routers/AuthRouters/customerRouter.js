@@ -1,37 +1,39 @@
-const router = require("express").Router()
-const customerRouter = require("../../Controllers/AuthControllers/CustomerControllers")
+const express = require('express');
+const router = express.Router();
 const multer = require('multer');
+const path = require('path');
+const customerRouter = require("../../Controllers/AuthControllers/CustomerControllers");
 
-
+// Set up multer for image uploads
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, "uploads/"); // Uploads will be stored in the 'uploads' directory
-    },
-    filename: function (req, file, cb) {
-      cb(null,file.originalname); // Unique filename
-    },
-  });
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
 
 const upload = multer({ storage: storage });
 
-router.post("/signup", upload.single('image'),customerRouter.SignupUser);
-// login the user 
-router.get("/login",customerRouter.LoginUser);
-// delete all 
+// Customer signup route
+router.post('/signup', upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'frontAadharImage', maxCount: 1 },
+  { name: 'backAadharImage', maxCount: 1 },
+  { name: 'panImage', maxCount: 1 },
+  { name: 'otherIdImage', maxCount: 1 },
+  { name: 'signature', maxCount: 1 }
+]), customerRouter.SignupUser);
+
+// Other routes
+router.get("/login", customerRouter.LoginUser);
 router.delete("/deleteall", customerRouter.DeleteUsers);
-// delete by id  
-router.get('/delete/:id', customerRouter.GetDeleteCustomerById)
-// all customers
+router.get('/delete/:id', customerRouter.GetDeleteCustomerById);
 router.get("/getall", customerRouter.AllCustomer);
-// all customers
 router.get("/getbyid/:id", customerRouter.GetCustomer);
-// get the single user by id
 router.post("/get", customerRouter.AllCustomer);
-// update the customer data
-router.put('/getupdate/:user_id', upload.single('image'),customerRouter.GetUpdateTheCustomer)
+router.put('/getupdate/:user_id', upload.single('image'), customerRouter.GetUpdateTheCustomer);
+router.post('/block/:id', customerRouter.UpdateStatus);
 
-router.post('/block/:id',customerRouter.UpdateStatus)
-
-
-
-module.exports = router
+module.exports = router;
