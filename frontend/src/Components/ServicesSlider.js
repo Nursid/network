@@ -45,7 +45,7 @@ const ServicesSlider = () => {
     return (
         <div className='text-center'>
             <div style={{ backgroundColor: '#eedc30', color: '#142572', padding: '20px' }}>
-                <Typography variant={isMobile ? 'h4' : 'h3'} fontWeight={800}>Welcome to Helper Services</Typography>
+                <Typography variant={isMobile ? 'h4' : 'h3'} fontWeight={800}>Welcome to </Typography>
             </div>
             <Slider {...settings} className='py-2'>
                 <div >
@@ -53,7 +53,7 @@ const ServicesSlider = () => {
                         <img
                             style={{ height: 350 }}
                             className='w-100'
-                            src="https://mytotalhelper.com//upload/WhatsApp_Image_2019-05-16_at_14_27_26.jpeg"
+                            src="/wireless-router.jpg"
                             title="green iguana"
                         />
                     </Card>
@@ -63,7 +63,7 @@ const ServicesSlider = () => {
                         <img
                             style={{ height: 350 }}
                             className='w-100'
-                            src="https://mytotalhelper.com//upload/WhatsApp_Image_2019-05-15_at_11_48_44.jpeg"
+                            src="/wireless-router.jpg"
                             title="green iguana"
                         />
                     </Card>
@@ -73,7 +73,7 @@ const ServicesSlider = () => {
                         <img
                             style={{ height: 350 }}
                             className='w-100'
-                            src="https://mytotalhelper.com//upload/WhatsApp_Image_2019-05-16_at_14_27_26.jpeg"
+                            src="/wireless-router.jpg"
                             title="green iguana"
                         />
                     </Card>
@@ -84,7 +84,7 @@ const ServicesSlider = () => {
                         <img
                             style={{ height: 350 }}
                             className='w-100'
-                            src="https://mytotalhelper.com//upload/WhatsApp_Image_2019-05-15_at_13_57_53.jpeg"
+                            src="/wireless-router.jpg"
                             title="green iguana"
                         />
                     </Card>
@@ -94,7 +94,7 @@ const ServicesSlider = () => {
                         <img
                             style={{ height: 350 }}
                             className='w-100'
-                            src="https://mytotalhelper.com//upload/WhatsApp_Image_2019-05-15_at_11_48_44.jpeg"
+                            src="/wireless-router.jpg"
                             title="green iguana"
                         />
                     </Card>

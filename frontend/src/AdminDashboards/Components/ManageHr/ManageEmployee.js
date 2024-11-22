@@ -10,8 +10,6 @@ import { useNavigate } from 'react-router-dom/dist'
 import AdminDataTable from '../../Elements/AdminDataTable'
 import ModalComponent from '../../Elements/ModalComponent'
 import AdminAddEmployeeForm from './Forms/AdminAddEmployeeForm'
-import ViewEmployee from './Views/ViewEmployee'
-import AdminEditEmploye from './Forms/AdminEditEmploye'
 import { useDispatch, useSelector } from 'react-redux'
 import { GetAllEmployeeAction } from '../../../Store/Actions/Dashboard/EmployeeActions/GetAllEmployee'
 import moment from 'moment'
@@ -19,8 +17,6 @@ import { Button } from '@mui/material'
 import Swal from 'sweetalert2'
 import { API_URL } from '../../../config'
 import axios from 'axios'
-import { ToggleOnOutlined } from '@mui/icons-material'
-
 
 const ManageEmployee = () => {
 
@@ -193,9 +189,6 @@ const ManageEmployee = () => {
             renderCell: (params) => (
                 <div className="d-flex gap-2">
                     <Button  onClick={(e)=>{toggleEditMode(params.row)}} variant='contained' color='primary' style={{minWidth: "40px", maxWidth: "40px"}} ><BorderColorIcon /></Button>
-                    <Button variant="contained" color="success" onClick={(e)=>{toggleView(params.row)}} style={{minWidth: "40px", maxWidth: "40px"}}>
-                        <VisibilityIcon />
-                    </Button>
                     <Button variant="contained" color="error"
                     style={{minWidth: "40px", maxWidth: "40px"}}
                     onClick={(e) => {
@@ -253,16 +246,6 @@ const ManageEmployee = () => {
                 modal={showModal}
                 toggle={toggleModal}
                 size={"xl"} scrollable={true}
-            />
-
-            <ModalComponent
-                data={<ViewEmployee 
-                data={editData} toggleModal={toggleView} />}
-                modalTitle={"Employee Profile"}
-                modal={viewModal}
-                toggle={toggleView}
-                size={"xl"}
-                scrollable={true}
             />
 
             <div className='flex'>

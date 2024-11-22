@@ -16,8 +16,6 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import BlockIcon from '@mui/icons-material/Block';
 import axios from 'axios';
 
-// import PlumberService from '../assets/img/'
-import PlumberService from "../../../assets/img/CarServicing.png"
 
 const ManageService = () => {
 
@@ -152,7 +150,7 @@ const ManageService = () => {
         {
             field: "icon", headerName: "Icon", minWidth: 120, renderCell: (params) => (
                 <div className='w-80 h-80 rounded-circle'>
-           <img src={PlumberService} alt='icon' style={{ width: "60px", height: "50px" }} />;
+           <img src={''} alt='icon' style={{ width: "60px", height: "50px" }} />;
            </div>
             )
         },

@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Button from "@mui/material/Button";
-import HelperDash from "../../../assets/img/HelperDash.jpg";
-import WeLogo from "../../../assets/img/we_logo.png";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
@@ -20,8 +18,6 @@ import { isMobile } from "react-device-detect";
 import { ScaleLoader } from "react-spinners";
 import { UseStateManager } from "../../../Context/StateManageContext";
 import { ForgetPasswordModal } from "../../../Components/Modal";
-import Navbar from "../../../Components/Navbar";
-import Header from "../../../Components/Header";
 function AdminSignIn() {
   const location = useLocation();
   const [selectedRole, setSelectedRole] = useState(roles.super);
@@ -66,85 +62,8 @@ function AdminSignIn() {
   }
 
   return (
-    // <Container sx={{ display: 'grid', placeItems: 'center' }}>
-    //     <Grid container spacing={1} mt={isMobile ? 1 : 10} mb={isMobile ? 1 : 0}>
-    //         <Grid className='d-none d-md-block' item lg={4} xs={12}>
-    //             <img className='animate__animated animate__backInLeft w-100' src={HelperDash} alt="..." />
-    //         </Grid>
-    //         <Grid className='animate__animated animate__zoomIn' item lg={4} xs={12}>
-    //             <div className="text-center">
-    //                 <img src={WeLogo} alt="Logo" />
-    //                 <Typography fontWeight={600} sx={{ mt: 1 }} variant="h5">
-    //                     {
-    //                         selectedRole === 'super' ? 'Super Admin ' : selectedRole === 'admin' ? 'Admin ' : selectedRole === 'supervisor' ? 'Supervisor ' : selectedRole === 'service' ? 'Service Provider ' : selectedRole === 'office' && 'Office '
-    //                     }
-    //                     Sign in
-    //                 </Typography>
-    //             </div>
-    //             <Formik initialValues={LoginData} onSubmit={OnLoginSubmit} enableReinitialize>
-    //                 {({ values, handleChange, handleSubmit }) => (
-    //                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 0.5 }}>
-    //                         <TextField
-    //                             margin="normal"
-    //                             required
-    //                             fullWidth
-    //                             id="email"
-    //                             label="Email Address"
-    //                             name="email"
-    //                             autoComplete="email"
-    //                             onChange={handleChange}
-    //                             value={values.email}
-    //                             autoFocus
-    //                         />
-    //                         <TextField
-    //                             margin="normal"
-    //                             required
-    //                             fullWidth
-    //                             name="password"
-    //                             label="Password"
-    //                             type="password"
-    //                             id="password"
-    //                             onChange={handleChange}
-    //                             value={values.password}
-    //                             autoComplete="current-password"
-    //                         />
-    //                         <FormControlLabel
-    //                             control={<Checkbox value="remember" color="primary" />}
-    //                             label="Remember me"
-    //                         />
-    //                         <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-    //                             Sign In
-    //                         </Button>
-    //                         <Grid container>
-    //                             <Grid item xs>
-    //                                 <Link href="#" variant="body2">
-    //                                     Forgot password?
-    //                                 </Link>
-    //                             </Grid>
-    //                             <Grid item>
-    //                                 <Link href="#" variant="body2">
-    //                                     {"Don't have an account? Sign Up"}
-    //                                 </Link>
-    //                             </Grid>
-    //                         </Grid>
-    //                     </Box>
-    //                 )}
-    //             </Formik>
-    //         </Grid>
-    //         <Grid item xs={12} lg={4} sx={{ display: 'grid', placeItems: 'center' }}>
-    //             <div className="d-flex animate__animated animate__bounceInRight flex-column gap-4">
-    //                 <Button onClick={() => setSelectedRole(roles.super)} variant={selectedRole === roles.super ? "contained" : 'outlined'} color='primary'>Super Admin Login</Button>
-    //                 <Button onClick={() => setSelectedRole(roles.admin)} variant={selectedRole === roles.admin ? "contained" : 'outlined'} color='primary'>Admin Login</Button>
-    //                 <Button onClick={() => setSelectedRole(roles.supervisor)} variant={selectedRole === roles.supervisor ? "contained" : 'outlined'} color='primary'>Supervisor Login</Button>
-    //                 <Button onClick={() => setSelectedRole(roles.service)} variant={selectedRole === roles.service ? "contained" : 'outlined'} color='primary'>Service Provider Login</Button>
-    //                 <Button onClick={() => setSelectedRole(roles.office)} variant={selectedRole === roles.office ? "contained" : 'outlined'} color='primary'>Back Office Login</Button>
-    //             </div>
-    //         </Grid>
-    //     </Grid>
-    // </Container>
+    
 <>
-<Navbar/>
-    {/* <Header/> */}
     <Container
       sx={{ display: "grid", placeItems: "center", position: "relative", }}
     >
@@ -170,7 +89,7 @@ function AdminSignIn() {
         <Grid className="d-none d-md-block" item lg={4} xs={12}>
           <img
             className="animate__animated animate__backInLeft w-100"
-            src={HelperDash}
+            src="/wireless-router.jpg"
             alt="..."
           />
         </Grid>
@@ -182,10 +101,6 @@ function AdminSignIn() {
                 ? "Super Admin "
                 : selectedRole === "admin"
                   ? "Admin "
-                  : selectedRole === "supervisor"
-                    ? "Supervisor "
-                    : selectedRole === "service"
-                      ? "Service Provider "
                       : selectedRole === "office" && "Office "}
               Sign in {otpid && `00:${timeRemaining}`}
             </Typography>
@@ -354,31 +269,6 @@ function AdminSignIn() {
               color="primary"
             >
               Admin Login
-            </Button>
-            <Button
-              onClick={() => setSelectedRole(roles.supervisor)}
-              variant={
-                selectedRole === roles.supervisor ? "contained" : "outlined"
-              }
-              color="primary"
-            >
-              Supervisor Login
-            </Button>
-            <Button
-              onClick={() => setSelectedRole(roles.service)}
-              variant={
-                selectedRole === roles.service ? "contained" : "outlined"
-              }
-              color="primary"
-            >
-              Service Provider Login
-            </Button>
-            <Button
-              onClick={() => setSelectedRole(roles.office)}
-              variant={selectedRole === roles.office ? "contained" : "outlined"}
-              color="primary"
-            >
-              Back Office Login
             </Button>
           </div>
         </Grid>

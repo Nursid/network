@@ -35,10 +35,6 @@ import { useAuth } from "../Context/userAuthContext";
 import { ServiceProviderRemarkModal } from "../Components/Modal";
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
-import Invoice from "../Components/Invoice";
-import MemberInvoice from "../Components/MemberInvoice";
-import { useReactToPrint } from 'react-to-print';
-import Invoice2 from "../Components/Invoice2";
 
 
 const AdminDashboard = () => {
@@ -863,28 +859,8 @@ const AdminDashboard = () => {
         }
       },
       },
-      { field: "memo", headerName: "Memo", minWidth: 150,  editable: false,
-        renderCell: (params) => {
-          return (
-            <>
-              <Button variant='contained' color='primary' onClick={() => handleMemo(params.row)}>
-                Memo
-              </Button>
-            </>
-            )
-       },
-      },
-      { field: "invoice", headerName: "Invoice", minWidth: 150,  editable: false,
-        renderCell: (params) => {
-        if(params.row.admin_approve){
-          return (
-              <Button variant='contained' color='primary' onClick={() => handleInvoice(params.row)}>
-                Invoice
-              </Button>
-            )
-        }
-       },
-      }
+
+
   ];
 
   const handleComplain = () =>{
@@ -912,43 +888,7 @@ const AdminDashboard = () => {
   }
 
 
-  const InvoiceRef = useRef(null);
 
-  const [invoiceData, setInvoice] = useState([]);
-
-  const handlePrint2 = useReactToPrint({
-    content: () => InvoiceRef.current,
-    onAfterPrint: () => setInvoice([])
-  });
-  
-  const handleInvoice = (data) => {
-    setInvoice(data);
-  };
-
-  useEffect(()=>{
-    if (invoiceData && Object.keys(invoiceData).length > 0) {
-      handlePrint2();
-    }
-  }, [invoiceData,handlePrint2 ])
-
-  const nonMemberRef = useRef(null);
-  const memberRef = useRef(null);
-  const [memoData, setMemoData] = useState([]);
-
-  const handlePrint = useReactToPrint({
-    content: () => (memoData.NewCustomer.customer.member_id == null) ? nonMemberRef.current : memberRef.current,
-    onAfterPrint: () => setMemoData([])
-  });
-  
-  const handleMemo = (data) => {
-    setMemoData(data);
-  };
-
-  useEffect(()=>{
-    if (memoData && Object.keys(memoData).length > 0) {
-      handlePrint();
-    }
-  }, [memoData,handlePrint ])
 
 
 
@@ -969,11 +909,6 @@ const AdminDashboard = () => {
   return (
     <Fragment>
 
-      <div style={{ display: 'none' }}>
-        <Invoice ref={memberRef} data={memoData} /> 
-        <Invoice2 ref={InvoiceRef} data={invoiceData} /> 
-        <MemberInvoice ref={nonMemberRef} data={memoData} /> 
-      </div>
 
     {supervisorModalOpen &&   <AssignSupervisorModal
         supervisorModalOpen={supervisorModalOpen}

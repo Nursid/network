@@ -65,18 +65,17 @@ const Privacy = () => {
                 <div className="container-fluid PrivcyAndPolicyBanner">
                     <div className=''>
                         <div style={{ background: '#eedc30', color: "#142572" }} className='text-center p-3'>
-                            <h3>Privacy & Policy</h3>
-                            <h6>Last Updated: 29thApril, 2022</h6>
+                           
                         </div>
                         <div className='p-4'>
                             <p className='py-2'>
-                                Welcome to Helper Services privacy policy (“Privacy Policy” or “Policy”).
+                               
                             </p>
                             <p className='py-2'>
-                                Helper Services India Private Limited and its affiliates are engaged in the business of providing web-based solutions to facilitate connections between customers that seek specific services and service professionals that offer these services. This Policy outlines our practices in relation to the collection, storage, usage, processing, and disclosure of personal data that you have consented to to share with us when you access, use, or otherwise interact with our website available at https://www.mytotalhelper.com/ or mobile application ‘Urban Company’ (collectively, “Platform”) or avail products or services that Helper services offers you on or through the Platform (collectively, the “Services”).In this Policy, the services offered to you by service professionals on or through the Platform are referred to as “Professional Services”.
+                               
                             </p>
                             <p className='py-2'>
-                                At Helper Company, we are committed to protecting your personal data and respecting your privacy. In order to provide you with access to the Services or the Professional Services, we have to collect and otherwise process certain data about you. This Policy explains how we process and use personal data about you.
+                                
                             </p>
                         </div>
                     </div>

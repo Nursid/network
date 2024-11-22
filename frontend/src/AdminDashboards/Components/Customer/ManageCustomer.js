@@ -19,8 +19,7 @@ import RotateLeftIcon from '@mui/icons-material/RotateLeft';
 import { Button } from '@mui/material';
 import UpdateCustomerForm from './Froms/UpdateCustomerForm';
 import CustomerView from './View/CustomerView';
-import PrintCustomer from './View/PrintCustomer';
-import { useReactToPrint } from 'react-to-print';
+
 
 
 const ManageCustomer = () => {
@@ -164,36 +163,6 @@ const ManageCustomer = () => {
         setViewModel(!viewModal)
     }
 
-    const [printCustomerData, setPrintCustomerData] = useState([]);
-
-    const PrintCustomerButton = (data) =>{
-        setPrintCustomerData(data);
-    }
-
-    const customerRef = useRef(null);
-  
-    const handlePrint = useReactToPrint({
-      content: () => customerRef.current,
-      onAfterPrint: () => setPrintCustomerData([])
-    });
-
-    const NonMemberSample = () => {
-        setIsmember(!isMember)
-    }
-
-    useEffect(()=> {
-        if(isMember) {
-            handlePrint();
-        }
-    }, [isMember])
-    
-  
-    useEffect(()=>{
-      if (printCustomerData && Object.keys(printCustomerData).length > 0) {
-        handlePrint();
-      }
-    }, [printCustomerData])
-
     
 
     const column = [
@@ -222,13 +191,6 @@ const ManageCustomer = () => {
                 style={{minWidth: "40px", maxWidth: "40px"}}
                 >
                     <VisibilityIcon />
-                </Button>
-
-                <Button variant="contained" color="primary" 
-                onClick={(e)=>{PrintCustomerButton(params.row)}}
-                style={{minWidth: "40px", maxWidth: "40px"}}
-                >
-                    <LocalPrintshopIcon />
                 </Button>
 
                 <Button  onClick={(e) => {
@@ -280,9 +242,6 @@ const ManageCustomer = () => {
 
     return (
     <>
-        <div style={{ display: 'none' }}>
-        <PrintCustomer ref={customerRef} data={printCustomerData} member={isMember} /> 
-      </div>
 
         <Fragment>
             <ModalComponent modal={addCustomer} toggle={ToggleAddCustomer} data={<AddNewCustomerForm  prop={ToggleAddCustomer } />} modalTitle={"Add New Customer"} size={"xl"} scrollable={true} />

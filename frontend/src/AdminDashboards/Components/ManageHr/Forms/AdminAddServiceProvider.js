@@ -28,17 +28,6 @@ const AdminAddServiceProvider = ({ toggleModal,data2 }) => {
     const [department, setDepartment] = useState(data2.supervisor_type || "");
 
 
-    const [allDepartments,setAllDepartments]=useState([
-        {
-            label: 'HELPER',
-            value: 'HELPER',
-        },
-        {
-            label: 'Technician',
-            value: 'Technician',
-        },
-    ]);
-
     const DataWithID = (data) => {
         if (data && Array.isArray(data.data)) {
             const transformedData = data.data.map(item => ({
@@ -258,7 +247,7 @@ const AdminAddServiceProvider = ({ toggleModal,data2 }) => {
                                     <Row>
                                         <h6 className='pb-3 fw-bold fs-5'>Personal Info</h6>
                                         
-                                        <Col md={6}>
+                                        {/* <Col md={6}>
                                             <FormGroup>
                                             <Label for="first_name">Service Provider Type</Label>
                                             <SelectBox options={allDepartments} setSelcted={setDepartment} initialValue={department} />
@@ -269,7 +258,7 @@ const AdminAddServiceProvider = ({ toggleModal,data2 }) => {
                                         )}
                                     
                                             </FormGroup>
-                                        </Col>
+                                        </Col> */}
 
                                         <Col md={6}>
                                             <FormGroup>

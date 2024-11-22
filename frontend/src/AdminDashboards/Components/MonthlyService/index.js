@@ -19,8 +19,6 @@ import AnimatedBackground from '../../Elements/AnimatedBacground'
 import AdminNavItems from '../../Elements/AdminNavItems'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { useReactToPrint } from 'react-to-print';
-import ViewMonthlyService from './view/ViewMonthly-Service'
-import InvoiceMonthlyService from './view/InvoiceMonthlyService'
 import CollapseDatatable from '../../Elements/CollapseDatatable'
 
 const MonthService = () => {
@@ -306,12 +304,7 @@ const MonthService = () => {
             renderCell: (params) => (
                 <div className="d-flex gap-2">
                     <Button onClick={(e)=>{toggleEditMode(params.row)}} variant='contained' color='primary' style={{minWidth: "40px", maxWidth: "40px"}}><BorderColorIcon /></Button>
-                    <Button variant="contained" color="success" 
-                onClick={(e)=>{handleMemo(params.row)}}
-                style={{minWidth: "40px", maxWidth: "40px"}}
-                >
-                    <VisibilityIcon />
-                </Button>
+                
 
                     <Button variant="contained" color="error"
                     onClick={(e) => {
@@ -347,23 +340,6 @@ const MonthService = () => {
     };
 
 
-    const memberRef = useRef(null);
-    const [memoData, setMemoData] = useState([]);
-
-  const handlePrint = useReactToPrint({
-    content: () => memberRef.current,
-    onAfterPrint: () => setMemoData([])
-  });
-
-  const handleMemo = (data) => {
-    setMemoData(data);
-  };
-
-  useEffect(()=>{
-    if (memoData && Object.keys(memoData).length > 0) {
-      handlePrint();
-    }
-  }, [memoData,handlePrint ])
 
     // Add Employee form Handler 
     // const [addEmployee, setAddEmployee] = useState(false)
@@ -374,10 +350,6 @@ const MonthService = () => {
 
     return (
         <Fragment>
-            <div style={{ display: 'none' }}>
-        <ViewMonthlyService ref={memberRef} data={memoData} /> 
-        <InvoiceMonthlyService ref={InvoiceRef} data={invoiceData} /> 
-        </div>
 
       <AdminHeader />
 

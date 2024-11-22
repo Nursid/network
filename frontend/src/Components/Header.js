@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import Logo from "../assets/svg/we_logo.png";
 import Swal from "sweetalert2";
 import { NavDropdown } from "react-bootstrap";
 import { UseStateManager } from "../Context/StateManageContext";

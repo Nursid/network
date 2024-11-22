@@ -303,15 +303,11 @@ const Footer = ({ hide, reqrem, paddingForm }) => {
                 </div>
 
                 <div>
-                    <a href='https://www.facebook.com/mytotal.helper?ref=br_rs' className='mr-4 text-reset'>
-                        <FaFacebook />
-                    </a>
+                    
                     <a href='' className='mr-4 text-reset'>
                         <FaTwitter />
                     </a>
-                    <a href='mailto:helperforyourservices@gmail.com' className='mr-4 text-reset'>
-                        <FaGoogle />
-                    </a>
+                   
                     <a href='' className='mr-4 text-reset'>
                         <FaInstagram />
                     </a>
@@ -324,39 +320,10 @@ const Footer = ({ hide, reqrem, paddingForm }) => {
                         <Col md="3" lg="4" xl="3" className='mx-auto mb-4'>
                             <h6 className='text-uppercase fw-bold mb-4'>
                                 {/* <FontAwesomeIcon icon={faGem} className="me-3" /> */}
-                                About Helper
+                                About 
                             </h6>
                             <p className=''>
                                 Linking businesses to customers, Providing all suitable opportunities to the service providers and entrepreneurs to expand their businesses, To cater to the daily needs of working couples who follow busy schedules by providing them.
-                            </p>
-                        </Col>
-
-                        <Col md="2" lg="2" xl="2" className='mx-auto mb-4'>
-                            <h6 className='text-uppercase fw-bold mb-4'>Services</h6>
-                            <p>
-                                <p onClick={()=> ServicePage(1)} className='text-reset service-page-footer'>
-                                    Electrician
-                                </p>
-                            </p>
-                            <p>
-                                <p  onClick={()=> ServicePage(2)} className='text-reset service-page-footer'>
-                                    Plumber
-                                </p>
-                            </p>
-                            <p>
-                                <p onClick={()=> ServicePage(3)} className='text-reset service-page-footer'>
-                                    Car Washing
-                                </p>
-                            </p>
-                            <p>
-                                <p onClick={()=> ServicePage(4)} className='text-reset service-page-footer'>
-                                    Travels & Driver
-                                </p>
-                            </p>
-                            <p>
-                                <p  className='text-reset service-page-footer ' onClick={()=> ServicePage(5)}>
-                                    Security Gaurd
-                                </p>
                             </p>
                         </Col>
 
@@ -416,35 +383,9 @@ const Footer = ({ hide, reqrem, paddingForm }) => {
                                 </span>
                             </p>
                         </Col>
-
-                        <Col md="4" lg="3" xl="3" className='mx-auto mb-md-0 mb-4'>
-                            <h6 className='text-uppercase fw-bold mb-4'>Contact</h6>
-                            <p>
-                                <FaHome className="mr-2" />
-                                A/1412, Sector- I Ashiyana, LDA Colony Near
-                                Pakripool, Lucknow, 226012, UP, India
-                            </p>
-                            <p className='d-none d-lg-none d-xl-block text-nowrap'>
-                                <FaEnvelope className="mr-2" />
-                                helperforyourservices@gmail.com
-                            </p>
-                            <p className=''>
-                                <FaPhone className="mr-2" /> 0522-4300589
-                            </p>
-                            <p className=''>
-                                <FaPhone className="mr-2" /> 0522-4330641
-                            </p>
-                            {/* <p>
-                                <FaPrint className="me-3" /> + 01 234 567 89
-                            </p> */}
-                        </Col>
                     </Row>
                 </Container>
             </section>
-            <div className='text-center p-2' style={{ backgroundColor: '#eedc30', color: '#142572' }}>
-                <b>Copyright © 2019 - {new Date().getFullYear()} All rights reserved | Helper Services</b>
-                <p>Designed & Developed By Trickle Solutions</p>
-            </div>
         </footer>
     )
 }

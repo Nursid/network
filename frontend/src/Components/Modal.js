@@ -16,7 +16,6 @@ import {
 	FormGroup
 } from "reactstrap";
 import { UseStateManager } from "../Context/StateManageContext";
-import Logo from "../assets/svg/we_logo.png";
 import {Formik} from "formik";
 import {GetCustomerLogIn, GetLogIn} from "../Store/Actions/LandingPage/AuthAction";
 import GetLogInReducers from "../Store/Reducers/LandingPage/AuthReducer";
@@ -119,10 +118,10 @@ export const LoginModal = () => {
 			}
 				<div className="w-100 d-flex loginmain">
 					<div className="text-center rounded">
-						<img src={Logo}
+						<img src={''}
 							alt="MainLogo"/>
 						<div className="text-center">
-							<h4 className="text-blue fw-bold">Welcome To Helper</h4>
+							<h4 className="text-blue fw-bold">Welcome To Laxdeep Network Services</h4>
 							<p className="py-2 text-secondary">
 								Please Enter your details to Login
 							</p>
@@ -259,10 +258,10 @@ export const SingupModal = () => {
 				Sign Up</ModalHeader>
 			<ModalBody>
 				<div className="text-center bgColour rounded">
-					<img src={Logo}
+					<img src={''}
 						alt="MainLogo"/>
 					<div className="text-center">
-						<h4>Welcome To Helper</h4>
+						<h4>Welcome To Laxdeep Network Services</h4>
 						<p className="py-2">Please Enter your details to Sign Up</p>
 						<Button style={
 								{background: "#142572"}
@@ -2387,10 +2386,10 @@ export const ForgetPasswordModal = ({ForgetPasswordModalOpen, ForgetPasswordModa
 			<ModalBody>
 				<div className="w-100 d-flex loginmain">
 					<div className="text-center rounded">
-						<img src={Logo}
+						<img src={''}
 							alt="MainLogo"/>
 						<div className="text-center">
-							<h4 className="text-blue fw-bold">Welcome To Helper</h4>
+							<h4 className="text-blue fw-bold">Welcome To Laxdeep Network Services</h4>
 							<p className="py-2 text-secondary">
 								Please Enter your details to Login
 							</p>

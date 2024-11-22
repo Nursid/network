@@ -430,29 +430,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 				</FormGroup>
 			</Col>
 
-			<Col md={6}>
-				<FormGroup>
-				<Label for="payment">Payment</Label>
-				<Input
-					type="text"
-					name="payment"
-					value={inputValue?.payment}
-					onChange={(e) => handleChange(e, 10)}
-					placeholder="Enter Payment Amount"
-				/>
-				</FormGroup>
-			</Col>
-
-			<Col md={6}>
-				<FormGroup>
-				<Label for="payment_method">Payment Method</Label>
-				<SelectBox
-					options={payment_options}
-					setSelcted={setPaymentMethod}
-					initialValue={payment_method}
-				/>
-				</FormGroup>
-			</Col>
+			
 
 			<Col md={6}>
 				<FormGroup>
@@ -489,6 +467,30 @@ const AddNewCustomerForm = ({prop, data}) => {
 				</FormGroup>
 			</Col>
 
+
+			<Col md={6}>
+				<FormGroup>
+				<Label for="payment">Payment</Label>
+				<Input
+					type="text"
+					name="payment"
+					value={inputValue?.payment}
+					onChange={(e) => handleChange(e, 10)}
+					placeholder="Enter Payment Amount"
+				/>
+				</FormGroup>
+			</Col>
+
+			<Col md={6}>
+				<FormGroup>
+				<Label for="payment_method">Payment Method</Label>
+				<SelectBox
+					options={payment_options}
+					setSelcted={setPaymentMethod}
+					initialValue={payment_method}
+				/>
+				</FormGroup>
+			</Col>
 			<Button
 				className="bg-primary h-fit text-blue"
 				onClick={createCustomer}

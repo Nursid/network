@@ -17,16 +17,7 @@ const MasterAddService = ({ ToggleMasterAddService , data}) => {
     const dispatch = useDispatch();
     const [Loading, setLoading] = useState(false);
     const [type, setType] = useState(data?.service_role || '')
-    const serviceType= [
-        {
-            label: "Helper",
-            value: "3"
-        },
-        {
-            label: "Technician",
-            value: "2"
-        }
-    ]
+
     const [formData, setFormData] = useState({
         serviceName: data?.serviceName || '',
         icon: data?.icon || null,
@@ -145,14 +136,14 @@ const MasterAddService = ({ ToggleMasterAddService , data}) => {
                     placeholder='Type details here...'
                 />
             </FormGroup>
-            <FormGroup>
+            {/* <FormGroup>
                 <Label for="details">Service Type</Label>
                 <SelectBox
                     initialValue={type}
                     options={serviceType}
                     setSelcted={setType}
                 />
-            </FormGroup>
+            </FormGroup> */}
             <Button type='button' onClick={HandleSubmit}> {data?.id ? 'Update' : 'Submit'}</Button>
         </div>
     );

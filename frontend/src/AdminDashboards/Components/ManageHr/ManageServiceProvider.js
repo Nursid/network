@@ -16,7 +16,6 @@ import moment from 'moment';
 import { API_URL } from '../../../config';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import ViewServiceProvider from './Views/ViewServiceProvider';
 
 const ManageServiceProvider = () => {
 
@@ -253,14 +252,6 @@ const ManageServiceProvider = () => {
             size={"xl"} scrollable={true}
             />
 
-            <ModalComponent
-                data={<ViewServiceProvider
-                data2={editData} toggleModal={toggleView} />}
-                modalTitle={"Service Provider Profile"}
-                modal={viewModel}
-                toggle={toggleView}
-                size={"xl"} scrollable={true}
-            />
 
             <div className='flex'>
                 <h4 className='p-3 px-4 mt-3 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}>Service Provider List</h4>

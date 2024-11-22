@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { DataGrid } from '@mui/x-data-grid';
 import { GetAllServices } from '../../Store/Actions/Dashboard/servicesAction';
-import PlumberService from '../../assets/img/Travel&Driver.png';
 import { IMG_URL } from '../../config';
 import AdminDataTable from '../../AdminDashboards/Elements/AdminDataTable';
 const FreeService = ({registerId}) => {
@@ -46,7 +45,7 @@ const FreeService = ({registerId}) => {
         {
             field: "icon", headerName: "Icon", minWidth: 120, renderCell: (params) => (
                 <div className='w-80 h-80 rounded-circle'>
-           <img src={PlumberService} alt='icon' style={{ width: "60px", height: "50px" }} />;
+           <img src={''} alt='icon' style={{ width: "60px", height: "50px" }} />;
            </div>
             )
         },

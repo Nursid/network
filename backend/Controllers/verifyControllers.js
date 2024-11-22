@@ -18,7 +18,7 @@ const msgFormat = (number, otp) => {
     senderid: "INFOCS",
     ispreapproved: "1",
     numbers: number, // Assuming `number` is a variable holding the recipient's number
-    message: `Welcome To HELPER. Please Share OTP For Checked in your OTP No is ${otp} CSPL`,
+    message: `Welcome To Laxdeep Network ISP. Please Share OTP For Checked in your OTP No is ${otp} CSPL`,
   };
 
   const queryString = new URLSearchParams(query).toString();
