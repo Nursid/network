@@ -167,7 +167,6 @@ const ManageCustomer = () => {
 
     const column = [
         { field: "id", headerName: "Sr No", minWidth: 50, editable: true },
-        { field: "member_id", headerName: "Member Id", minWidth: 120, editable: true },
         { field: "name", headerName: "Name", minWidth: 120, editable: true },
         { field: "mobileno", headerName: "Mobile No.", minWidth: 120, editable: true },
         { field: "date", headerName: "To Date.", minWidth: 120, editable: true },
@@ -201,23 +200,23 @@ const ManageCustomer = () => {
             </div>
             ),
         },
-        {
-            field: "block",
-            headerName: "Block",
-            minWidth: 150,
-            renderCell: (params) => (
-                <div className="d-flex gap-2">
-                    {blockStatus[params.row.user_id] ?
-                       <Button variant="contained" color="error" onClick={() => handleToggleBlock(params.row.user_id)} 
-                       style={{minWidth: "40px", maxWidth: "40px"}}
-                       ><BlockIcon /></Button>
-                        :
-                        <Button className="text-white bg-warning border-warning" onClick={() => handleToggleBlock(params.row.user_id)}>Un-Block</Button>
-                    }
+        // {
+        //     field: "block",
+        //     headerName: "Block",
+        //     minWidth: 150,
+        //     renderCell: (params) => (
+        //         <div className="d-flex gap-2">
+        //             {blockStatus[params.row.user_id] ?
+        //                <Button variant="contained" color="error" onClick={() => handleToggleBlock(params.row.user_id)} 
+        //                style={{minWidth: "40px", maxWidth: "40px"}}
+        //                ><BlockIcon /></Button>
+        //                 :
+        //                 <Button className="text-white bg-warning border-warning" onClick={() => handleToggleBlock(params.row.user_id)}>Un-Block</Button>
+        //             }
                
-                </div>
-            ),
-        },
+        //         </div>
+        //     ),
+        // },
     ];
 
     const CustomToolbar = () => {
@@ -272,8 +271,8 @@ const ManageCustomer = () => {
                  Non Member Sample
                 </div> */}
 
-            </div>
-            </div>
+                </div>
+              </div>
             <div className='p-4'>
                 <AdminDataTable rows={DataWithID(data.data)} columns={column} CustomToolbar={CustomToolbar} loading={isLoading} />
             </div>

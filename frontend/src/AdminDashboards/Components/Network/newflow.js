@@ -13,7 +13,7 @@ import dagre from '@dagrejs/dagre';
 import CustomNode from './CustomNode';
 import { Button } from 'reactstrap';
 import '@xyflow/react/dist/style.css';
- 
+import { Input } from 'reactstrap';
  
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
  
@@ -215,6 +215,16 @@ const Flow = () => {
     setEdges(flowEdges)
     setNodes(flowNodes)
   }
+  
+
+  const onsubmit = (e) => {
+   
+    const newNode = {
+     nodes: nodes,
+     edges: edges,
+    };
+    console.log(newNode);
+  }
 // Get the flow starting from the specified node
 
   const handleSearchChange = (e) => setSearchId(e.target.value);
@@ -222,14 +232,28 @@ const Flow = () => {
 
   return (
  <div style={{ height: '100vh', width: '100%', backgroundColor: '#34495e' }}>
-  <input 
-        type="text" 
-        placeholder="Enter Node ID" 
-        value={searchId} 
-        onChange={handleSearchChange}
-        style={{ marginBottom: '10px', padding: '5px' }}
-      />
-      <Button onClick={searchConnectedNodes}>Search</Button>
+  <div class="d-flex justify-content-between align-items-center w-100">
+  
+  <div class="d-flex flex-row  align-items-center w-50">
+    <Input 
+      type="text" 
+      class="form-control w-50 me-2" 
+      placeholder="Enter Node ID" 
+      value={searchId} 
+      onChange={handleSearchChange}
+    />
+    <button class="btn btn-primary w-25" onClick={searchConnectedNodes}>
+      Search
+    </button>
+  </div>
+
+  <div class="d-flex justify-content-end w-50">
+    <button class="btn btn-success w-auto" onClick={onsubmit}>
+      Submit
+    </button>
+  </div>
+</div>
+
     <ReactFlow
       nodes={nodes}
       edges={edges}

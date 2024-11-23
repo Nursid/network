@@ -1,6 +1,8 @@
 import React from 'react';
 import { Handle } from '@xyflow/react';
 import { useState } from 'react';
+
+
 const CustomNode = ({ data }) => {
 
 
@@ -32,6 +34,8 @@ const CustomNode = ({ data }) => {
 
   const [showFractionOptions, setShowFractionOptions] = useState(fields?.nodeType ||false);
 
+  const [columns, setColumns] = useState([]);
+
   const handlePrimaryChange = (e) => {
     const { name, value } = e.target;
     if (['Splitter', 'Switch', 'ONU', 'ONT', 'Copper'].includes(value)) {
@@ -45,8 +49,16 @@ const CustomNode = ({ data }) => {
     }
   };
 
-  
+  const handleColumnChange = (index, value) => {
+    const newColumns = [...columns];
+    newColumns[index] = value;
+    setColumns(newColumns);
+  };
 
+  const addColumn = () => {
+    setColumns((prevColumns) => [...prevColumns, '']);
+  };
+  
   return (
     <div
       style={{ padding: 10, border: '1px solid black', borderRadius: 5, width: '200px' }}
@@ -68,14 +80,21 @@ const CustomNode = ({ data }) => {
         onChange={handleFieldChange}
         style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '9px' }}
       />
-      <input
-        type="text"
-        name="address"
-        placeholder="Address"
-        value={fields.address}
-        onChange={handleFieldChange}
-        style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '9px' }}
-      />
+      <div>
+        {columns.map((column, index) => (
+          <input
+            key={index}
+            type="text"
+            placeholder={`Column ${index + 1}`}
+            value={column}
+            onChange={(e) => handleColumnChange(index, e.target.value)}
+            style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '9px' }}
+          />
+        ))}
+      </div>
+      <button onClick={addColumn} style={{ fontSize: '9px', padding: '5px' }}>
+        Add Column
+      </button>
 
       <select
         onChange={handlePrimaryChange}
