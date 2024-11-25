@@ -85,7 +85,7 @@ const CustomNode = ({ data }) => {
           <input
             key={index}
             type="text"
-            placeholder={`Column ${index + 1}`}
+            placeholder={`Field ${index + 1}`}
             value={column}
             onChange={(e) => handleColumnChange(index, e.target.value)}
             style={{ marginBottom: '5px', width: '100%', margin: 0, padding: 0, fontSize: '9px' }}
@@ -93,7 +93,7 @@ const CustomNode = ({ data }) => {
         ))}
       </div>
       <button onClick={addColumn} style={{ fontSize: '9px', padding: '5px' }}>
-        Add Column
+        Add Field
       </button>
 
       <select

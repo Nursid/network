@@ -173,26 +173,26 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 		e.preventDefault();
         let errors = {};
 		setIsLoading(true)
-		if (!formData?.name) {
-            errors.name = "Name is required";
-        }
-		if (!formData?.mobile) {
-			errors.mobile = "Mobile number is required";
-		} else if (!/^\d{10}$/.test(formData.mobile)) {
-			errors.mobile = "Mobile number should be 10 digits";
-		}
-		if (!formData?.service_address) {
-            errors.service_address = "address  is required";
-        }
-		if (!service?.value) {
-            errors.service = "service  is required";
-        }
-		if (!formData?.serviceDateTime) {
-            errors.serviceDateTime = "serviceDateTime  is required";
-        }
-		if (!timeslot?.value) {
-            errors.timeslot = "timeslot  is required";
-        }
+		// if (!formData?.name) {
+        //     errors.name = "Name is required";
+        // }
+		// if (!formData?.mobile) {
+		// 	errors.mobile = "Mobile number is required";
+		// } else if (!/^\d{10}$/.test(formData.mobile)) {
+		// 	errors.mobile = "Mobile number should be 10 digits";
+		// }
+		// if (!formData?.service_address) {
+        //     errors.service_address = "address  is required";
+        // }
+		// if (!service?.value) {
+        //     errors.service = "service  is required";
+        // }
+		// if (!formData?.serviceDateTime) {
+        //     errors.serviceDateTime = "serviceDateTime  is required";
+        // }
+		// if (!timeslot?.value) {
+        //     errors.timeslot = "timeslot  is required";
+        // }
 		// if (!serviceProvider?.value) {
         //     errors.serviceProvider = "service Provider  is required";
         // }
@@ -216,10 +216,10 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 		const data ={
 			...formData,
 			service_name: service.value,
-			user_type: userType.value,
-			servicep_id: serviceProvider?.value,
-			suprvisor_id: supervisor?.value,
-			allot_time_range: timeslot.value
+			// user_type: userType.value,
+			// servicep_id: serviceProvider?.value,
+			// suprvisor_id: supervisor?.value,
+			// allot_time_range: timeslot.value
 		}
 		const apiUrl = `${API_URL}/order/add`;
 		// Make a POST request using Axios
@@ -338,12 +338,12 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 					</FormGroup>
 				</Col>
 
-				<Col md={6}>
+				{/* <Col md={6}>
 				<Label for="firstname">User Type </Label>
 				<SelectBox options={UserTypes}
 							setSelcted={setUsertype}
 							selectOption={userType}/>
-									</Col>
+									</Col> */}
 
 				<Col md={6}>
 					<FormGroup>
@@ -357,7 +357,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 					</FormGroup>
 				</Col>
 
-				<Col md={6}>
+				{/* <Col md={6}>
 					<FormGroup>
 						<Label>Age</Label>
 						<Input 
@@ -368,8 +368,8 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 							readOnly={!!formData?.cust_id}
 							placeholder='Enter Your Age'/>
 					</FormGroup>
-				</Col>
-				{formData?.cust_id && 
+				</Col> */}
+				{/* {formData?.cust_id && 
 				<Col md={6}>
 					<FormGroup>
 						<Label>MemberShip Id</Label>
@@ -381,7 +381,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 							placeholder='Enter Your member Id'/>
 					</FormGroup>
 				</Col>
-				}
+				} */}
 				<Col md={6}>
 					<FormGroup>
 						<Label>Service Type <span style={{color: "red"}}>*</span></Label>
@@ -427,7 +427,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 					</FormGroup>
 				</Col> 
 
-				<Col md={6}>
+				 <Col md={6}>
 					<FormGroup>
 						<Label>Approx Duration</Label>
 						<Input 
@@ -452,7 +452,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 							</span>
 						)}
 					</FormGroup>
-				</Col>
+				</Col> 
 				<Col md={6}>
 					<FormGroup>
 						<Label>Service Provider <span style={{color: "red"}}>*</span></Label>
@@ -483,6 +483,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 						)}
 					</FormGroup>
 				</Col>
+				{/*
 				<Col md={6}>
 					<FormGroup>
 						<Label>Last Date Service</Label>
@@ -509,7 +510,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 					</FormGroup>
 				</Col>
 				
-				
+				*/}
 				<Col md={6}>
 					<FormGroup>
 						<Label>City</Label>

@@ -9,11 +9,11 @@ module.exports = (sequelize) => {
           },
           department_id: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
           },
           designation_id: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
           },
           name: {
             type: DataTypes.STRING,
@@ -25,15 +25,15 @@ module.exports = (sequelize) => {
           },
           alterno: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
           },
           email: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
           },
           gender: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
           },
           aadhar_no: {
             type: DataTypes.STRING

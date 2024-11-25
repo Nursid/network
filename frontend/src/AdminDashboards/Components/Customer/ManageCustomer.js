@@ -172,6 +172,8 @@ const ManageCustomer = () => {
         { field: "date", headerName: "To Date.", minWidth: 120, editable: true },
         { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 120, editable: true },
         { field: "address", headerName: "Address", minWidth: 250, editable: true },
+        { field: "area", headerName: "Area", minWidth: 250, editable: true },
+        { field: "apartment", headerName: "Apartment", minWidth: 250, editable: true },
         {
             field: "action",
             headerName: "Action",

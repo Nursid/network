@@ -64,21 +64,21 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
 			errors.mobile_no = "Mobile number should be 10 digits";
 		}
 
-        if (!department) {
-            errors.department = "Department is required";
-        }
+    //     if (!department) {
+    //         errors.department = "Department is required";
+    //     }
         
 
-       if (parseInt(department?.value) === 1) {
-            if (!slectedDesignation) {
-                errors.designation = "Designation is required";
-            }
-        } 
-        if(parseInt(department?.value) === 2 || parseInt(department?.value) === 3 ) {
-            if (!selectedOptions || !Array.isArray(selectedOptions) || selectedOptions.length === 0) {
-                errors.designation = "Service is required";
-            }
-        }
+    //    if (parseInt(department?.value) === 1) {
+    //         if (!slectedDesignation) {
+    //             errors.designation = "Designation is required";
+    //         }
+    //     } 
+    //     if(parseInt(department?.value) === 2 || parseInt(department?.value) === 3 ) {
+    //         if (!selectedOptions || !Array.isArray(selectedOptions) || selectedOptions.length === 0) {
+    //             errors.designation = "Service is required";
+    //         }
+    //     }
 
 
 		if (errors && Object.keys(errors).length === 0) {
@@ -95,12 +95,12 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
         const serviceValues = selectedOptions.map(option => option.value);
         const newFormData = {
             ...formData,
-            department_id: department?.value,
-            designation_id: (department?.value === 2 || department?.value === 3) ? 3 : slectedDesignation?.value,
+            // department_id: department?.value,
+            // designation_id: (department?.value === 2 || department?.value === 3) ? 3 : slectedDesignation?.value,
             pan_image: pan_image,
             adhar_image: adhar_image, 
             image: image, 
-            multiServices: JSON.stringify(serviceValues)
+            // multiServices: JSON.stringify(serviceValues)
           };
 
         const formData2 = new FormData();
@@ -155,64 +155,64 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
    
     // const ImageResult = useSelector(state => state.ImageUploadReducer)
     const dispatch = useDispatch()
-    const Departments = async () =>{
-		const response = await axios.get(API_URL + '/department/getall')
-		if (response.status === 200) {
-			  const transformedData = response.data.map(item => ({
-				label: item.name,
-				value: item.id 
-			}));
-			setAllDepartments(transformedData);
-		}
-	}
-    const Designation = async () => {
-		const response = await axios.get(API_URL + '/designation/getall')
-		if (response.status === 200) {
-            const filteredData = response.data.filter(item => item.id !== 1 && item.id !== 7 && item.id !== 3);
-            const transformedData = filteredData.map(item => ({
-                label: item.name,
-                value: item.id
-            }));
-			setAllServices(transformedData);
-		}
-	}
+    // const Departments = async () =>{
+	// 	const response = await axios.get(API_URL + '/department/getall')
+	// 	if (response.status === 200) {
+	// 		  const transformedData = response.data.map(item => ({
+	// 			label: item.name,
+	// 			value: item.id 
+	// 		}));
+	// 		setAllDepartments(transformedData);
+	// 	}
+	// }
+    // const Designation = async () => {
+	// 	const response = await axios.get(API_URL + '/designation/getall')
+	// 	if (response.status === 200) {
+    //         const filteredData = response.data.filter(item => item.id !== 1 && item.id !== 7 && item.id !== 3);
+    //         const transformedData = filteredData.map(item => ({
+    //             label: item.name,
+    //             value: item.id
+    //         }));
+	// 		setAllServices(transformedData);
+	// 	}
+	// }
 
-    useEffect(() => {
-		Departments();
-	}, []);
-    useEffect(() => {
-		Designation();
-	}, []);
+    // useEffect(() => {
+	// 	Departments();
+	// }, []);
+    // useEffect(() => {
+	// 	Designation();
+	// }, []);
 
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const deptValue = parseInt(department?.value);
-            console.log(deptValue)
-            if (deptValue === 2 || deptValue === 3) {
-                try {
-                    const response = await axios.get(`${API_URL}/service/get-service/${deptValue}`);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         const deptValue = parseInt(department?.value);
+    //         console.log(deptValue)
+    //         if (deptValue === 2 || deptValue === 3) {
+    //             try {
+    //                 const response = await axios.get(`${API_URL}/service/get-service/${deptValue}`);
                 
-                    const transformedData = response.data.data.map(item => ({
-                        label: item.serviceName,
-                        value: item.serviceName 
-                    }));
-                    setAllServices(transformedData);
+    //                 const transformedData = response.data.data.map(item => ({
+    //                     label: item.serviceName,
+    //                     value: item.serviceName 
+    //                 }));
+    //                 setAllServices(transformedData);
 
-                } catch (error) {
-                    console.error(`Error fetching data for department ${deptValue}:`, error);
-                }
-            }
+    //             } catch (error) {
+    //                 console.error(`Error fetching data for department ${deptValue}:`, error);
+    //             }
+    //         }
 
-            if(deptValue===1){
-                Designation()
-            }
-        };
+    //         if(deptValue===1){
+    //             Designation()
+    //         }
+    //     };
 
-        if (department?.value !== undefined) {
-            fetchData();
-        }
-    }, [department?.value]);
+    //     if (department?.value !== undefined) {
+    //         fetchData();
+    //     }
+    // }, [department?.value]);
 
    
 
@@ -233,17 +233,17 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
         setSelectedOptions(selected);
       };
 
-        useEffect(() => {
-        if (data?.empservices && Array.isArray(data.empservices)) {
-            const transformedData = data.empservices.map(item => ({
-                label: item.service_name,
-                value: item.service_name 
-            }));
-            setSelectedOptions(transformedData);
-        } else {
-            setSelectedOptions([]); 
-        }
-    }, [data?.empservices]);
+    //     useEffect(() => {
+    //     if (data?.empservices && Array.isArray(data.empservices)) {
+    //         const transformedData = data.empservices.map(item => ({
+    //             label: item.service_name,
+    //             value: item.service_name 
+    //         }));
+    //         setSelectedOptions(transformedData);
+    //     } else {
+    //         setSelectedOptions([]); 
+    //     }
+    // }, [data?.empservices]);
 
     const handleKeyPress = (e) => {
 		const charCode = e.which || e.keyCode;
@@ -264,7 +264,7 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
                                 <Form >
                                     <Row>
                                         <h6 className='pb-3 fw-bold fs-5'>Personal Info</h6>
-                                        <Col md={6}>
+                                        {/* <Col md={6}>
                                             <FormGroup>
                                                 <Label for="department">Department Name <span style={{color: "red"}}>*</span></Label>
                                                 <SelectBox options={allDepartments} setSelcted={setDepartment} initialValue={department} />
@@ -312,7 +312,7 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
                                             }
                         
                                             </FormGroup>
-                                        </Col>
+                                        </Col> */}
 
                                         <Col md={6}>
                                             <FormGroup>

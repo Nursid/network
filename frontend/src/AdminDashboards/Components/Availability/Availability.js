@@ -209,36 +209,6 @@ const Availability = () => {
         { field: "provider_type",  headerName: "Provider Type", minWidth: 150, editable: true},
         { field: "date",  headerName: "Date", minWidth: 150, editable: true
          },
-          {
-            field: "07:00-07:30",
-            headerName: "07:00-07:30 AM",
-            minWidth: 150,
-            cellClassName: getCellClassName
-        },
-        {
-          field: "07:30-08:00",
-          headerName: "07:30-08:00 AM",
-          minWidth: 150,
-          cellClassName: getCellClassName
-      },
-      {
-        field: "08:00-08:30",
-        headerName: "08:00-08:30 AM",
-        minWidth: 150,
-        cellClassName: getCellClassName
-    },
-        {
-          field: "08:30-09:00",
-          headerName: "08:30-09:00 AM",
-          minWidth: 150,
-          cellClassName: getCellClassName
-      },
-        {
-          field: "09:00-09:30",
-          headerName: "09:00-09:30 AM",
-          minWidth: 150,
-          cellClassName: getCellClassName
-      },
         { field: "09:30-10:00", headerName: "09:30-10:00 AM ", minWidth: 150, cellClassName: getCellClassName},
         { field: "10:00-10:30", headerName: "10:00-10:30 AM ", minWidth: 150, cellClassName: getCellClassName},
         { field: "10:30-11:00", headerName: "10:30-11:00 AM ", minWidth: 150, cellClassName: getCellClassName},
@@ -256,6 +226,8 @@ const Availability = () => {
         { field: "04:30-05:00", headerName: "04:30-05:00 PM ", minWidth: 150, cellClassName: getCellClassName},
         { field: "05:00-05:30", headerName: "05:00-05:30 PM ", minWidth: 150, cellClassName: getCellClassName},
         { field: "05:30-06:00", headerName: "05:30-06:00 PM ", minWidth: 150, cellClassName: getCellClassName},
+        { field: "06:00-06:30", headerName: "06:00-06:30 PM ", minWidth: 150, cellClassName: getCellClassName},
+        { field: "06:30-07:00", headerName: "07:30-07:00 PM ", minWidth: 150, cellClassName: getCellClassName},
     ]
 
 

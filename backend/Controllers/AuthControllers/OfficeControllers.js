@@ -16,8 +16,7 @@ const AddEmployee = async (req, res) => {
 	try {
 		const data = req.body;
 
-		const empServiceData = JSON.parse(data?.multiServices);
-
+		
 		if(req.files){
 		const {pan_image, adhar_image, image} = req.files;
 		data.pan_image = pan_image ? pan_image[0].filename : null;
@@ -80,12 +79,6 @@ const AddEmployee = async (req, res) => {
 			return res.status(400).json({status: 400, error: true, message: "Failed to register employee. Please try again."});
 		}
 
-		const addService = await Promise.all(empServiceData.map(async (service) => {
-			return Empservices.create({
-				service_name: service, // Directly use the string
-				mobile_no: empData?.mobile_no
-			});
-		}));
 
 		return res.status(200).json({status: true, message: "Employee Added Successfully!"});
 	} catch (error) { // If an unexpected error occurs

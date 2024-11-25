@@ -115,7 +115,7 @@ const AdminDashboard = () => {
           bookdate: moment(item.bookdate).format("DD-MM-YYYY"),
           userRole: userRole,
           member_id: (!customer.member_id) 
-                    ? 'NM' + paddedId 
+                    ? 'LS' + paddedId 
                     : customer.member_id
         });
       }
@@ -568,86 +568,86 @@ const AdminDashboard = () => {
   };
   
   const columns = [
-    {
-      field: "Status",
-      headerName: "Status",
-      renderCell: (params) => {
-          const { pending, order_no, piadamt, totalamt, checkintime, checkouttime } = params.row;
+    // {
+    //   field: "Status",
+    //   headerName: "Status",
+    //   renderCell: (params) => {
+    //       const { pending, order_no, piadamt, totalamt, checkintime, checkouttime } = params.row;
   
-          let checkInLabel = '';
-          let checkInColor = '';
-          let checkInHandler = null;
+    //       let checkInLabel = '';
+    //       let checkInColor = '';
+    //       let checkInHandler = null;
   
-          let checkOutLabel = '';
-          let checkOutColor = '';
-          let checkOutHandler = null;
+    //       let checkOutLabel = '';
+    //       let checkOutColor = '';
+    //       let checkOutHandler = null;
   
-          // Determine Check In button state
-          if (!checkintime) {
-              checkInLabel = 'Check In';
-              checkInColor = 'yellow';
-              checkInHandler = () => check_in(order_no);
-          } else {
-              checkInLabel = `Update Check In ${checkintime}`;
-              checkInColor = 'green';
-              checkInHandler = null; // Disable clicking for updated check-in
-          }
+    //       // Determine Check In button state
+    //       if (!checkintime) {
+    //           checkInLabel = 'Check In';
+    //           checkInColor = 'yellow';
+    //           checkInHandler = () => check_in(order_no);
+    //       } else {
+    //           checkInLabel = `Update Check In ${checkintime}`;
+    //           checkInColor = 'green';
+    //           checkInHandler = null; // Disable clicking for updated check-in
+    //       }
   
-          // Determine Check Out button state
-          if (checkintime && !checkouttime) {
-              checkOutLabel = 'Check Out';
-              checkOutColor = 'red';
-              checkOutHandler = () => check_out(order_no, piadamt, totalamt);
-          } else if (checkouttime) {
-              checkOutLabel = `Update Check Out ${checkouttime}`;
-              checkOutColor = 'green';
-              checkOutHandler = null; // Disable clicking for updated check-out
-          }
+    //       // Determine Check Out button state
+    //       if (checkintime && !checkouttime) {
+    //           checkOutLabel = 'Check Out';
+    //           checkOutColor = 'red';
+    //           checkOutHandler = () => check_out(order_no, piadamt, totalamt);
+    //       } else if (checkouttime) {
+    //           checkOutLabel = `Update Check Out ${checkouttime}`;
+    //           checkOutColor = 'green';
+    //           checkOutHandler = null; // Disable clicking for updated check-out
+    //       }
   
-          return (
-              <div className="d-flex flex-row align-items-center">
-                  <p
-                      className="justify-content-center align-items-center mr-2"
-                      style={{
-                          width: "140px",
-                          backgroundColor: checkInColor,
-                          borderRadius: "5px",
-                          cursor: checkInHandler ? "pointer" : "default",
-                          whiteSpace: "normal",
-                          textAlign: "center", 
-                          fontSize: "10px",
-                          padding: !checkintime ? "12px" : "5px",
-                          color: !checkintime ? "black" : "white", // Corrected this line
-                      }}
-                      onClick={checkInHandler}
-                  >
-                      {checkInLabel}
-                  </p>
-                  {checkOutLabel && (
-                      <p
-                          className="d-flex justify-content-center align-items-center"
-                          style={{
-                              width: "140px",
-                              backgroundColor: checkOutColor,
-                              borderRadius: "5px",
-                              cursor: checkOutHandler ? "pointer" : "default",
-                              whiteSpace: "normal", // Allow wrapping
-                              textAlign: "center", // Center text
-                              fontSize: "10px",
-                              padding: !checkouttime ? "12px" : "5px",
-                              color: "white"
-                          }}
-                          onClick={checkOutHandler}
-                      >
-                          {checkOutLabel}
-                      </p>
-                  )}
-              </div>
-          );
-      },
-      minWidth: 300,
-      editable: false,
-    },
+    //       return (
+    //           <div className="d-flex flex-row align-items-center">
+    //               <p
+    //                   className="justify-content-center align-items-center mr-2"
+    //                   style={{
+    //                       width: "140px",
+    //                       backgroundColor: checkInColor,
+    //                       borderRadius: "5px",
+    //                       cursor: checkInHandler ? "pointer" : "default",
+    //                       whiteSpace: "normal",
+    //                       textAlign: "center", 
+    //                       fontSize: "10px",
+    //                       padding: !checkintime ? "12px" : "5px",
+    //                       color: !checkintime ? "black" : "white", // Corrected this line
+    //                   }}
+    //                   onClick={checkInHandler}
+    //               >
+    //                   {checkInLabel}
+    //               </p>
+    //               {checkOutLabel && (
+    //                   <p
+    //                       className="d-flex justify-content-center align-items-center"
+    //                       style={{
+    //                           width: "140px",
+    //                           backgroundColor: checkOutColor,
+    //                           borderRadius: "5px",
+    //                           cursor: checkOutHandler ? "pointer" : "default",
+    //                           whiteSpace: "normal", // Allow wrapping
+    //                           textAlign: "center", // Center text
+    //                           fontSize: "10px",
+    //                           padding: !checkouttime ? "12px" : "5px",
+    //                           color: "white"
+    //                       }}
+    //                       onClick={checkOutHandler}
+    //                   >
+    //                       {checkOutLabel}
+    //                   </p>
+    //               )}
+    //           </div>
+    //       );
+    //   },
+    //   minWidth: 300,
+    //   editable: false,
+    // },
     {
         field: "action",
         headerName: "Action",
@@ -683,9 +683,9 @@ const AdminDashboard = () => {
               {params.value}</div>
         </Tooltip>
     ) },   
-    { field: "allot_time_range", headerName: "Alloted Time Slot ", minWidth: 150,  editable: false },
+//     { field: "allot_time_range", headerName: "Alloted Time Slot ", minWidth: 150,  editable: false },
 
-    { field: "suprvisor_id", headerName: "Supervisor",
+    { field: "suprvisor_id", headerName: "Admin",
     renderCell: (params) => ( 
         <>
         {
@@ -697,7 +697,7 @@ const AdminDashboard = () => {
               onClick={() => AssignSupervisor(params.row.order_no, params.row.bookdate, params.row.allot_time_range, params.row.service_name)} 
               disabled={params?.row?.userRole?.role === "service"}
             >
-              Supervisor
+              Admin
             </Button>
           ) : (
             params.row.suprvisor_id
@@ -722,120 +722,120 @@ const AdminDashboard = () => {
       ) : params.row.servicep_id } </> ),
     minWidth: 200,  editable: false },
 
-    // { field: "vehicle_inventory", headerName: "Vehicle Used",
-    // renderCell: (params) => ( 
-    //     <>
-    //     {(!params.row.vehicle_inventory) ? (<><Button variant='contained' color='primary'> Choose Vehicle</Button></> ) : <>{params.row.vehicle_inventory} </> } </> ),
-    //  minWidth: 200,  editable: false },
-    { field: "netpayamt", headerName: "Billing Amount",
+//     // { field: "vehicle_inventory", headerName: "Vehicle Used",
+//     // renderCell: (params) => ( 
+//     //     <>
+//     //     {(!params.row.vehicle_inventory) ? (<><Button variant='contained' color='primary'> Choose Vehicle</Button></> ) : <>{params.row.vehicle_inventory} </> } </> ),
+//     //  minWidth: 200,  editable: false },
+//     { field: "netpayamt", headerName: "Billing Amount",
+// //     renderCell: (params) => ( 
+// //         <>
+// //         {params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
+// //         (!params.row.netpayamt) ? (<><Button variant='contained' color='primary'  
+// // onClick={()=>AssignAmount(params.row.order_no)}
+// //         >Amount</Button></> ) : <>{params.row.netpayamt} </> ) : <>{params.row.netpayamt}</>
+        
+// //         } </> ),
+//     minWidth: 150 },
+//     { field: "paymethod", headerName: "Payment Method", minWidth: 150},
+//     { field: "piadamt", headerName: "Paid Amount", minWidth: 150 },
+//     { field: "totalamt", headerName: "Balance Amount", minWidth: 150},
+//     { field: "cust_remark", headerName: "Customer Remark", minWidth: 150 },
+//     { field: "admin_remark", headerName: "Admin Remark", minWidth: 150 },
+//     { field: "bakof_remark", headerName: "Back Office Remark",
+//     renderCell: (params) => ( 
+//         <>
+//         { params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
+//         (params.row?.userRole?.role==="office" && !params.row.bakof_remark) ? (
+//             <Tooltip title="Add a remark">
+//                 <Button variant='contained' color='primary' onClick={()=>backOfficeRemark(params.row.order_no)}>Remark</Button>
+//             </Tooltip>
+//         ) : (
+//             <Tooltip title={params.row.bakof_remark}>
+//                 <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+//                     {params.row.bakof_remark}
+//                 </div>
+//             </Tooltip>
+//         )) : (
+//             <Tooltip title={params.row.bakof_remark}>
+//                 <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+//                     {params.row.bakof_remark}
+//                 </div>
+//             </Tooltip>
+//         )}
+//         </>
+//     ),
+//     minWidth: 180,  editable: false},
+
+//     { field: "suerv_remark", headerName: "Supervisor Remark",
 //     renderCell: (params) => ( 
 //         <>
 //         {params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
-//         (!params.row.netpayamt) ? (<><Button variant='contained' color='primary'  
-// onClick={()=>AssignAmount(params.row.order_no)}
-//         >Amount</Button></> ) : <>{params.row.netpayamt} </> ) : <>{params.row.netpayamt}</>
         
-//         } </> ),
-    minWidth: 150 },
-    { field: "paymethod", headerName: "Payment Method", minWidth: 150},
-    { field: "piadamt", headerName: "Paid Amount", minWidth: 150 },
-    { field: "totalamt", headerName: "Balance Amount", minWidth: 150},
-    { field: "cust_remark", headerName: "Customer Remark", minWidth: 150 },
-    { field: "admin_remark", headerName: "Admin Remark", minWidth: 150 },
-    { field: "bakof_remark", headerName: "Back Office Remark",
-    renderCell: (params) => ( 
-        <>
-        { params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
-        (params.row?.userRole?.role==="office" && !params.row.bakof_remark) ? (
-            <Tooltip title="Add a remark">
-                <Button variant='contained' color='primary' onClick={()=>backOfficeRemark(params.row.order_no)}>Remark</Button>
-            </Tooltip>
-        ) : (
-            <Tooltip title={params.row.bakof_remark}>
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {params.row.bakof_remark}
-                </div>
-            </Tooltip>
-        )) : (
-            <Tooltip title={params.row.bakof_remark}>
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {params.row.bakof_remark}
-                </div>
-            </Tooltip>
-        )}
-        </>
-    ),
-    minWidth: 180,  editable: false},
+//         (params?.row?.userRole?.role==="supervisor" && !params.row.suerv_remark) ? (
+//             <Tooltip title="Add a remark">
+//                 <Button variant='contained' color='primary' onClick={()=>AdminRemark(params.row.order_no)}>Remark</Button>
+//             </Tooltip>
+//         ) : (
+//             <Tooltip title={params.row.suerv_remark}>
+//                 <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+//                     {params.row.suerv_remark}
+//                 </div>
+//             </Tooltip>
+//         )) : (
+//             <Tooltip title={params.row.suerv_remark}>
+//                 <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+//                     {params.row.suerv_remark}
+//                 </div>
+//             </Tooltip>
+//         )}
+//         </>
+//     ),
+//     minWidth: 150,  editable: false },
 
-    { field: "suerv_remark", headerName: "Supervisor Remark",
-    renderCell: (params) => ( 
-        <>
-        {params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
-        
-        (params?.row?.userRole?.role==="supervisor" && !params.row.suerv_remark) ? (
-            <Tooltip title="Add a remark">
-                <Button variant='contained' color='primary' onClick={()=>AdminRemark(params.row.order_no)}>Remark</Button>
-            </Tooltip>
-        ) : (
-            <Tooltip title={params.row.suerv_remark}>
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {params.row.suerv_remark}
-                </div>
-            </Tooltip>
-        )) : (
-            <Tooltip title={params.row.suerv_remark}>
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {params.row.suerv_remark}
-                </div>
-            </Tooltip>
-        )}
-        </>
-    ),
-    minWidth: 150,  editable: false },
+//     { field: "servp_remark",
+//         headerName: "Service Provider Remark",
 
-    { field: "servp_remark",
-        headerName: "Service Provider Remark",
-
-        renderCell: (params) => ( 
-            <>
-            {params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
-            (params.row?.userRole?.role==="service" && !params.row.servp_remark) ? (
-                <Tooltip title="Add a remark">
-                    <Button variant='contained' color='primary' onClick={()=>ServiceProviderRemark(params.row.order_no)}>Remark</Button>
-                </Tooltip>
-            ) : (
-                <Tooltip title={params.row.servp_remark}>
-                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {params.row.servp_remark}
-                    </div>
-                </Tooltip>
-            )) : (
-                <Tooltip title={params.row.servp_remark}>
-                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {params.row.servp_remark}
-                    </div>
-                </Tooltip>
-            )}
-            </> 
-        ),
-        minWidth: 180,
-         editable: false,
-    },
-    { field: "pending", headerName: "Order Status", minWidth: 150,  editable: false },
-    { field: "cancle_reson", headerName: "Cancel Reason", minWidth: 150,  editable: false },
-    { 
-      field: "sueadmin_remark", 
-      headerName: "Super Admin Remark",
-      minWidth: 180, 
-       editable: false,
-      renderCell: (params) => ( 
-        <Tooltip title={params.row.sueadmin_remark}>
-          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {params.row.sueadmin_remark}
-          </div>
-        </Tooltip>
-      )
-    },   
+//         renderCell: (params) => ( 
+//             <>
+//             {params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
+//             (params.row?.userRole?.role==="service" && !params.row.servp_remark) ? (
+//                 <Tooltip title="Add a remark">
+//                     <Button variant='contained' color='primary' onClick={()=>ServiceProviderRemark(params.row.order_no)}>Remark</Button>
+//                 </Tooltip>
+//             ) : (
+//                 <Tooltip title={params.row.servp_remark}>
+//                     <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+//                         {params.row.servp_remark}
+//                     </div>
+//                 </Tooltip>
+//             )) : (
+//                 <Tooltip title={params.row.servp_remark}>
+//                     <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+//                         {params.row.servp_remark}
+//                     </div>
+//                 </Tooltip>
+//             )}
+//             </> 
+//         ),
+//         minWidth: 180,
+//          editable: false,
+//     },
+//     { field: "pending", headerName: "Order Status", minWidth: 150,  editable: false },
+//     { field: "cancle_reson", headerName: "Cancel Reason", minWidth: 150,  editable: false },
+//     { 
+//       field: "sueadmin_remark", 
+//       headerName: "Super Admin Remark",
+//       minWidth: 180, 
+//        editable: false,
+//       renderCell: (params) => ( 
+//         <Tooltip title={params.row.sueadmin_remark}>
+//           <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+//             {params.row.sueadmin_remark}
+//           </div>
+//         </Tooltip>
+//       )
+//     },   
     { 
       field: "admin_approve", 
       headerName: "Final Status", 
