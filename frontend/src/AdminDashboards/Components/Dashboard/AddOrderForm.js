@@ -67,16 +67,8 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 	  });
 
 	  useEffect(()=>{
-		if(formData.serviceDateTime && timeslot?.value){
-			const assignData = formData.serviceDateTime.split('T')[0];
-            const filterData = {
-				date: assignData,
-				time_range: timeslot.value
-			}
-			getAllServicesProvider(filterData)
-			GetAllSupervisor(filterData)
-		  }
-	  }, [formData.serviceDateTime, timeslot?.value])
+			getAllServicesProvider()
+	  }, [])
 	  
 
 	const UserTypes =[
@@ -173,33 +165,30 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 		e.preventDefault();
         let errors = {};
 		setIsLoading(true)
-		// if (!formData?.name) {
-        //     errors.name = "Name is required";
-        // }
-		// if (!formData?.mobile) {
-		// 	errors.mobile = "Mobile number is required";
-		// } else if (!/^\d{10}$/.test(formData.mobile)) {
-		// 	errors.mobile = "Mobile number should be 10 digits";
-		// }
-		// if (!formData?.service_address) {
-        //     errors.service_address = "address  is required";
-        // }
-		// if (!service?.value) {
-        //     errors.service = "service  is required";
-        // }
-		// if (!formData?.serviceDateTime) {
-        //     errors.serviceDateTime = "serviceDateTime  is required";
-        // }
-		// if (!timeslot?.value) {
-        //     errors.timeslot = "timeslot  is required";
-        // }
-		// if (!serviceProvider?.value) {
-        //     errors.serviceProvider = "service Provider  is required";
-        // }
-		// if (!supervisor?.value) {
-        //     errors.supervisor = "supervisor  is required";
-        // }
-		
+		if (!formData?.name) {
+            errors.name = "Name is required";
+        }
+		if (!formData?.mobile) {
+			errors.mobile = "Mobile number is required";
+		} else if (!/^\d{10}$/.test(formData.mobile)) {
+			errors.mobile = "Mobile number should be 10 digits";
+		}
+		if (!formData?.service_address) {
+            errors.service_address = "address  is required";
+        }
+		if (!service?.value) {
+            errors.service = "service  is required";
+        }
+		if (!formData?.serviceDateTime) {
+            errors.serviceDateTime = "serviceDateTime  is required";
+        }
+		if (!timeslot?.value) {
+            errors.timeslot = "timeslot  is required";
+        }
+		if (!serviceProvider?.value) {
+            errors.serviceProvider = "service Provider  is required";
+        }
+
 
 
         if (errors && Object.keys(errors).length === 0) {
@@ -216,10 +205,8 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 		const data ={
 			...formData,
 			service_name: service.value,
-			// user_type: userType.value,
-			// servicep_id: serviceProvider?.value,
-			// suprvisor_id: supervisor?.value,
-			// allot_time_range: timeslot.value
+			servicep_id: serviceProvider?.value,
+			allot_time_range: timeslot.value
 		}
 		const apiUrl = `${API_URL}/order/add`;
 		// Make a POST request using Axios
@@ -263,10 +250,9 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
         }
     };
 
-	const getAllServicesProvider = async (filterData) => {
+	const getAllServicesProvider = async () => {
 		try {
-		  const queryParams = new URLSearchParams(filterData).toString()
-		  const response = await axios.get(`${API_URL}/service-provider/getall?${queryParams}`);
+		  const response = await axios.get(`${API_URL}/service-provider/getall`);
 		  if (response.status === 200) {
 			const transformedData = response.data.data.map(item => ({ label: item.name, value: item.name }));
 			setGetAllServiceProvider(transformedData);
@@ -468,7 +454,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 						)}
 					</FormGroup>
 				</Col>
-				<Col md={6}>
+				{/* <Col md={6}>
 					<FormGroup>
 						<Label>Supervisor Name <span style={{color: "red"}}>*</span></Label>
 						<SelectBox 
@@ -482,7 +468,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 							</span>
 						)}
 					</FormGroup>
-				</Col>
+				</Col> */}
 				{/*
 				<Col md={6}>
 					<FormGroup>

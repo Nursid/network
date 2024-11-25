@@ -10,22 +10,6 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        "07:00-07:30": {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        "07:30-08:00": {
-            type: DataTypes.STRING,
-            allowNull: true,
-        }, 
-        "08:00-08:30": {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        "08:30-09:00": {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
         "09:00-09:30": {
             type: DataTypes.STRING,
             allowNull: true,
@@ -95,6 +79,14 @@ module.exports = (sequelize) => {
             allowNull: true,
         },
         "05:30-06:00": {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        "06:00-06:30": {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        "06:30-07:00": {
             type: DataTypes.STRING,
             allowNull: true,
         },

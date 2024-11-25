@@ -227,7 +227,7 @@ const Availability = () => {
         { field: "05:00-05:30", headerName: "05:00-05:30 PM ", minWidth: 150, cellClassName: getCellClassName},
         { field: "05:30-06:00", headerName: "05:30-06:00 PM ", minWidth: 150, cellClassName: getCellClassName},
         { field: "06:00-06:30", headerName: "06:00-06:30 PM ", minWidth: 150, cellClassName: getCellClassName},
-        { field: "06:30-07:00", headerName: "07:30-07:00 PM ", minWidth: 150, cellClassName: getCellClassName},
+        { field: "06:30-07:00", headerName: "06:30-07:00 PM ", minWidth: 150, cellClassName: getCellClassName},
     ]
 
 

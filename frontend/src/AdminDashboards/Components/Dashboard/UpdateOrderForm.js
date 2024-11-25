@@ -273,12 +273,12 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
             <Input name="problem_des" onChange={(e) => handleInputChange(e, 100)} value={formData.problem_des} placeholder="Problem Description" />
           </FormGroup>
         </Col>
-        <Col md={6}>
+        {/* <Col md={6}>
           <FormGroup>
             <Label>Supervisor Name</Label>
             <SelectBox options={allSupervisors} setSelcted={(value) => setFormData((prev) => ({ ...prev, suprvisor_id: value }))} initialValue={formData.suprvisor_id} />
           </FormGroup>
-        </Col>
+        </Col> */}
         <Col md={6}>
 					<FormGroup>
 						<Label>Time Slot</Label>
@@ -335,7 +335,7 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
                 />
               </FormGroup>
             </Col>
-            <Col md={6}>
+            {/* <Col md={6}>
               <FormGroup>
                 <Label>Back Office Remark</Label>
                 <Input
@@ -378,7 +378,7 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
                   placeholder="Service Provider remark"
                 />
               </FormGroup>
-            </Col>
+            </Col> */}
         <h2>Billing Details</h2>
         <Col md={6}>
           <FormGroup>

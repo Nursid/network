@@ -544,26 +544,6 @@ const GetOrderAssing = async (req, res) => {
             transaction,
         });
 
-        // Check if the record exists and if the dynamic field already has a value
-        // if (existingAvailability) {
-        //     if (existingAvailability[allot_time_range]) {
-        //         await transaction.rollback();
-        //         return res.status(202).json({
-        //             message: 'Already assigned to someone at this time range.',
-        //         });
-        //     } else {
-        //         await existingAvailability.update({
-        //             [allot_time_range]: `${updatedOrder.service_name}-${order_no}`,
-        //         }, { transaction });
-
-        //         await transaction.commit();
-        //         return res.status(200).json({ status: true, message: 'Availability updated successfully.' });
-        //     }
-        // } else {
-        //     const newAvailability = await Availability.create(AllotData, { transaction });
-        //     await transaction.commit();
-        //     return res.status(200).json({ message: 'Availability created successfully.' });
-        // }
 
 
 		if (existingAvailability) {

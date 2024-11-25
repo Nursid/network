@@ -40,11 +40,7 @@ const { Op } = require('sequelize');
 
 
 var AllLeaveSlots = {
-    '07:00-07:30': 'p',
-    '07:30-08:00': 'p',
-    '08:00-08:30': 'p',
-    '08:30-09:00': 'p',
-    '09:00-09:30': 'p',
+    
     '09:30-10:00': 'p',
     '10:00-10:30': 'p',
     '10:30-11:00': 'p',
@@ -62,6 +58,8 @@ var AllLeaveSlots = {
     '04:30-05:00': 'p',
     '05:00-05:30': 'p',
     '05:30-06:00': 'p',
+    '06:00-06:30': 'p',
+    '06:30-07:00': 'p'
 }
 
 const GetAllAvailability = async (req, res) => {
@@ -133,11 +131,6 @@ const AddLeave = async (req, res) => {
         if (data.leaveDay === '1' || data.leaveDay === '3' || data.leaveDay === '4' ) {
             // Full Day Leave: Add leave for all time slots
             leaveSlots = {
-                '07:00-07:30': data?.label,
-                '07:30-08:00': data?.label,
-                '08:00-08:30': data?.label,
-                '08:30-09:00': data?.label,
-                '09:00-09:30': data?.label,
                 '09:30-10:00': data?.label,
                 '10:00-10:30': data?.label,
                 '10:30-11:00': data?.label,
@@ -155,16 +148,13 @@ const AddLeave = async (req, res) => {
                 '04:30-05:00': data?.label,
                 '05:00-05:30': data?.label,
                 '05:30-06:00': data?.label,
+                '06:00-06:30': data?.label,
+                '06:30-07:00': data?.label,
             };
         } else if (data.leaveDay === '2') {
             if (data.half === '1') {
                 // First Half Day Leave: Add leave for the morning slots
-                leaveSlots = {
-                    '07:00-07:30': data?.label,
-                    '07:30-08:00': data?.label,
-                    '08:00-08:30': data?.label,
-                    '08:30-09:00': data?.label,
-                    '09:00-09:30': data?.label,
+                leaveSlots = {                   
                     '09:30-10:00': data?.label,
                     '10:00-10:30': data?.label,
                     '10:30-11:00': data?.label,
@@ -186,6 +176,8 @@ const AddLeave = async (req, res) => {
                     '04:30-05:00': data?.label,
                     '05:00-05:30': data?.label,
                     '05:30-06:00': data?.label,
+                    '06:00-06:30': data?.label,
+                    '06:30-07:00': data?.label,
                 };
             }
         }
@@ -352,10 +344,10 @@ const AddAttendance = async (req, res) => {
 
         // Extract the hours and minutes
         let timeParts = kolkataTime.split(', ')[1].split(':');
-        let hours = parseInt(timeParts[0]);
-        let minutes = parseInt(timeParts[1]);
-        // let hours = 9
-        // let minutes = 40
+        // let hours = parseInt(timeParts[0]);
+        // let minutes = parseInt(timeParts[1]);
+        let hours = 9
+        let minutes = 30
 
 
         // Check if the time is between 6:00 PM and 6:00 AM

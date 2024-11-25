@@ -1381,21 +1381,14 @@ export const AssignServiceProviderModal = ({serviceProviderModalOpen, servicePro
 
 
 	useEffect(()=>{
-		if(date && timeslot?.value){
-            const filterData = {
-				date: moment(date, "DD-MM-YYYY").format("YYYY-MM-DD"),
-				time_range: timeslot.value
-			}
-			getAllServicesProvider(filterData)
-		  }
-	  }, [date, timeslot?.value])
+			getAllServicesProvider()
+	  }, [])
 
 
 
-	const getAllServicesProvider = async (filterData) => {
+	const getAllServicesProvider = async () => {
 		try {
-		  const queryParams = new URLSearchParams(filterData).toString()
-		  const response = await axios.get(`${API_URL}/service-provider/getall?${queryParams}`);
+		  const response = await axios.get(`${API_URL}/service-provider/getall`);
 		  if (response.status === 200) {
 			const transformedData = response.data.data.map(item => ({ label: item.name, value: item.name }));
 			setAllServiceProvider(transformedData);

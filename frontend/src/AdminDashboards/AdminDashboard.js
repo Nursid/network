@@ -35,7 +35,8 @@ import { useAuth } from "../Context/userAuthContext";
 import { ServiceProviderRemarkModal } from "../Components/Modal";
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
-
+import { useReactToPrint } from 'react-to-print';
+import Invoice from "../Components/Invoice";
 
 const AdminDashboard = () => {
   const { rows, Show, setShow } = UseStateManager();
@@ -683,27 +684,27 @@ const AdminDashboard = () => {
               {params.value}</div>
         </Tooltip>
     ) },   
-//     { field: "allot_time_range", headerName: "Alloted Time Slot ", minWidth: 150,  editable: false },
+    { field: "allot_time_range", headerName: "Alloted Time Slot ", minWidth: 150,  editable: false },
 
-    { field: "suprvisor_id", headerName: "Admin",
-    renderCell: (params) => ( 
-        <>
-        {
-        params?.row?.pending !== "Completed" && params?.row?.pending !== "Cancel" ? (
-          !params.row.suprvisor_id ? (
-            <Button 
-              variant='contained' 
-              color='primary' 
-              onClick={() => AssignSupervisor(params.row.order_no, params.row.bookdate, params.row.allot_time_range, params.row.service_name)} 
-              disabled={params?.row?.userRole?.role === "service"}
-            >
-              Admin
-            </Button>
-          ) : (
-            params.row.suprvisor_id
-          )
-        ) :  params.row.suprvisor_id
-      } </> ), minWidth: 200,  editable: false },
+    // { field: "suprvisor_id", headerName: "Admin",
+    // renderCell: (params) => ( 
+    //     <>
+    //     {
+    //     params?.row?.pending !== "Completed" && params?.row?.pending !== "Cancel" ? (
+    //       !params.row.suprvisor_id ? (
+    //         <Button 
+    //           variant='contained' 
+    //           color='primary' 
+    //           onClick={() => AssignSupervisor(params.row.order_no, params.row.bookdate, params.row.allot_time_range, params.row.service_name)} 
+    //           disabled={params?.row?.userRole?.role === "service"}
+    //         >
+    //           Admin
+    //         </Button>
+    //       ) : (
+    //         params.row.suprvisor_id
+    //       )
+    //     ) :  params.row.suprvisor_id
+    //   } </> ), minWidth: 200,  editable: false },
 
     { field: "servicep_id", headerName: "Service Provider",
     renderCell: (params) => ( 
@@ -737,9 +738,9 @@ const AdminDashboard = () => {
         
 // //         } </> ),
 //     minWidth: 150 },
-//     { field: "paymethod", headerName: "Payment Method", minWidth: 150},
-//     { field: "piadamt", headerName: "Paid Amount", minWidth: 150 },
-//     { field: "totalamt", headerName: "Balance Amount", minWidth: 150},
+    { field: "paymethod", headerName: "Payment Method", minWidth: 150},
+    { field: "piadamt", headerName: "Paid Amount", minWidth: 150 },
+    { field: "totalamt", headerName: "Balance Amount", minWidth: 150},
 //     { field: "cust_remark", headerName: "Customer Remark", minWidth: 150 },
 //     { field: "admin_remark", headerName: "Admin Remark", minWidth: 150 },
 //     { field: "bakof_remark", headerName: "Back Office Remark",
@@ -821,8 +822,8 @@ const AdminDashboard = () => {
 //         minWidth: 180,
 //          editable: false,
 //     },
-//     { field: "pending", headerName: "Order Status", minWidth: 150,  editable: false },
-//     { field: "cancle_reson", headerName: "Cancel Reason", minWidth: 150,  editable: false },
+    { field: "pending", headerName: "Order Status", minWidth: 150,  editable: false },
+    { field: "cancle_reson", headerName: "Cancel Reason", minWidth: 150,  editable: false },
 //     { 
 //       field: "sueadmin_remark", 
 //       headerName: "Super Admin Remark",
@@ -859,8 +860,17 @@ const AdminDashboard = () => {
         }
       },
       },
-
-
+      { field: "invoice", headerName: "Invoice", minWidth: 150,  editable: false,
+        renderCell: (params) => {
+        if(params.row.admin_approve){
+          return (
+              <Button variant='contained' color='primary' onClick={() => handleInvoice(params.row)}>
+                Invoice
+              </Button>
+            )
+        }
+       },
+      }
   ];
 
   const handleComplain = () =>{
@@ -890,6 +900,24 @@ const AdminDashboard = () => {
 
 
 
+  const InvoiceRef = useRef(null);
+
+  const [invoiceData, setInvoice] = useState([]);
+
+  const handlePrint2 = useReactToPrint({
+    content: () => InvoiceRef.current,
+    onAfterPrint: () => setInvoice([])
+  });
+  
+  const handleInvoice = (data) => {
+    setInvoice(data);
+  };
+
+  useEffect(()=>{
+    if (invoiceData && Object.keys(invoiceData).length > 0) {
+      handlePrint2();
+    }
+  }, [invoiceData,handlePrint2 ])
 
 
   const UpdateDueOrder = async () => {
@@ -909,6 +937,9 @@ const AdminDashboard = () => {
   return (
     <Fragment>
 
+       <div style={{ display: 'none' }}>
+        <Invoice ref={InvoiceRef} data={invoiceData} />
+      </div>
 
     {supervisorModalOpen &&   <AssignSupervisorModal
         supervisorModalOpen={supervisorModalOpen}
