@@ -89,7 +89,7 @@ function AdminSignIn() {
         <Grid className="d-none d-md-block" item lg={4} xs={12}>
           <img
             className="animate__animated animate__backInLeft w-100"
-            src="/wireless-router.jpeg"
+            src="/wireless-route.jpeg"
             alt="..."
           />
         </Grid>

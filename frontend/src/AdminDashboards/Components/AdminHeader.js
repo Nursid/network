@@ -48,7 +48,7 @@ const AdminHeader = () => {
                 <Row>
                     <Col sm={6} lg={6} className={isMobile ? 'd-flex align-items-center justify-content-center' : 'd-flex align-items-center justify-content-start'}>
                         <div className="">
-                            <img width={'150px'} src="/images.png" alt="" height={'30px'}/>
+                            <img  src="/images.png" alt="" height={'60px'}/>
                         </div>
                     </Col>
 
