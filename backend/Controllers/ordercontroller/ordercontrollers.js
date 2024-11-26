@@ -249,7 +249,7 @@ const GetOrderUpdate = async (req, res) => {
 			}
 		})
 
-		if (! isUpdated) {
+		if (!isUpdated) {
 			return res.status(400).json({error: true, message: 'Updation Failed ! Try again'})
 		}
 		res.status(200).json({status: 200, message: "Updated Successfull!"})
@@ -314,6 +314,7 @@ const GetAllOrders = async (req, res) => {
 				attributes: ['name', 'email', 'mobileno'],
 				include: {
 					model: CustomerModel,
+					attributes: ['address'],
 				}
 			},
 			order: [['bookdate', 'DESC']]
@@ -490,6 +491,7 @@ const AddOrderCustomer = async (req, res) => {
 	  return res.status(500).json({ error: true, message: "Internal Server Error" });
 	}
   }
+
 const GetOrderAssing = async (req, res) => {
     const transaction = await sequelize.transaction();
 
@@ -497,11 +499,15 @@ const GetOrderAssing = async (req, res) => {
         const order_no = req.params.order_no;
         const data = req.body;
 
+		
+
         // Update the order with the provided data
         const [isUpdated] = await OrderModel.update(data, {
             where: { order_no: order_no },
             transaction,
         });
+
+		
 
         if (!isUpdated) {
             await transaction.rollback();
@@ -514,6 +520,7 @@ const GetOrderAssing = async (req, res) => {
             transaction,
         });
 
+		
         if (!updatedOrder) {
             await transaction.rollback();
             return res.status(202).json({ error: true, message: 'Order not found!' });
@@ -524,6 +531,7 @@ const GetOrderAssing = async (req, res) => {
             where: { name: data.servicep_id },
             transaction,
         });
+		
 
         if (!serProvider) {
             await transaction.rollback();
@@ -535,6 +543,7 @@ const GetOrderAssing = async (req, res) => {
             [allot_time_range]: `${updatedOrder.service_name}-${order_no}`,
             emp_id: serProvider.id,
         };
+		
 
         const existingAvailability = await Availability.findOne({
             where: {
@@ -543,8 +552,6 @@ const GetOrderAssing = async (req, res) => {
             },
             transaction,
         });
-
-
 
 		if (existingAvailability) {
 			if (existingAvailability[allot_time_range] === 'p') {
@@ -560,8 +567,11 @@ const GetOrderAssing = async (req, res) => {
 					  message: 'Service Provider Not Available',
 					});
 			} 
+		  }else{
+			const newAvailability = await Availability.create(AllotData, { transaction });
+			await transaction.commit();
+			return res.status(200).json({ status: true, message: 'Availability created successfully.' });
 		  }
-
     } catch (error) {
         await transaction.rollback();
         console.error(error);

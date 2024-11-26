@@ -738,8 +738,10 @@ const AdminDashboard = () => {
         
 // //         } </> ),
 //     minWidth: 150 },
+    { field: "netpayamt", headerName: "Net Payment", minWidth: 150},
     { field: "paymethod", headerName: "Payment Method", minWidth: 150},
-    { field: "piadamt", headerName: "Paid Amount", minWidth: 150 },
+    { field: "online", headerName: "Online", minWidth: 150 },
+    { field: "cash", headerName: "Cash", minWidth: 150 },
     { field: "totalamt", headerName: "Balance Amount", minWidth: 150},
 //     { field: "cust_remark", headerName: "Customer Remark", minWidth: 150 },
 //     { field: "admin_remark", headerName: "Admin Remark", minWidth: 150 },
@@ -824,19 +826,19 @@ const AdminDashboard = () => {
 //     },
     { field: "pending", headerName: "Order Status", minWidth: 150,  editable: false },
     { field: "cancle_reson", headerName: "Cancel Reason", minWidth: 150,  editable: false },
-//     { 
-//       field: "sueadmin_remark", 
-//       headerName: "Super Admin Remark",
-//       minWidth: 180, 
-//        editable: false,
-//       renderCell: (params) => ( 
-//         <Tooltip title={params.row.sueadmin_remark}>
-//           <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-//             {params.row.sueadmin_remark}
-//           </div>
-//         </Tooltip>
-//       )
-//     },   
+    { 
+      field: "sueadmin_remark", 
+      headerName: "Super Admin Remark",
+      minWidth: 180, 
+       editable: false,
+      renderCell: (params) => ( 
+        <Tooltip title={params.row.sueadmin_remark}>
+          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {params.row.sueadmin_remark}
+          </div>
+        </Tooltip>
+      )
+    },   
     { 
       field: "admin_approve", 
       headerName: "Final Status", 
@@ -932,7 +934,6 @@ const AdminDashboard = () => {
   useEffect(() => {
       UpdateDueOrder();
   }, []);
-  
   
   return (
     <Fragment>

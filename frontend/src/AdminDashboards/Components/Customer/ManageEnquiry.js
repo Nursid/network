@@ -153,7 +153,7 @@ const ManageEnquiry = () => {
     const column = [
         { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: true },
         { field: "date", headerName: "Date",flex: 1, minWidth: 120, editable: true },
-        { field: "service", headerName: "Date",flex: 1, minWidth: 120, editable: true },
+        { field: "service", headerName: "Serivce Name",flex: 1, minWidth: 120, editable: true },
         { field: "name", headerName: "Name",flex: 1, minWidth: 120, editable: true },
         { field: "mobileNo", headerName: "Mobile No.",flex: 1, minWidth: 120, editable: true },
         { field: "email", headerName: "Email",flex: 1, minWidth: 350, editable: true },

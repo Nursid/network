@@ -73,8 +73,11 @@ module.exports = (sequelize) => {
           totalamt: {
             type: DataTypes.STRING
           },
-          piadamt: {
-            type: DataTypes.STRING
+          online: {
+            type: DataTypes.INTEGER
+          },
+          cash: {
+            type: DataTypes.INTEGER
           },
           netpayamt: {
             type: DataTypes.STRING

@@ -35,7 +35,8 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
     problem_des: orderData?.problem_des || '',
     paymethod: orderData?.paymethod || '',
     netpayamt: orderData?.netpayamt || '',
-    piadamt: orderData?.piadamt || '',
+    online: orderData?.online || '',
+    cash: orderData?.cash || '',
     totalamt: orderData?.totalamt || '',
     allot_time_range: orderData?.allot_time_range || '',
     sueadmin_remark: orderData?.sueadmin_remark || '',
@@ -60,6 +61,7 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
   const payMethodOptions = [
     { label: 'Cash', value: 'Cash' },
     { label: 'Online', value: 'Online' },
+    { label: 'Both', value: 'Both' },
   ];
 
   const handleInputChange = (e, maxLength) => {
@@ -67,11 +69,24 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
     if (value.length <= maxLength) {
       setFormData((prev) => ({ ...prev, [name]: value }));
       }
-    if (name === 'netpayamt' || name === 'piadamt') {
-      const bill = name === 'netpayamt' ? parseFloat(value) : parseFloat(formData.netpayamt);
-      const paid = name === 'piadamt' ? parseFloat(value) : parseFloat(formData.piadamt);
-      setFormData((prev) => ({ ...prev, totalamt: bill - paid }));
+    if (name === 'netpayamt' || name === 'online' || name === 'cash') {
+      // const bill = name === 'netpayamt' ? parseFloat(value) : parseFloat(formData.netpayamt);
+      // const paid = name === 'piadamt' ? parseFloat(value) : parseFloat(formData.piadamt);
+      // setFormData((prev) => ({ ...prev, totalamt: bill - paid }));
+      const parsedValue = parseFloat(value) || 0;
+      setFormData((prev) => {
+        const bill = parseFloat(prev.netpayamt) || 0;
+        const online = name === "online" ? parsedValue : parseFloat(prev.online) || 0;
+        const cash = name === "cash" ? parsedValue : parseFloat(prev.cash) || 0;
+        const paid = online + cash;
+        return {
+          ...prev,
+          totalamt: bill - paid, // Update the balance
+        };
+      });
     }
+
+
   };
 
   const { data, isLoading: isLoadingTime } = useSelector(state => state.GetAllTimeSlotReducer);
@@ -130,8 +145,16 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
           if (!formData.netpayamt || formData.netpayamt <= 0) {
             errors.netpayamt = "Total Amount is required ";
           }
-          if (!formData.piadamt || formData.piadamt <= 0) {
-            errors.piadamt = "Paid Amount is required ";
+          if(!formData.cash || formData.cash <= 0) {
+            errors.cash = "Paid Amount is required ";
+          }
+          if (formData.paymethod === 'Both') {
+            if (!formData.cash || formData.cash <= 0) {
+              errors.cash = "Paid Amount is required ";
+            }
+            if (!formData.online || formData.online <= 0) {
+              errors.online = "Paid Amount is required ";
+            }
           }
           if (!formData.paymethod) {
             errors.paymethod = "Payment method is required";
@@ -154,21 +177,20 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
           ...formData,
           service_name: formData.service_name.value,
           user_type: formData.user_type.value,
-          paymethod: formData.paymethod.value,
           servicep_id: formData.servicep_id.value,
           suprvisor_id: formData.suprvisor_id.value,
           allot_time_range: timeslot.value
         }
 
-        const AddAccountAmount = {
-          payment_mode: formData?.paymethod?.value,
-          amount: formData?.piadamt,
-          order_no: orderData.order_no,
-          person_name: orderData?.NewCustomer?.name,
-          about_payment: formData?.service_name?.value,
-          balance: formData?.totalamt,
-          type_payment: 0
-        }	
+        // const AddAccountAmount = {
+        //   payment_mode: formData?.paymethod?.value,
+        //   amount: formData?.piadamt,
+        //   order_no: orderData.order_no,
+        //   person_name: orderData?.NewCustomer?.name,
+        //   about_payment: formData?.service_name?.value,
+        //   balance: formData?.totalamt,
+        //   type_payment: 0
+        // }	
 
         try {
           // Update order
@@ -178,10 +200,10 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
           if (response.status === 200) {
             setIsLoading(false)
 
-            if(formData.paymethod){
-                // Add balance
-                await axios.post(`${API_URL}/api/add-balance`, AddAccountAmount);
-            }
+            // if(formData.paymethod){
+            //     // Add balance
+            //     await axios.post(`${API_URL}/api/add-balance`, AddAccountAmount);
+            // }
             
             // Call the provided function prop
             prop();
@@ -380,7 +402,7 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
               </FormGroup>
             </Col> */}
         <h2>Billing Details</h2>
-        <Col md={6}>
+        {/* <Col md={6}>
           <FormGroup>
             <Label>Payment Method</Label>
             <SelectBox options={payMethodOptions} setSelcted={(value) => setFormData((prev) => ({ ...prev, paymethod: value }))} initialValue={formData.paymethod} />
@@ -391,17 +413,7 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
 						)}
           </FormGroup>
         </Col>
-        <Col md={6}>
-          <FormGroup>
-            <Label>Bill Amount</Label>
-            <Input name="netpayamt" type="number" onChange={(e) => handleInputChange(e, 7)} value={formData.netpayamt} placeholder="Bill Amount" />
-            {errors?.netpayamt && (
-							<span className='validationError'>
-								{errors?.netpayamt}
-							</span>
-						)}
-          </FormGroup>
-        </Col>
+        
         <Col md={6}>
           <FormGroup>
             <Label>Paid Amount</Label>
@@ -413,12 +425,70 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
 						)}
           </FormGroup>
         </Col>
-        <Col md={6}>
+        */}
+
+
+<Col md={6}>
+          <FormGroup>
+            <Label>Bill Amount</Label>
+            <Input name="netpayamt" type="number" onChange={(e) => handleInputChange(e, 7)} value={formData.netpayamt} placeholder="Bill Amount" />
+            {errors?.netpayamt && (
+							<span className='validationError'>
+								{errors?.netpayamt}
+							</span>
+						)}
+          </FormGroup>
+        </Col>
+
+
+ <Col md={6}>
+				<FormGroup>
+				<Label for="payment_method">Payment Method</Label>
+				<SelectBox
+					options={payMethodOptions} setSelcted={(value) => setFormData((prev) => ({ ...prev, paymethod: value?.value }))} initialValue={formData.paymethod}
+				/>
+				</FormGroup>
+			</Col>
+
+			{(formData?.paymethod === "Both" || formData?.paymethod === "Online") && 
+				<Col md={6}>
+					<FormGroup>
+					<Label for="payment">Online Amount</Label>
+					<Input
+						type="number"
+						name="online"
+						value={formData?.online}
+						onChange={(e) => handleInputChange(e, 7)}
+						placeholder="Enter Payment Amount"
+					/>
+					</FormGroup>
+				</Col>
+				}
+				
+			{(formData?.paymethod === "Both" || formData?.paymethod === "Cash") && 
+			<Col md={6}>
+				<FormGroup>
+				<Label for="payment">Cash Amount</Label>
+				<Input
+					type="number"
+					name="cash"
+					value={formData?.cash}
+					onChange={(e) => handleInputChange(e, 10)}
+					placeholder="Enter Payment Amount"
+				/>
+				</FormGroup>
+			</Col>
+			}
+
+<Col md={6}>
           <FormGroup>
             <Label>Balance Amount</Label>
             <Input name="totalamt" type="number" value={formData.totalamt} placeholder="Balance Amount" readOnly />
           </FormGroup>
         </Col>
+
+
+
         <Button className="bg-primary text-white" disabled={isLoading} onClick={handleSubmit}>Update</Button>
       </Row>
     </Fragment>
