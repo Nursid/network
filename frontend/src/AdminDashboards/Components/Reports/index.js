@@ -14,56 +14,81 @@ const Reports = () => {
   return (
     <Fragment>
       <AdminHeader />
-      <div className='position-relative'>
-        <AnimatedBackground />
-        <div className='BackgroundTopContents'>
-          <AdminNavItems />
+      <div className="d-flex">
+        <div
+          className="sidebar bg-light"
+          style={{
+            width: "300px",
+            position: "sticky",
+            top: 0,
+            height: "100vh",
+          }}
+        >
+          <AdminNavItems  />
+        </div>
 
-          <div className="AttendenceTabs px-3">
-            <span 
-              className={` ${attendanceActive === "1" ? "ReportsTabs_Active" : ""}`} 
-              onClick={() => setAttendanceActive("1")}
-            >
-            Employee  Attendance Report
-            </span>
+        {/* Main Content */}
+        <div
+          className="main-content flex-grow-1 position-relative"
+          style={{
+            width: "calc(100% - 300px)",
+            overflowY: "auto",
+          }}
+        >
+          <AnimatedBackground />
+          <div className="BackgroundTopContents">
+            <div className="AttendenceTabs px-3 pt-4 d-flex gap-3">
+              <span
+                className={`${
+                  attendanceActive === "1" ? "ReportsTabs_Active" : ""
+                }`}
+                onClick={() => setAttendanceActive("1")}
+              >
+                Employee Attendance Report
+              </span>
+              <span
+                className={`${
+                  attendanceActive === "2" ? "ReportsTabs_Active" : ""
+                }`}
+                onClick={() => setAttendanceActive("2")}
+              >
+                Service Provider Attendance Report
+              </span>
+              <span
+                className={`${
+                  attendanceActive === "3" ? "ReportsTabs_Active" : ""
+                }`}
+                onClick={() => setAttendanceActive("3")}
+              >
+                Order Report
+              </span>
+              <span
+                className={`${
+                  attendanceActive === "4" ? "ReportsTabs_Active" : ""
+                }`}
+                onClick={() => setAttendanceActive("4")}
+              >
+                Account Report
+              </span>
+            </div>
 
-            <span 
-              className={` ${attendanceActive === "2" ? "ReportsTabs_Active" : ""}`} 
-              onClick={() => setAttendanceActive("2")}
-            >
-            Service Provider  Attendance Report
-            </span>
-
-            <span 
-              className={` ${attendanceActive === "3" ? "ReportsTabs_Active" : ""}`} 
-              onClick={() => setAttendanceActive("3")}
-            >
-              Order Report
-            </span>
-            <span 
-              className={` ${attendanceActive === "4" ? "ReportsTabs_Active" : ""}`} 
-              onClick={() => setAttendanceActive("4")}
-            >
-              Account Report
-            </span>
+            <TabContent activeTab={attendanceActive}>
+              <TabPane tabId="1">
+                <AttendanceReports setActiveAttendance={setAttendanceActive} />
+              </TabPane>
+              <TabPane tabId="2">
+                <ServiceProviderAttendanceReports
+                  setActiveAttendance={setAttendanceActive}
+                />
+              </TabPane>
+              <TabPane tabId="3">
+                <OrderReports setActiveAttendance={setAttendanceActive} />
+              </TabPane>
+              <TabPane tabId="4">
+                <AccountReports setActiveAttendance={setAttendanceActive} />
+              </TabPane>
+            </TabContent>
           </div>
-
-          <TabContent activeTab={attendanceActive}>
-            <TabPane tabId="1">
-              <AttendanceReports setActiveAttendance={setAttendanceActive}  />
-            </TabPane>
-
-            <TabPane tabId="2">
-              <ServiceProviderAttendanceReports setActiveAttendance={setAttendanceActive}  />
-            </TabPane>
-
-            <TabPane tabId="3">
-              <OrderReports setActiveAttendance={setAttendanceActive} />
-            </TabPane>
-            <TabPane tabId="4">
-              <AccountReports setActiveAttendance={setAttendanceActive}  />
-            </TabPane>
-          </TabContent>
         </div>
       </div>
     </Fragment>

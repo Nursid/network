@@ -10,17 +10,32 @@ const AdminManageMaster = () => {
     const [attendanceActive, setActiveAttendance] = useState("packs")
     return (
         <Fragment>
-            <AdminHeader />
-            <div className='position-relative'>
-                <AnimatedBackground />
-                <div className='BackgroundTopContents'>
-                    <AdminNavItems />
+        <AdminHeader />
+        <div className="d-flex">
+          <div
+            className="sidebar bg-light"
+            style={{
+              width: "300px",
+              position: "sticky",
+              top: 0,
+              height: "100vh",
+            }}
+          >
+            <AdminNavItems  />
+          </div>
+          <div
+            className="main-content flex-grow-1 position-relative"
+            style={{
+              width: "calc(100% - 300px)",
+              overflowY: "auto",
+            }}
+          >
+            <AnimatedBackground />
+            <div className="BackgroundTopContents">
+                      <div className="AttendenceTabs px-3 pt-2">
+                        <span className={`${attendanceActive === "packs" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("packs") }}>Packs/Plans</span>
 
-
-                    <div className="AttendenceTabs px-3">
-                        <span className={`${attendanceActive === "packs" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("out") }}>Packs/Plans</span>
-
-                        <span className={` ${attendanceActive === "service" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("in") }}>Service</span>
+                        <span className={` ${attendanceActive === "service" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("service") }}>Service</span>
                     </div>
 
 
@@ -33,6 +48,7 @@ const AdminManageMaster = () => {
                         </TabPane>
                     </TabContent>
                 </div>
+            </div>
             </div>
         </Fragment>
     )

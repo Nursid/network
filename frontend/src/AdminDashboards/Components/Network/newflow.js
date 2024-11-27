@@ -231,10 +231,10 @@ const Flow = () => {
 
 
   return (
- <div style={{ height: '100vh', width: '100%', backgroundColor: '#34495e' }}>
-  <div class="d-flex justify-content-between align-items-center w-100">
+ <div style={{ height: '100vh', width: '100%', backgroundColor: '#34495e' }} >
+  <div class="d-flex justify-content-between align-items-center w-100 p-2">
   
-  <div class="d-flex flex-row  align-items-center w-50">
+  <div class="d-flex flex-row gap-2  align-items-center w-50">
     <Input 
       type="text" 
       class="form-control w-50 me-2" 

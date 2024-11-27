@@ -23,14 +23,30 @@ const AvailabilityIndex = () => {
 
     return (
 
-            <Fragment>
-            <AdminHeader />
-            <div className='position-relative'>
-                <AnimatedBackground />
-                <div className='BackgroundTopContents'>
-                    <AdminNavItems />
-
-                    <div className="AttendenceTabs px-3">
+        <Fragment>
+        <AdminHeader />
+        <div className="d-flex">
+          <div
+            className="sidebar bg-light"
+            style={{
+              width: "300px",
+              position: "sticky",
+              top: 0,
+              height: "100vh",
+            }}
+          >
+            <AdminNavItems  />
+          </div>
+          <div
+            className="main-content flex-grow-1 position-relative"
+            style={{
+              width: "calc(100% - 300px)",
+              overflowY: "auto",
+            }}
+          >
+            <AnimatedBackground />
+            <div className="BackgroundTopContents">
+                      <div className="AttendenceTabs px-3 pt-2">
                             {/* set role wise display  */}
 
 
@@ -48,6 +64,7 @@ const AvailabilityIndex = () => {
                                         <Availability />
                                     </TabPane>
                         </TabContent>
+                    </div>
                     </div>
                 </div>
             </Fragment>

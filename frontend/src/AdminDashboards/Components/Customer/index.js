@@ -36,12 +36,29 @@ const AdminCustomerManage = () => {
 
     return (
         <Fragment>
-            <AdminHeader />
-            <div className='position-relative'>
-                <AnimatedBackground />
-                <div className='BackgroundTopContents'>
-                    <AdminNavItems />
-                    <div className="AttendenceTabs px-3">
+        <AdminHeader />
+        <div className="d-flex">
+          <div
+            className="sidebar bg-light"
+            style={{
+              width: "300px",
+              position: "sticky",
+              top: 0,
+              height: "100vh",
+            }}
+          >
+            <AdminNavItems  />
+          </div>
+          <div
+            className="main-content flex-grow-1 position-relative"
+            style={{
+              width: "calc(100% - 300px)",
+              overflowY: "auto",
+            }}
+          >
+            <AnimatedBackground />
+            <div className="BackgroundTopContents">
+                      <div className="AttendenceTabs px-3 pt-2">
                         {userRole && userRole.ManageCustomer ? <span className={` ${attendanceActive === "customer" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("customer") }}>Manage Customers</span> : null}
                         {userRole && userRole.ManageHistory ? <span className={` ${attendanceActive === "history" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("history") }}>Manage History</span> : null}
                         {/* {userRole && userRole.MonthlyMembers ? <span className={` ${attendanceActive === "members" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("members") }}>Manage Members</span> : null} */}
@@ -71,9 +88,10 @@ const AdminCustomerManage = () => {
                             </TabPane>
                             : null}
                     </TabContent>
-                </div>
-            </div>
-        </Fragment >
+                    </div>
+                    </div>
+			</div>
+			</Fragment>
     )
 }
 

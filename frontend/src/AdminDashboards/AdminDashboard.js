@@ -300,6 +300,8 @@ const AdminDashboard = () => {
   }
 
   const GetFilterOrder = (status) =>{
+
+    console.log("status---",status)
     setInventry(false);
     setSummary(false);
     setComplain(false);
@@ -1087,11 +1089,36 @@ const AdminDashboard = () => {
         }
 
 
-      <div className="position-relative">
+      {/* <div className="position-relative">
         <AnimatedBackground />
         <div className="BackgroundTopContents" style={{ overflowX: "hidden" }}>
 
-          {userRole && userRole?.Dashboard ? <AdminNavItems /> : null}
+          {userRole && userRole?.Dashboard ? <AdminNavItems /> : null} */}
+
+      {/* <AdminHeader /> */}
+      <div className="d-flex">
+        <div
+          className="sidebar bg-light"
+          style={{
+            width: "300px",
+            position: "sticky",
+            top: 0,
+            height: "100vh",
+          }}
+        >
+        {userRole && userRole?.Dashboard ?   <AdminNavItems  /> : null}
+        </div>
+
+        {/* Main Content */}
+        <div
+          className="main-content flex-grow-1 position-relative"
+          style={{
+            width: "calc(100% - 300px)",
+            overflowY: "auto",
+          }}
+        >
+          <AnimatedBackground />
+          <div className="BackgroundTopContents">
 
           <h4 className="p-4 fs-5 Fw_600 text-white ">
             {userRole && userRole?.Dashboard ? "Analytics" : "Dashboard"}
@@ -1201,170 +1228,171 @@ const AdminDashboard = () => {
             </> : null }
           </div>
 
-          <div className='flex'>
-            <h4 className='p-3 px-4 mt-3 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}> All Order List</h4>
+            <div className='flex'>
+              <h4 className='p-3 px-4 mt-3 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}> All Order List</h4>
 
-           
-              <div className="AttendenceNavBtn w-100 py-2 px-4 gap-3 justify-content-end">
-                <div
-                  className="py-2 px-4 border shadow rounded-2 cursor-p hoverThis text-white Fw_500 d-flex align-items-center justify-content-center"
-                  style={{ minWidth: "18rem", maxWidth: "18rem" }}
-                  onClick={() => customerTypeOpenFunction(!customerTypeOpen)}
-                >
-                  Add New Order
+            
+                <div className="AttendenceNavBtn w-100 py-2 px-4 gap-3 justify-content-end">
+                  <div
+                    className="py-2 px-4 border shadow rounded-2 cursor-p hoverThis text-white Fw_500 d-flex align-items-center justify-content-center"
+                    style={{ minWidth: "18rem", maxWidth: "18rem" }}
+                    onClick={() => customerTypeOpenFunction(!customerTypeOpen)}
+                  >
+                    Add New Order
+                  </div>
                 </div>
+            
+          </div>
+            <div className="p-4 ">
+            {!complain && !inventry && summary && 
+            <Card className="p-4">
+            <div className="">
+            <h3>Order Summary</h3>
+            <div className="flex flex-col justify-between w-full mb-3 ">
+              <div className="flex justify-between gap-6 items-center">
+                  <label htmlFor="startDate">From:</label>
+                  <Input id="startDate" type="date" className="ml-2 mr-2" onChange={(e)=>setFrom(e.target.value)}/>
+                  <label htmlFor="endDate" className="mr-2">To:</label>
+                  <Input id="endDate" type="date" onChange={(e)=>setTo(e.target.value)}/>
+                  <Button className="btn btn-primary ml-3" size="small" onClick={GetTotalSummary}  variant="contained">Search</Button>
               </div>
-           
-        </div>
-          <div className="p-4 ">
-          {!complain && !inventry && summary && 
-          <Card className="p-4">
-          <div className="">
-          <h3>Order Summary</h3>
-          <div className="flex flex-col justify-between w-full mb-3 ">
-            <div className="flex justify-between gap-6 items-center">
-                <label htmlFor="startDate">From:</label>
-                <Input id="startDate" type="date" className="ml-2 mr-2" onChange={(e)=>setFrom(e.target.value)}/>
-                <label htmlFor="endDate" className="mr-2">To:</label>
-                <Input id="endDate" type="date" onChange={(e)=>setTo(e.target.value)}/>
-                <Button className="btn btn-primary ml-3" size="small" onClick={GetTotalSummary}  variant="contained">Search</Button>
-            </div>
-        </div>     
-          <Table striped>
-              <thead>
-                  <tr>
-                      <th>Total Services</th>
-                      <th>Monthly Service</th>
-                      <th>Completed Service</th>
-                      <th>Cancelled Service</th>
-                      <th>Hold Service</th>
-                      <th>Pending</th>
-                      <th>Running</th>
-                      <th>Due</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr>
-                      <td>{totalSummary?.totalOrders}</td>
-                      <td>{totalSummary?.totalMonthlyService}</td>
-                      <td>{totalSummary?.totalCompleted}</td>
-                      <td>{totalSummary?.totalCancel}</td>
-                      <td>{totalSummary?.totalHold}</td>
-                      <td>{totalSummary?.totalPending}</td>
-                      <td>{totalSummary?.totalRunning}</td>
-                      <td>{totalSummary?.totalDue}</td>
-                      
-                  </tr>
-              </tbody>
-          </Table>
-          <h4>Cash Summary</h4>
-          <Table striped>
-              <thead>
-                  <tr>
-                      <th>Monthly Service Payments</th>
-                      <th> Total Expenses</th>
-                      <th> Total in Cash</th>
-                      <th> Total in Bank </th>
-                      <th> Net Balance </th>
-                      <th>Action</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr>
-                      <td>{totalSummary?.TotalserviceFees}</td>
-                      <td>{totalSummary?.TotalExpenses}</td>
-                      <td>{totalSummary?.TotalCash}</td>
-                      <td>{totalSummary?.TotalBank}</td>
-                      <td>{totalSummary?.Netbalance}</td>
-                      <th><a
-                                href={`data:text/csv;charset=utf-8,Total Services,Monthly Service,Completed Service,Cancelled Service,Hold Service,Pending
-                                    ${totalSummary?.totalOrders},${totalSummary?.totalMonthlyService},${totalSummary?.totalCompleted},${totalSummary?.totalCancel},${totalSummary?.totalHold},${totalSummary?.totalPending}
-                                    Monthly Service Payments,Total Expenses,Total Cash,Total online,Net Balance 
-                                    ${totalSummary?.TotalserviceFees},${totalSummary?.TotalExpenses},${totalSummary?.TotalCash},${totalSummary?.TotalBank},${parseFloat(totalSummary?.TotalCash) + parseFloat(totalSummary?.TotalBank)}`}
-                                download="TodaysServicesReport.csv"
-                            >
-                              Export Report</a></th>
-                  </tr>
-
-              </tbody>
-          </Table>
-          </div>
-          </Card>             
-            }
-           {!complain && !summary && !inventry && <AdminDataTable
-              rows={DataWithID(orders.data)}
-              // columns={columns}
-              CustomToolbar={CustomToolbar}
-              columns={columns.map(column => {
-                if (column.field === 'action') {
-                    return {
-                        ...column,
-                        renderCell: (params) => (
-                          <select
-                                className="p-2 border-0"
-                                style={{ borderRadius: "5px", outline: "none", cursor: "pointer", width: "120px" }}
-                                onChange={(e) => {
-                                    const selectedValue = e.target.value;
-                                    if (selectedValue === 'Delete') {
-                                        OrderDeleteByID(params.row.order_no);
-                                    }
-                                    else if(selectedValue==='Cancel'){
-                                      OrderCancel(params.row.order_no,params.row.cust_id);
-                                    }
-                                    else if(selectedValue === 'Edit'){
-                                      OrderUpdate(params.row)
-                                    }
-                                    else if(selectedValue === 'Hold'){
-                                      OrderHold(params.row.order_no)
-                                    }
-                                    else if(selectedValue === 'Complete'){
-                                      OrderComplete(params.row.order_no, params.row.piadamt, params.row.totalamt);
-                                    }
-                                    else if(selectedValue === 'Transfer'){
-                                      OrderTransfers(params.row.order_no)
-                                    }
-                                    e.target.value = 'Action';
-                                }}
+          </div>     
+            <Table striped>
+                <thead>
+                    <tr>
+                        <th>Total Services</th>
+                        <th>Monthly Service</th>
+                        <th>Completed Service</th>
+                        <th>Cancelled Service</th>
+                        <th>Hold Service</th>
+                        <th>Pending</th>
+                        <th>Running</th>
+                        <th>Due</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{totalSummary?.totalOrders}</td>
+                        <td>{totalSummary?.totalMonthlyService}</td>
+                        <td>{totalSummary?.totalCompleted}</td>
+                        <td>{totalSummary?.totalCancel}</td>
+                        <td>{totalSummary?.totalHold}</td>
+                        <td>{totalSummary?.totalPending}</td>
+                        <td>{totalSummary?.totalRunning}</td>
+                        <td>{totalSummary?.totalDue}</td>
+                        
+                    </tr>
+                </tbody>
+            </Table>
+            <h4>Cash Summary</h4>
+            <Table striped>
+                <thead>
+                    <tr>
+                        <th>Monthly Service Payments</th>
+                        <th> Total Expenses</th>
+                        <th> Total in Cash</th>
+                        <th> Total in Bank </th>
+                        <th> Net Balance </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{totalSummary?.TotalserviceFees}</td>
+                        <td>{totalSummary?.TotalExpenses}</td>
+                        <td>{totalSummary?.TotalCash}</td>
+                        <td>{totalSummary?.TotalBank}</td>
+                        <td>{totalSummary?.Netbalance}</td>
+                        <th><a
+                                  href={`data:text/csv;charset=utf-8,Total Services,Monthly Service,Completed Service,Cancelled Service,Hold Service,Pending
+                                      ${totalSummary?.totalOrders},${totalSummary?.totalMonthlyService},${totalSummary?.totalCompleted},${totalSummary?.totalCancel},${totalSummary?.totalHold},${totalSummary?.totalPending}
+                                      Monthly Service Payments,Total Expenses,Total Cash,Total online,Net Balance 
+                                      ${totalSummary?.TotalserviceFees},${totalSummary?.TotalExpenses},${totalSummary?.TotalCash},${totalSummary?.TotalBank},${parseFloat(totalSummary?.TotalCash) + parseFloat(totalSummary?.TotalBank)}`}
+                                  download="TodaysServicesReport.csv"
                               >
-                              <option disabled selected>Action</option>
-                             
-                              {params.row.pending === "Completed" || params.row.pending === "Cancel" ? (
-                          <>
-                          {(params.row.pending === "Cancel") ?  null  : <option value="Edit">Edit</option> }                         
-                          {(userRole?.role === "super" || userRole?.role === "office" ) ? <option value="Delete">Delete</option> : null}
+                                Export Report</a></th>
+                    </tr>
 
-                          </>
-                            ) : (
-                                  <>
-                                  <option value="Complete">Complete</option>
-                                  <option value="Edit">Edit</option>
-                                  <option value="Cancel">Cancel</option>
-                                  {/* <option value="Delete">Delete</option> */}
-                                  {(userRole?.role === "office" || userRole?.role === "super" || userRole?.role === "admin") ?  (
+                </tbody>
+            </Table>
+            </div>
+            </Card>             
+              }
+            {!complain && !summary && !inventry && <AdminDataTable
+                rows={DataWithID(orders.data)}
+                // columns={columns}
+                CustomToolbar={CustomToolbar}
+                columns={columns.map(column => {
+                  if (column.field === 'action') {
+                      return {
+                          ...column,
+                          renderCell: (params) => (
+                            <select
+                                  className="p-2 border-0"
+                                  style={{ borderRadius: "5px", outline: "none", cursor: "pointer", width: "120px" }}
+                                  onChange={(e) => {
+                                      const selectedValue = e.target.value;
+                                      if (selectedValue === 'Delete') {
+                                          OrderDeleteByID(params.row.order_no);
+                                      }
+                                      else if(selectedValue==='Cancel'){
+                                        OrderCancel(params.row.order_no,params.row.cust_id);
+                                      }
+                                      else if(selectedValue === 'Edit'){
+                                        OrderUpdate(params.row)
+                                      }
+                                      else if(selectedValue === 'Hold'){
+                                        OrderHold(params.row.order_no)
+                                      }
+                                      else if(selectedValue === 'Complete'){
+                                        OrderComplete(params.row.order_no, params.row.piadamt, params.row.totalamt);
+                                      }
+                                      else if(selectedValue === 'Transfer'){
+                                        OrderTransfers(params.row.order_no)
+                                      }
+                                      e.target.value = 'Action';
+                                  }}
+                                >
+                                <option disabled selected>Action</option>
+                              
+                                {params.row.pending === "Completed" || params.row.pending === "Cancel" ? (
+                            <>
+                            {(params.row.pending === "Cancel") ?  null  : <option value="Edit">Edit</option> }                         
+                            {(userRole?.role === "super" || userRole?.role === "office" ) ? <option value="Delete">Delete</option> : null}
+
+                            </>
+                              ) : (
                                     <>
-                                      <option value="Delete">Delete</option>
-                                      <option value="Transfer">Transfer</option>
-                                      <option value="Hold">Hold</option>
-                                    </>
-                                  ) : null 
+                                    <option value="Complete">Complete</option>
+                                    <option value="Edit">Edit</option>
+                                    <option value="Cancel">Cancel</option>
+                                    {/* <option value="Delete">Delete</option> */}
+                                    {(userRole?.role === "office" || userRole?.role === "super" || userRole?.role === "admin") ?  (
+                                      <>
+                                        <option value="Delete">Delete</option>
+                                        <option value="Transfer">Transfer</option>
+                                        <option value="Hold">Hold</option>
+                                      </>
+                                    ) : null 
+                                  }
+                                  </>
+                              )}
+                                  </select>
+                                        )
+                                    };
                                 }
-                                </>
-                            )}
-                                </select>
-                                      )
-                                  };
-                              }
-                              return column;
-                          })}    
-                         />
-                        }
-            {inventry && !allotedItems && <AdminDataTable rows={inventories} CustomToolbar={InventryToolbar} columns={Inventrycolumns} />}  
+                                return column;
+                            })}    
+                          />
+                          }
+              {inventry && !allotedItems && <AdminDataTable rows={inventories} CustomToolbar={InventryToolbar} columns={Inventrycolumns} />}  
 
-            {!complain && !summary && inventry && allotedItems && <AdminDataTable rows={allotedItem} CustomToolbar={InventryToolbar} columns={AllotedItemsCollums} />}   
-          </div>
-        </div>
-      </div>
-    </Fragment>
+              {!complain && !summary && inventry && allotedItems && <AdminDataTable rows={allotedItem} CustomToolbar={InventryToolbar} columns={AllotedItemsCollums} />}   
+            </div>
+            </div>
+				</div>
+			</div>
+			</Fragment>
   );
 };
 

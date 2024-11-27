@@ -20,12 +20,29 @@ const AdminRolesAndPermission = () => {
 
     return (
         <Fragment>
-            <AdminHeader />
-            <div className='position-relative'>
-                <AnimatedBackground />
-                <div className='BackgroundTopContents'>
-                    <AdminNavItems />
-                    <div className="AttendenceTabs px-3">
+        <AdminHeader />
+        <div className="d-flex">
+          <div
+            className="sidebar bg-light"
+            style={{
+              width: "300px",
+              position: "sticky",
+              top: 0,
+              height: "100vh",
+            }}
+          >
+            <AdminNavItems  />
+          </div>
+          <div
+            className="main-content flex-grow-1 position-relative"
+            style={{
+              width: "calc(100% - 300px)",
+              overflowY: "auto",
+            }}
+          >
+            <AnimatedBackground />
+            <div className="BackgroundTopContents">
+                      <div className="AttendenceTabs px-3 pt-2">
                         <span className={` ${attendanceActive === "admin" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("admin") }}>Admin</span>
                         <span className={` ${attendanceActive === "supervisor" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("supervisor") }}>Supervisor</span>
                         <span className={` ${attendanceActive === "office" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("office") }}>Back Office</span>
@@ -47,6 +64,7 @@ const AdminRolesAndPermission = () => {
                         </TabPane>
                     </TabContent>
                 </div>
+            </div>
             </div>
         </Fragment>
     )

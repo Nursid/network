@@ -234,11 +234,11 @@ button.dropdownMenu-btn-header.btn.btn-secondary {
 
 .AllMenuCards > div {
   flex: 1 1 auto;
-  max-width: fit-content;
-  min-width: 12rem;
+  width: "100px";
+  height: '80px';
   text-align: center;
   aspect-ratio: 4/4 !important;
-  padding: 10px;
+  padding: 5px;
 }
 
 .StackSelectBox {
@@ -260,8 +260,8 @@ button.dropdownMenu-btn-header.btn.btn-secondary {
   left: 0;
   top: 0;
   height: 100vh;
-  width: 100vw;
-  max-height: 100vh;
+  width: 100%;
+  max-height: 100%;
   overflow-y: auto;
   background-color: rgba(38, 38, 38, 0.404);
   z-index: 1;
@@ -488,3 +488,5 @@ span.validationError {
   background-color: #ffffff !important;
   color: #000 !important;
 }
+
+

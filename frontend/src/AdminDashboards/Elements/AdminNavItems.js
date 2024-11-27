@@ -36,25 +36,28 @@ const AdminNavItems = () => {
   ];
 
   return (
-    <div>
-      <h3 className='pl-4 pt-4 pb-2 text-white headingBelowBorder fw-bold' style={{ maxWidth: "fit-content" }}>
-        Welcome To Laxdeep Dashboard
-      </h3>
-      <div className="AllMenuCards">
-        {NavItems.filter(x => userRole ? userRole[x.field] : false).map((item, index) => {
-          const isActive = location.pathname === `/admin/${item.title.toLocaleLowerCase().split(" ").join("-")}`;
-          return (
-            <div 
-              key={index}
-              onClick={() => navigate(item.title !== "" ? `/admin/${item.title.toLocaleLowerCase().split(" ").join("-")}` : "/admin")} 
-              className={`${isActive ? "activeNavItem" : ""} d-flex cursor-p bg-white text-blue hoverShadow hoverPrimary flex-column align-items-center justify-content-center gap-1 border rounded-3`}
-            >
-              {item.icon}
-              <h6 className='text-center'>{item.title}</h6>
-            </div>
-          );
-        })}
-      </div>
+
+<div className="d-flex flex-column bg-light sidebar p-3">
+      <h3 className="fw-bold mb-4"> Dashboard</h3>
+      <div className="d-flex flex-column gap-3">
+      {NavItems.filter(x => (userRole ? userRole[x.field] : false)).map((item, index) => {
+        const isActive = location.pathname === `/admin/${item.title.toLocaleLowerCase().split(" ").join("-")}`;
+        return (
+          <div
+            key={index}
+            onClick={() => navigate(item.title !== "" ? `/admin/${item.title.toLocaleLowerCase().split(" ").join("-")}` : "/admin")}
+            className={`${isActive ? "activeNavItem" : ""} d-flex align-items-center cursor-pointer bg-white text-blue hoverShadow hoverPrimary gap-2 p-2 border rounded-3 hoverNavItem cursor-pointer`} 
+            style={{
+              cursor: "pointer", // Inline style to override conflicts
+              transition: "background-color 0.3s",
+            }}
+          >
+            {item.icon}
+            <h6 className="m-0">{item.title}</h6>
+          </div>
+        );
+      })}
+    </div>
     </div>
   );
 }
