@@ -63,11 +63,7 @@ const AdminHeader = () => {
                                     <div className=''>
                                         <h6 className='d-none d-md-block'>{currentUser && currentUser.name ? currentUser.name : "yourName "}</h6>
                                         <small>
-                                            
                                             {currentUser && currentUser.role ? currentUser.role : currentUser && currentUser.designation.name ? currentUser.designation.name : ""}
-                                        
-                                        
-                                        
                                         </small>
                                     </div>
                                     <FaChevronDown />

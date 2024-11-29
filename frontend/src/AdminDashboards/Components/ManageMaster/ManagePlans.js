@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import MasterAddService from './Form/MasterAddService';
 import ModalComponent from '../../Elements/ModalComponent';
 import AdminDataTable from '../../Elements/AdminDataTable';
-import { GetAllServices } from '../../../Store/Actions/Dashboard/servicesAction';
+import { GetAllPlan } from '../../../Store/Actions/Dashboard/PlanAction';
 import { DeleteService } from '../../../Store/Actions/Dashboard/servicesAction';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import Swal from 'sweetalert2';
@@ -26,7 +26,7 @@ const ManagePlans = () => {
     const [deleteSuccess, setDeleteSuccess] = useState(false); // New state variable
 
 
-    const { data } = useSelector(pre => pre.GetAllServicesReducer)
+    const { data } = useSelector(pre => pre.GetAllPlanReducer)
     // service reducere
     // const DeletResult = useSelector(pre => pre.DeleterTheServiceReducer)
 
@@ -181,33 +181,11 @@ const ManagePlans = () => {
                     style={{minWidth: "40px", maxWidth: "40px"}}
                     onClick={() => handleEdit(params.row)}
                     ><BorderColorIcon /></Button>
-                    {/* <Button variant="contained" color="success"
-                    style={{minWidth: "40px", maxWidth: "40px"}}
-                    >
-                        <VisibilityIcon />
-                    </Button> */}
                     <Button onClick={() => handleDeleteServices(params.id)} variant="contained" color="error"
                         style={{minWidth: "40px", maxWidth: "40px"}}
                         >
                         <DeleteForeverIcon />
                     </Button>
-                </div>
-            ),
-        },
-        {
-            field: "block",
-            headerName: "Block",
-            minWidth: 100,
-            renderCell: (params) => (
-                <div className="d-flex gap-2">
-                    {blockStatus[params.row.id] ?
-                       <Button variant="contained" color="error" onClick={() => handleToggleBlock(params.row.id)}
-                       style={{minWidth: "40px", maxWidth: "40px"}}
-                       ><BlockIcon /
-                       ></Button>
-                        :
-                        <Button className="text-white bg-warning border-warning" onClick={() => handleToggleBlock(params.row.id)}>Un-Block</Button>
-                    }
                 </div>
             ),
         },
@@ -240,11 +218,11 @@ const ManagePlans = () => {
     }
 
     useEffect(() => {
-        dispatch(GetAllServices())
+        dispatch(GetAllPlan())
     }, [])
 
     useEffect(() => {
-        dispatch(GetAllServices());
+        dispatch(GetAllPlan());
         setDeleteSuccess(false); // Reset the delete success state
     }, [deleteSuccess]); // Trigger useEffect when deleteSuccess changes
     return (

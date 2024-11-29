@@ -30,19 +30,11 @@ const AddPlans = ({ ToggleMasterAddService, data }) => {
 
     // Submit the form
     const handleSubmit = () => {
-        setLoading(true);
+        setLoading(true)
 
-        const formDataSubmit = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
-            formDataSubmit.append(key, value);
-        });
-
-        const apiUrl = data?.id
-            ? `${API_URL}/service/update/${data.id}`
-            : `${API_URL}/service/add`;
-
+        const apiUrl = `${API_URL}/plan/add`;
         axios
-            .post(apiUrl, formDataSubmit)
+            .post(apiUrl, formData)
             .then((response) => {
                 setLoading(false);
                 ToggleMasterAddService();

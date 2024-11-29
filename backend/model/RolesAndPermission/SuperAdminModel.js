@@ -22,6 +22,10 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
+    Tickets: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
     AttendenceEmployee: {
       type: DataTypes.BOOLEAN,
       allowNull: true,

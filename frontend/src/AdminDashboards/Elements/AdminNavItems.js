@@ -10,6 +10,7 @@ import { CgWebsite } from 'react-icons/cg';
 import { FaPeopleCarry } from 'react-icons/fa';
 import { FaRegClock } from "react-icons/fa";
 import { MdReportProblem } from "react-icons/md";
+import { MdAirplaneTicket } from "react-icons/md";
 import { FcSupport } from "react-icons/fc";
 import { GoReport } from "react-icons/go";
 import { useLocation } from 'react-router-dom';
@@ -31,6 +32,7 @@ const AdminNavItems = () => {
     { field: "Customer", title: "Customer", icon: <FaPeopleCarry size={30} /> },
     { field: "RolesAndPermission", title: "Roles & Permission", icon: <MdOutlinePeople size={30} /> },
     { field: "Availability", title: "Availability", icon: <FaRegClock size={30} /> },
+    { field: "Tickets", title: "Tickets", icon: <MdAirplaneTicket size={30} /> },
     { field: "OrderReports", title: "Reports", icon: <GoReport size={30} /> },
     { field: "Network", title: "Network", icon: <IoIosGitNetwork size={30} /> },
   ];
@@ -38,7 +40,7 @@ const AdminNavItems = () => {
   return (
 
 <div className="d-flex flex-column bg-light sidebar p-3">
-      <h3 className="fw-bold mb-4"> Dashboard</h3>
+      <h3 className="fw-bold mb-4"> Laxdeep System & Service</h3>
       <div className="d-flex flex-column gap-3">
       {NavItems.filter(x => (userRole ? userRole[x.field] : false)).map((item, index) => {
         const isActive = location.pathname === `/admin/${item.title.toLocaleLowerCase().split(" ").join("-")}`;

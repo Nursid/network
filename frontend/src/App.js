@@ -17,6 +17,8 @@ import AdminComplain from './AdminDashboards/Components/Complain';
 import Reports from './AdminDashboards/Components/Reports';
 import MonthService from './AdminDashboards/Components/MonthlyService';
 import Network from './AdminDashboards/Components/Network';
+import Tickets from './AdminDashboards/Components/Tickets';
+
 function App() {
 
   return (
@@ -40,6 +42,7 @@ function App() {
             <Route path='reports' element={<Reports />} />
             <Route path='network' element={<Network />} />
             <Route path='monthly-service' element={<MonthService />} />
+            <Route path='tickets' element={<Tickets />} />
           </Route>
         </Routes>
       </BrowserRouter>

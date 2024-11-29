@@ -26,6 +26,7 @@ const CustomerPost= require("./Routers/NewCustomerRouters/CustomerPostRouter")
 const InventoryRouter=require("./Routers/InventryRouter")
 const complain = require("./Routers/ComplainRouter")
 const Attendance = require("./Routers/AttendanceRouters")
+const Plan = require("./Routers/Services/PlansRouters")
 const app = express();
 const route= require("./Routers/index")
 app.use(cors());
@@ -80,6 +81,7 @@ app.use("/post",CustomerPost);
 app.use("/inventry",InventoryRouter)
 app.use("/complain",complain)
 app.use("/attendance",Attendance)
+app.use("/plan",Plan)
 
 // Start the server
 app.listen(5000, () => {
