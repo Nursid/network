@@ -59,6 +59,7 @@ db.SpServices = require("./Misc/sp_services")(sequelize, DataTypes)
 db.locality=require("./Misc/localities")(sequelize, DataTypes)
 db.ComplainModel = require("./ComplainModel")(sequelize, DataTypes)
 db.TimeSlotModel = require("./TimeSlotModel")(sequelize, DataTypes)
+db.TicketModel = require("./TicketModel")(sequelize, DataTypes)
 
 db.SupervisorAttendance = require("./AttendanceModels/SupervisorAttendance")(sequelize, DataTypes)
 

@@ -4,7 +4,7 @@ const AccountController = require('../Controllers/AccountController');
 const AvailabilityController = require("../Controllers/AvailabilityController")
 const LocationModel = require("../Controllers/misc/LocationController")
 const supervisorAvailabilityController = require("../Controllers/SupervisorAvailabilityController")
-
+const ticketRouter = require('./TicketRouter')
 
 router.get('/account-listing',AccountController.ListingAccount);
 router.post('/add-balance',AccountController.AddBalance);
@@ -32,9 +32,9 @@ router.post("/supervisor-availability/attendance/:empId", supervisorAvailability
 
 
 //  Location API
-
 router.get("/location-listing",LocationModel.ListingLocation )
 
-
+/* Ticket API */
+router.use('/', ticketRouter);
     
 module.exports = router

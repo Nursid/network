@@ -5,9 +5,11 @@ import AdminDataTable from '../../Elements/AdminDataTable';
 import moment from 'moment/moment';
 import ModalComponent from '../../Elements/ModalComponent';
 import CreateTickets from './form/CreateTickets';
+import { GetAllTicket } from '../../../Store/Actions/Dashboard/TicketAction';
 
 const AllTickets = () => {
-    const { data } = useSelector(pre => pre.GetAllPlanReducer)
+    const { data } = useSelector(pre => pre.GetAllTicketReducers)
+    const dispatch = useDispatch()
     const DataWithID = (data) => {
         const NewData = []
         if (data !== undefined) {
@@ -56,6 +58,10 @@ const AllTickets = () => {
     const ToggleAddTickets = () => {
         setCreateTicket(!createTicket)
     };
+
+    useEffect(() => {
+        dispatch(GetAllTicket())
+    }, [])
 
     return (
         <Fragment>
