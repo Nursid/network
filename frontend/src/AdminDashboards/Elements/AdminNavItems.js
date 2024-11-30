@@ -40,7 +40,7 @@ const AdminNavItems = () => {
   return (
 
 <div className="d-flex flex-column bg-light sidebar p-3">
-      <h3 className="fw-bold mb-4"> Laxdeep System & Service</h3>
+      {/* <h3 className="fw-bold mb-4"> Laxdeep System & Service</h3> */}
       <div className="d-flex flex-column gap-3">
       {NavItems.filter(x => (userRole ? userRole[x.field] : false)).map((item, index) => {
         const isActive = location.pathname === `/admin/${item.title.toLocaleLowerCase().split(" ").join("-")}`;

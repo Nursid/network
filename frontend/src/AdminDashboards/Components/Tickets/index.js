@@ -4,7 +4,6 @@ import AnimatedBackground from '../../Elements/AnimatedBacground';
 import AdminNavItems from '../../Elements/AdminNavItems';
 import { TabContent, TabPane } from 'reactstrap';
 import AssignTickets from './AssignTickets';
-import CreateTickets from './CreateTickets';
 import AllTickets from './AllTickets';
 import TicketHead from './TicketHead';
 
@@ -56,14 +55,6 @@ const Tickets = () => {
               </span>
               <span
                 className={`${
-                  attendanceActive === "3" ? "ReportsTabs_Active" : ""
-                }`}
-                onClick={() => setAttendanceActive("3")}
-              >
-               Create Tickets
-              </span>
-              <span
-                className={`${
                   attendanceActive === "4" ? "ReportsTabs_Active" : ""
                 }`}
                 onClick={() => setAttendanceActive("4")}
@@ -80,9 +71,6 @@ const Tickets = () => {
                 <AllTickets
                   setActiveAttendance={setAttendanceActive}
                 />
-              </TabPane>
-              <TabPane tabId="3">
-                <CreateTickets setActiveAttendance={setAttendanceActive} />
               </TabPane>
               <TabPane tabId="4">
                 <TicketHead setActiveAttendance={setAttendanceActive} />
