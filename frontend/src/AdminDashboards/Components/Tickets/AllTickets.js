@@ -6,39 +6,111 @@ import moment from 'moment/moment';
 import ModalComponent from '../../Elements/ModalComponent';
 import CreateTickets from './form/CreateTickets';
 import { GetAllTicket } from '../../../Store/Actions/Dashboard/TicketAction';
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import { Button } from '@mui/material';
+import AssignTechnician from './form/AssignTechnician';
 
 const AllTickets = () => {
     const { data } = useSelector(pre => pre.GetAllTicketReducers)
     const dispatch = useDispatch()
     const DataWithID = (data) => {
-        const NewData = []
-        if (data !== undefined) {
+        const NewData = [];
+        if (Array.isArray(data) && data.length > 0) {
             for (let item of data) {
-                NewData.push({ ...item, _id: data.indexOf(item), date: moment(item.createdAt).format("D / M / Y") })
+                const mergedCustomer = {
+                    ...item.customer, 
+                    ...item.customer?.NewCustomer // Merge customer and NewCustomer
+                };
+    
+                delete mergedCustomer.NewCustomer; // Remove nested NewCustomer if needed
+    
+                NewData.push({
+                    ...item,
+                    _id: item.id, // Use item's ID for _id
+                    formattedDate: moment(item.date).format("DD MMM YYYY, hh:mm a"), // Format the `date` field
+                    createdAt: moment(item.createdAt).format("DD MMM YYYY, hh:mm a"), // Format the `date` field
+                    customer: mergedCustomer // Replace customer with the merged object
+                });
             }
         } else {
-            NewData.push({ id: 0 })
+            NewData.push({ id: 0 });
         }
-        return NewData
-    }
-
+        return NewData;
+    };
+    const [serviceProviderModalOpen, setServiceProviderModalOpen] = useState(false);
+    const [ticketId, setTicketId] = useState('');
+    const [createTicket, setCreateTicket] = useState(false)
     const column = [
         { field: "_id", headerName: "Sr No", minWidth: 50 },
-        { field: "ticket_code", headerName: "Ticket Code/Id", flex: 1 },
+        {
+            field: "ticket_code",
+            headerName: "Ticket Code/Id",
+            flex: 1,
+            renderCell: (params) => {
+                return (
+                    <div
+                        className="d-flex flex-column justify-content-center align-items-start p-2"
+                        style={{ width: "200px", height: "100px" }} // Inline style for width and height
+                    >
+                        <div>{params.row.customer?.name}</div>
+                        {/* <div>CustomerId: {params.row.customer?.id}</div>
+                        <div>Box Unique No: {params.row.customer?.other_id}</div> */}
+                    </div>
+                );
+            }
+        },        
         {
             field: "details", headerName: "Details", flex: 1 },
         {
-            field: "c_date", headerName: "Created Date & Time", flex: 1
+            field: "createdAt", headerName: "Created Date & Time", flex: 1
         },
         {
-            field: "v_date", headerName: 'Visit Date & Time', flex: 1
+            field: "formattedDate", headerName: 'Visit Date & Time', flex: 1
         },
+        { field: "technician", headerName: "Assign Technician",
+            renderCell: (params) => ( 
+                <>
+                {
+                !params.row.technician   ? (
+                  <Button variant='contained' color='primary' onClick={() => AssignServiceProvider(params.row.id)} >
+                    Technician
+                  </Button>
+        
+                ) : (
+                  params.row.technician
+                )
+            }
+            </> ),
+
+            minWidth: 200,  editable: false },
         {
-            field: "View",
-            flex: 1,
-            headerName: "View",
+            field: "action",
+            headerName: "Action",
+            minWidth: 150,
+            renderCell: (params) => (
+
+                <div className="d-flex gap-2">
+                
+
+                <Button variant="contained" color="success" 
+                onClick={(e)=>{toggleView(params.row)}}
+                style={{minWidth: "40px", maxWidth: "40px"}}
+                >
+                    <VisibilityIcon />
+                </Button>
+            </div>
+            ),
         },
     ];
+
+    const toggleView = (data) =>{
+       console.log(data)
+    }
+
+    const AssignServiceProvider = (id) => { 
+        setTicketId(id)
+        setServiceProviderModalOpen(!serviceProviderModalOpen)
+      }
 
     const CustomToolbar = () => {
         return (
@@ -52,11 +124,12 @@ const AllTickets = () => {
         );
     };
 
-    const [createTicket, setCreateTicket] = useState(false)
-    // const ToggleMasterAddService = () => setMasterAddServices(!masterAddService)
-
     const ToggleAddTickets = () => {
         setCreateTicket(!createTicket)
+    };
+
+    const ToggleAssingTickets = () => {
+        setServiceProviderModalOpen(!serviceProviderModalOpen)
     };
 
     useEffect(() => {
@@ -65,7 +138,12 @@ const AllTickets = () => {
 
     return (
         <Fragment>
-              <ModalComponent modal={createTicket} toggle={ToggleAddTickets} data={<CreateTickets ToggleMasterAddService={ToggleAddTickets} />} modalTitle={'Add Tickets'} size={'lg'} />
+
+
+
+              <ModalComponent modal={createTicket} toggle={ToggleAddTickets} data={<CreateTickets ToggleMasterAddService={ToggleAddTickets}  />} modalTitle={'Add Tickets'} size={'lg'} />
+
+              <ModalComponent modal={serviceProviderModalOpen} toggle={ToggleAssingTickets} data={<AssignTechnician ToggleAssingTickets={ToggleAssingTickets}  ticketId={ticketId} GetAllTicket={GetAllTicket}/>} modalTitle={'Assign Technician'} size={'md'} />
 
             <div className='flex'>
             <h4 className='p-3 px-4 mt-3 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}> All Ticket</h4>
@@ -78,7 +156,9 @@ const AllTickets = () => {
             </div>
 
             <div className='p-4'>
-                <AdminDataTable rows={DataWithID(data.data)} columns={column} CustomToolbar={CustomToolbar} />
+                <AdminDataTable rows={DataWithID(data.data)} columns={column} CustomToolbar={CustomToolbar}
+                
+                />
             </div>
         </Fragment>
     )

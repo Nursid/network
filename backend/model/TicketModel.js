@@ -22,7 +22,15 @@ const TicketModel = sequelize.define('Ticket', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    technician: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     mobileNo: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    status: {
         type: DataTypes.STRING,
         allowNull: false,
     }

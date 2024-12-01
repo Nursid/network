@@ -4,38 +4,64 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from "react-redux";
 import AdminDataTable from '../../Elements/AdminDataTable';
 import moment from 'moment/moment';
-
+import { GetAllTicket } from '../../../Store/Actions/Dashboard/TicketAction';
 
 const AssignTickets = () => {
-    const { data } = useSelector(pre => pre.GetAllPlanReducer)
+    const { data } = useSelector(pre => pre.GetAllTicketReducers)
+    const dispatch = useDispatch()
     const DataWithID = (data) => {
-        const NewData = []
-        if (data !== undefined) {
+        const NewData = [];
+        if (Array.isArray(data) && data.length > 0) {
             for (let item of data) {
-                NewData.push({ ...item, _id: data.indexOf(item), date: moment(item.createdAt).format("D / M / Y") })
+                if(item.technician !== null){
+                const mergedCustomer = {
+                    ...item.customer, 
+                    ...item.customer?.NewCustomer // Merge customer and NewCustomer
+                };
+                delete mergedCustomer.NewCustomer; 
+                NewData.push({
+                    ...item,
+                    _id: item.id, // Use item's ID for _id
+                    formattedDate: moment(item.date).format("DD MMM YYYY, hh:mm a"), // Format the `date` field
+                    createdAt: moment(item.createdAt).format("DD MMM YYYY, hh:mm a"), // Format the `date` field
+                    customer: mergedCustomer // Replace customer with the merged object
+                });
+            }
             }
         } else {
-            NewData.push({ id: 0 })
+            NewData.push({ id: 0 });
         }
-        return NewData
-    }
+        return NewData;
+    };
 
     const column = [
         { field: "_id", headerName: "Sr No", minWidth: 50 },
-        { field: "ticket_code", headerName: "Ticket Code/Id", flex: 1 },
+        {
+            field: "ticket_code",
+            headerName: "Ticket Code/Id",
+            flex: 1,
+            renderCell: (params) => {
+                return (
+                    <div
+                        className="d-flex flex-column justify-content-center align-items-start p-2"
+                        style={{ width: "200px", height: "100px" }} // Inline style for width and height
+                    >
+                        <div>{params.row.customer?.name}</div>
+                        {/* <div>CustomerId: {params.row.customer?.id}</div>
+                        <div>Box Unique No: {params.row.customer?.other_id}</div> */}
+                    </div>
+                );
+            }
+        },        
         {
             field: "details", headerName: "Details", flex: 1 },
         {
-            field: "c_date", headerName: "Created Date & Time", flex: 1
+            field: "createdAt", headerName: "Created Date & Time", flex: 1
         },
         {
-            field: "v_date", headerName: 'Visit Date & Time', flex: 1
+            field: "formattedDate", headerName: 'Visit Date & Time', flex: 1
         },
-        {
-            field: "View",
-            flex: 1,
-            headerName: "View",
-        },
+        { field: "technician", headerName: "Assign Technician", minWidth: 200},
     ];
 
     const CustomToolbar = () => {
@@ -49,6 +75,10 @@ const AssignTickets = () => {
             </GridToolbarContainer>
         );
     };
+    
+    useEffect(() => {
+        dispatch(GetAllTicket())
+    }, [])
 
     return (
         <Fragment>

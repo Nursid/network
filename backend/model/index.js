@@ -90,6 +90,8 @@ db.Availability.belongsTo(db.ServiceProviderModel, { foreignKey: 'emp_id' });
 
 db.EmployeeModel.belongsTo(db.SupervisorAvailability, { foreignKey: 'emp_id', targetKey: 'emp_id' });
 
+db.TicketModel.belongsTo(db.CustomerModel, { foreignKey: 'mobileNo', targetKey: 'mobile' });
+
 db.sequelize.sync({ force: false }).then(() => {
   console.log("re-sync done!");
 });
