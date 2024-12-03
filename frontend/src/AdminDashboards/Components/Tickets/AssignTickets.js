@@ -61,7 +61,19 @@ const AssignTickets = () => {
         {
             field: "formattedDate", headerName: 'Visit Date & Time', flex: 1
         },
-        { field: "technician", headerName: "Assign Technician", minWidth: 200},
+        { field: "technician", headerName: "Assign Technician", minWidth: 200,
+            renderCell: (params) => {
+                return (
+                    <div
+                        className="d-flex flex-column justify-content-center align-items-start p-2"
+                        style={{ width: "200px", height: "100px" }} // Inline style for width and height
+                    >
+                        <div>{params.row.service_provider?.name}</div>
+                        <div>{params.row.service_provider?.mobile_no}</div>
+                    </div>
+                );
+            }
+        },
     ];
 
     const CustomToolbar = () => {

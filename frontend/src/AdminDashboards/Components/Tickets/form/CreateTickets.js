@@ -8,7 +8,7 @@ import { GetAllServices } from '../../../../Store/Actions/Dashboard/servicesActi
 import { API_URL } from '../../../../config';
 import SelectBox from '../../../Elements/SelectBox';
 
-const CreateTickets = ({ ToggleMasterAddService }) => {
+const CreateTickets = ({ ToggleMasterAddService, GetAllTicket }) => {
     const dispatch = useDispatch();
     const [Loading, setLoading] = useState(false);
     const [ticketType, setTicketType] = useState('');
@@ -99,6 +99,7 @@ const CreateTickets = ({ ToggleMasterAddService }) => {
                 ToggleMasterAddService();
                 Swal.fire('Success', response.data.message, 'success');
                 dispatch(GetAllServices());
+                dispatch(GetAllTicket());
             })
             .catch((error) => {
                 setLoading(false);

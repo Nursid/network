@@ -2,6 +2,8 @@ const db = require("../model/index")
 const Ticket = db.TicketModel;
 const NewCustomerModel = db.NewCustomerModel;
 const CustomerModel = db.CustomerModel;
+const ServiceProviderModel = db.ServiceProviderModel
+
 
 const createTicket = async (req, res) => {
 	try {
@@ -43,7 +45,15 @@ const getAllTicket = async (req, res) => {
 							attributes: ['name', 'email']
 						}
 					]
-				}
+				},
+				{
+					model: ServiceProviderModel,
+					attributes: [
+						'name', 'mobile_no'
+					]
+				},
+
+
 			]
 		});
 

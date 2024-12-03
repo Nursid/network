@@ -16,15 +16,15 @@ const TicketModel = sequelize.define('Ticket', {
     },
     details: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     },
     timeSlot: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     technician: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     mobileNo: {
         type: DataTypes.STRING,
@@ -32,7 +32,7 @@ const TicketModel = sequelize.define('Ticket', {
     },
     status: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     }
 }, {
     timestamps: true,

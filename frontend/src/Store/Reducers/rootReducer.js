@@ -28,7 +28,7 @@ import { ServiceProviderAttendanceReducers, AttendanceReportReducers, ServicePro
 import SupervisorAvailabilityReducers from '../Reducers/Dashboard/SupervisorAvailabilityReducers'
 import GetAllPlanReducer from "./Dashboard/PlanGetReducers";
 import GetAllTicketReducers from "./Dashboard/TicketReducers";
-
+import GetAllTicketHeadReducers from "./Dashboard/TicketHeadReducers";
 
 const rootReducer = combineReducers({
     SeviceAddReducer: SeviceAddReducer,
@@ -69,7 +69,8 @@ const rootReducer = combineReducers({
     SupervisorAvailabilityReducers:SupervisorAvailabilityReducers,
     ServiceProviderAttendanceReportReducers: ServiceProviderAttendanceReportReducers,
     GetAllPlanReducer: GetAllPlanReducer,
-    GetAllTicketReducers: GetAllTicketReducers
+    GetAllTicketReducers: GetAllTicketReducers,
+    GetAllTicketHeadReducers: GetAllTicketHeadReducers
 })
 
 

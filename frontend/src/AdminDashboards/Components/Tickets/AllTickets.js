@@ -9,6 +9,7 @@ import { GetAllTicket } from '../../../Store/Actions/Dashboard/TicketAction';
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { Button } from '@mui/material';
 import AssignTechnician from './form/AssignTechnician';
+import TicketView from './view/TicketVIew';
 
 const AllTickets = () => {
     const { data } = useSelector(pre => pre.GetAllTicketReducers)
@@ -39,7 +40,9 @@ const AllTickets = () => {
     };
     const [serviceProviderModalOpen, setServiceProviderModalOpen] = useState(false);
     const [ticketId, setTicketId] = useState('');
+    const [viewData, setViewData] = useState('');
     const [createTicket, setCreateTicket] = useState(false)
+    const [viewTicket, setViewTicket] = useState(false)
     const column = [
         { field: "_id", headerName: "Sr No", minWidth: 50 },
         {
@@ -77,7 +80,7 @@ const AllTickets = () => {
                   </Button>
         
                 ) : (
-                  params.row.technician
+                  params.row.service_provider?.name
                 )
             }
             </> ),
@@ -104,7 +107,8 @@ const AllTickets = () => {
     ];
 
     const toggleView = (data) =>{
-       console.log(data)
+        setViewData(data)
+        ToggleVIewTickets();
     }
 
     const AssignServiceProvider = (id) => { 
@@ -128,6 +132,10 @@ const AllTickets = () => {
         setCreateTicket(!createTicket)
     };
 
+    const ToggleVIewTickets = () => {
+        setViewTicket(!viewTicket)
+    };
+
     const ToggleAssingTickets = () => {
         setServiceProviderModalOpen(!serviceProviderModalOpen)
     };
@@ -138,10 +146,9 @@ const AllTickets = () => {
 
     return (
         <Fragment>
+              <ModalComponent modal={createTicket} toggle={ToggleAddTickets} data={<CreateTickets ToggleMasterAddService={ToggleAddTickets} GetAllTicket={GetAllTicket}  />} modalTitle={'Add Tickets'} size={'lg'} />
 
-
-
-              <ModalComponent modal={createTicket} toggle={ToggleAddTickets} data={<CreateTickets ToggleMasterAddService={ToggleAddTickets}  />} modalTitle={'Add Tickets'} size={'lg'} />
+              <ModalComponent modal={viewTicket} toggle={ToggleVIewTickets} data={<TicketView  data={viewData}  />} modalTitle={'VIew Tickets'} size={'xl'} />
 
               <ModalComponent modal={serviceProviderModalOpen} toggle={ToggleAssingTickets} data={<AssignTechnician ToggleAssingTickets={ToggleAssingTickets}  ticketId={ticketId} GetAllTicket={GetAllTicket}/>} modalTitle={'Assign Technician'} size={'md'} />
 
