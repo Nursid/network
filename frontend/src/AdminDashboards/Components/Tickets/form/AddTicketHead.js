@@ -90,7 +90,7 @@ const AddTicketHead = ({ ToggleMasterAddService, GetAllTicketHead, editData }) =
           }
       
         let apiUrl;  
-          if(editData.id){
+          if(editData?.id){
             apiUrl = `${API_URL}/api/ticket-head/update/${editData.id}`
           }else{
               apiUrl = `${API_URL}/api/ticket-head/create`;

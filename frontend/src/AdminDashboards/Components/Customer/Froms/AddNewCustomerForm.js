@@ -99,18 +99,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 		{ value: "Swagat Apartment", label: "Swagat Apartment" },
 	];
 	
-	const bill_date_options = [
-		{ value: "1", label: "1" },
-		{ value: "2", label: "2" },
-		{ value: "3", label: "3" },
-		{ value: "4", label: "4" },
-		{ value: "5", label: "5" },
-		{ value: "6", label: "6" },
-		{ value: "7", label: "7" },
-		{ value: "8", label: "8" },
-		{ value: "9", label: "9" },
-		{ value: "10", label: "10" },
-	];
 
 	const area_option = [
 		{ value: "Tigri", label: "Tigri" },
@@ -459,7 +447,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 				</FormGroup>
 			</Col>
 
-			<Col md={6}>
+			{/* <Col md={6}>
 				<FormGroup>
 				<Label for="payment_method">Payment Method</Label>
 				<SelectBox
@@ -498,7 +486,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 				/>
 				</FormGroup>
 			</Col>
-			}
+			} */}
 						
 			<Button
 				className="bg-primary h-fit text-blue"

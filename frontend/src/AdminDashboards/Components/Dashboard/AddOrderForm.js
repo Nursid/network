@@ -29,6 +29,9 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 	const [errors, setErrors]= useState([]);
 	const [isLoadings, setIsLoading] = useState(false)
 	const { data, isLoading } = useSelector(state => state.GetAllTimeSlotReducer);
+	const [appartment, setAppartment] = useState('')
+	const [block, setBlock] = useState('')
+	const [area, setArea] = useState('')
 
 	const DataWithID = (data) => {
 		const transformedData = data?.map(item => ({label: item.time_range, value: item.time_range}));
@@ -65,6 +68,60 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 		allot_time_range: '',
 		alterno: ''
 	  });
+
+
+	  const apartment_options = [
+		{ value: "Shiv Shakti Apartment", label: "Shiv Shakti Apartment" },
+		{ value: "Lottan Apartment", label: "Lottan Apartment" },
+		{ value: "Sai Apartment", label: "Sai Apartment" },
+		{ value: "Geetanjali Apartment", label: "Geetanjali Apartment" },
+		{ value: "Ganga Apartment", label: "Ganga Apartment" },
+		{ value: "Deepmala Apartment", label: "Deepmala Apartment" },
+		{ value: "Yamuna Apartment", label: "Yamuna Apartment" },
+		{ value: "Krishna Apartment", label: "Krishna Apartment" },
+		{ value: "Ashirwad Apartment", label: "Ashirwad Apartment" },
+		{ value: "Swagat Apartment", label: "Swagat Apartment" },
+	];
+	
+
+	const area_option = [
+		{ value: "Tigri", label: "Tigri" },
+		{ value: "Tigri Village", label: "Tigri Village" },
+		{ value: "Tigri Extn.", label: "Tigri Extn." },
+		{ value: "Tigri Camp", label: "Tigri Camp" },
+		{ value: "Karnal Farm Tigri", label: "Karnal Farm Tigri" },
+		{ value: "DDA Flat Tigri", label: "DDA Flat Tigri" },
+		{ value: "Khanpur", label: "Khanpur" },
+		{ value: "Khanpur Extn.", label: "Khanpur Extn." },
+		{ value: "Shiv Park", label: "Shiv Park" },
+		{ value: "Duggal Colony", label: "Duggal Colony" },
+		{ value: "Devli Road", label: "Devli Road" },
+		{ value: "Devli Extension", label: "Devli Extension" },
+		{ value: "Krishna Park", label: "Krishna Park" },
+		{ value: "Jawahar Park", label: "Jawahar Park" },
+		{ value: "Raju Park", label: "Raju Park" },
+		{ value: "Durga Vihar", label: "Durga Vihar" },
+		{ value: "Bandh Road Sangam Vihar", label: "Bandh Road Sangam Vihar" },
+		{ value: "Sangam Vihar", label: "Sangam Vihar" },
+		{ value: "Madangir", label: "Madangir" },
+		{ value: "Dakshinpuri", label: "Dakshinpuri" },
+		{ value: "BSF Campus", label: "BSF Campus" },
+		{ value: "RPS Colony", label: "RPS Colony" },
+	];
+	
+	const block_option = [
+		{ value: "A", label: "A" },
+		{ value: "B", label: "B" },
+		{ value: "C", label: "C" },
+		{ value: "D", label: "D" },
+		{ value: "E", label: "E" },
+		{ value: "F", label: "F" },
+		{ value: "G", label: "G" },
+		{ value: "H", label: "H" },
+	];
+	
+
+
 
 	  useEffect(()=>{
 			getAllServicesProvider()
@@ -206,7 +263,10 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 			...formData,
 			service_name: service.value,
 			servicep_id: serviceProvider?.value,
-			allot_time_range: timeslot.value
+			allot_time_range: timeslot.value,
+			block: block?.value,
+			area: area?.value,
+			apartment: appartment?.value,
 		}
 		const apiUrl = `${API_URL}/order/add`;
 		// Make a POST request using Axios
@@ -324,12 +384,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 					</FormGroup>
 				</Col>
 
-				{/* <Col md={6}>
-				<Label for="firstname">User Type </Label>
-				<SelectBox options={UserTypes}
-							setSelcted={setUsertype}
-							selectOption={userType}/>
-									</Col> */}
+	
 
 				<Col md={6}>
 					<FormGroup>
@@ -343,31 +398,6 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 					</FormGroup>
 				</Col>
 
-				{/* <Col md={6}>
-					<FormGroup>
-						<Label>Age</Label>
-						<Input 
-						onChange={(e) => handleChange(e, 2)}
-							type='number'
-							value={formData?.age}
-							name='age'
-							readOnly={!!formData?.cust_id}
-							placeholder='Enter Your Age'/>
-					</FormGroup>
-				</Col> */}
-				{/* {formData?.cust_id && 
-				<Col md={6}>
-					<FormGroup>
-						<Label>MemberShip Id</Label>
-						<Input 
-						onChange={(e) => handleChange(e, 10)}
-							value={formData?.member_id}
-							name='member_id'
-							readOnly={!!formData?.cust_id}
-							placeholder='Enter Your member Id'/>
-					</FormGroup>
-				</Col>
-				} */}
 				<Col md={6}>
 					<FormGroup>
 						<Label>Service Type <span style={{color: "red"}}>*</span></Label>
@@ -497,7 +527,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 				</Col>
 				
 				*/}
-				<Col md={6}>
+				{/* <Col md={6}>
 					<FormGroup>
 						<Label>City</Label>
 						<Input type='text'
@@ -506,7 +536,30 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 							name='city'
 							placeholder='Enter Your City'/>
 					</FormGroup>
-				</Col>
+				</Col> */}
+
+<Col md={6}>
+				<FormGroup>
+				<Label for="area">Area</Label>
+				<SelectBox options={area_option} setSelcted={setArea} initialValue={area}/>
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="block">Block</Label>
+				
+				<SelectBox options={block_option} setSelcted={setBlock} initialValue={block}/>
+
+				</FormGroup>
+			</Col>
+			<Col md={6}>
+				<FormGroup>
+				<Label for="apartment">Apartment</Label>
+				<SelectBox options={apartment_options} setSelcted={setAppartment} initialValue={appartment}/>
+				</FormGroup>
+			</Col>
+
+
 				<Col md={6}>
 					<FormGroup>
 						<Label>Address <span style={{color: "red"}}>*</span></Label>

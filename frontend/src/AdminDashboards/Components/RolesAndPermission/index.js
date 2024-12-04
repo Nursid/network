@@ -44,9 +44,13 @@ const AdminRolesAndPermission = () => {
             <div className="BackgroundTopContents">
                       <div className="AttendenceTabs px-3 pt-2">
                         <span className={` ${attendanceActive === "admin" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("admin") }}>Admin</span>
-                        <span className={` ${attendanceActive === "supervisor" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("supervisor") }}>Supervisor</span>
-                        <span className={` ${attendanceActive === "office" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("office") }}>Back Office</span>
+                        {/* <span className={` ${attendanceActive === "supervisor" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("supervisor") }}>Supervisor</span>
+
+                        <span className={` ${attendanceActive === "office" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("office") }}>Back Office</span> */}
+
                         <span className={` ${attendanceActive === "service" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("service") }}>Service Provider</span>
+
+
                         {/* <span className={` ${attendanceActive === "enquiry" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("enquiry") }}></span> */}
                     </div>
                     <TabContent activeTab={attendanceActive} >

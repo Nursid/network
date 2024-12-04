@@ -58,7 +58,10 @@ const GetOrderNow = async (req, res) => {
 			address: formdata.service_address,
 			land_mark: formdata.land_mark,
 			age: formdata.age,
-			mobile: formdata.mobile
+			mobile: formdata.mobile,
+			block: formdata?.block,
+			area: formdata?.area,
+			apartment: formdata?.apartment,
 		  }, { transaction });
   
 		  userId = newUser.id;
@@ -314,7 +317,7 @@ const GetAllOrders = async (req, res) => {
 				attributes: ['name', 'email', 'mobileno'],
 				include: {
 					model: CustomerModel,
-					attributes: ['address'],
+					attributes: ['address', 'user_id'],
 				}
 			},
 			order: [['bookdate', 'DESC']]

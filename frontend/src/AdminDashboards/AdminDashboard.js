@@ -115,9 +115,7 @@ const AdminDashboard = () => {
           date: moment(item.createdAt).format("D / M / Y"),
           bookdate: moment(item.bookdate).format("DD-MM-YYYY"),
           userRole: userRole,
-          member_id: (!customer.member_id) 
-                    ? 'LS' + paddedId 
-                    : customer.member_id
+          member_id:  'LS' + paddedId 
         });
       }
     } else {
