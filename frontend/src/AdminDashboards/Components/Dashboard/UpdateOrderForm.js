@@ -70,9 +70,6 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
       setFormData((prev) => ({ ...prev, [name]: value }));
       }
     if (name === 'netpayamt' || name === 'online' || name === 'cash') {
-      // const bill = name === 'netpayamt' ? parseFloat(value) : parseFloat(formData.netpayamt);
-      // const paid = name === 'piadamt' ? parseFloat(value) : parseFloat(formData.piadamt);
-      // setFormData((prev) => ({ ...prev, totalamt: bill - paid }));
       const parsedValue = parseFloat(value) || 0;
       setFormData((prev) => {
         const bill = parseFloat(prev.netpayamt) || 0;
@@ -182,15 +179,16 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
           allot_time_range: timeslot.value
         }
 
-        // const AddAccountAmount = {
-        //   payment_mode: formData?.paymethod?.value,
-        //   amount: formData?.piadamt,
-        //   order_no: orderData.order_no,
-        //   person_name: orderData?.NewCustomer?.name,
-        //   about_payment: formData?.service_name?.value,
-        //   balance: formData?.totalamt,
-        //   type_payment: 0
-        // }	
+        const AddAccountAmount = {
+          payment_mode: formData?.paymethod,
+          online: formData?.online,
+          cash: formData?.cash,
+          order_no: orderData.order_no,
+          person_name: orderData?.NewCustomer?.name,
+          about_payment: formData?.service_name?.value,
+          balance: formData?.totalamt,
+          type_payment: 0
+        }	
 
         try {
           // Update order
@@ -200,11 +198,11 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
           if (response.status === 200) {
             setIsLoading(false)
 
-            // if(formData.paymethod){
-            //     // Add balance
-            //     await axios.post(`${API_URL}/api/add-balance`, AddAccountAmount);
-            // }
-            
+            if(formData.paymethod){
+                // Add balance
+                await axios.post(`${API_URL}/api/add-balance`, AddAccountAmount);
+            }
+
             // Call the provided function prop
             prop();
             // Show success message
@@ -428,6 +426,8 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
         */}
 
 
+
+
 <Col md={6}>
           <FormGroup>
             <Label>Bill Amount</Label>
@@ -480,12 +480,12 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
 			</Col>
 			}
 
-<Col md={6}>
-          <FormGroup>
-            <Label>Balance Amount</Label>
-            <Input name="totalamt" type="number" value={formData.totalamt} placeholder="Balance Amount" readOnly />
-          </FormGroup>
-        </Col>
+    <Col md={6}>
+              <FormGroup>
+                <Label>Balance Amount</Label>
+                <Input name="totalamt" type="number" value={formData.totalamt} placeholder="Balance Amount" readOnly />
+              </FormGroup>
+            </Col>
 
 
 

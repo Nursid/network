@@ -705,96 +705,96 @@ const GetOrderAssingwithStatus = async (req, res) => {
 	}
 }
 
-const GetTotalSummary = async (req, res) => {
-    let { from, to } = req.query;
+// const GetTotalSummary = async (req, res) => {
+//     let { from, to } = req.query;
 
-    try {
-        // Parse and validate date inputs
-        from = !from || isNaN(new Date(from)) ? new Date(0) : new Date(from);
-        to = !to || isNaN(new Date(to)) ? new Date() : new Date(to);
-        to.setHours(23, 59, 59, 999); // Set to end of the day
+//     try {
+//         // Parse and validate date inputs
+//         from = !from || isNaN(new Date(from)) ? new Date(0) : new Date(from);
+//         to = !to || isNaN(new Date(to)) ? new Date() : new Date(to);
+//         to.setHours(23, 59, 59, 999); // Set to end of the day
 
-        const dateFilter = {
-            createdAt: {
-                [Op.between]: [from, to]
-            }
-        };
+//         const dateFilter = {
+//             createdAt: {
+//                 [Op.between]: [from, to]
+//             }
+//         };
 
-        // Fetching all necessary data in parallel
-        const [orders, monthlyServices, TotalAcount,TotalExpenses ] = await Promise.all([
-            OrderModel.findAll({ where: dateFilter }),
-			 MonthlyServiceModel.findAll({
-				where: dateFilter,
-				attributes: [
-				  [Sequelize.fn('DISTINCT', Sequelize.col('orderNo')), 'orderNo']],
-			  }),
-			AccountModel.findAll({
-				attributes: [
-					[sequelize.fn('SUM', sequelize.col('amount')), 'total_amount'],
-					[sequelize.fn('SUM', sequelize.literal("CASE WHEN payment_mode = 'Cash' THEN amount ELSE 0 END")), 'total_cash'],
-					[sequelize.fn('SUM', sequelize.literal("CASE WHEN payment_mode = 'Online' THEN amount ELSE 0 END")), 'total_online']
-				],
-				where: {
-					type_payment: 0,
-					date: {
-						[Op.between]: [from, to]
-					}
-				}
-			}),
-			AccountModel.findAll({
-				attributes: [
-					[sequelize.fn('SUM', sequelize.col('amount')), 'total_expense'],
-				],
-				where: {
-					type_payment: 1,
-					date: {
-						[Op.between]: [from, to]
-					}
-				}
-			})
+//         // Fetching all necessary data in parallel
+//         const [orders, monthlyServices, TotalAcount,TotalExpenses ] = await Promise.all([
+//             OrderModel.findAll({ where: dateFilter }),
+// 			 MonthlyServiceModel.findAll({
+// 				where: dateFilter,
+// 				attributes: [
+// 				  [Sequelize.fn('DISTINCT', Sequelize.col('orderNo')), 'orderNo']],
+// 			  }),
+// 			AccountModel.findAll({
+// 				attributes: [
+// 					[sequelize.fn('SUM', sequelize.col('amount')), 'total_amount'],
+// 					[sequelize.fn('SUM', sequelize.literal("CASE WHEN payment_mode = 'Cash' THEN amount ELSE 0 END")), 'total_cash'],
+// 					[sequelize.fn('SUM', sequelize.literal("CASE WHEN payment_mode = 'Online' THEN amount ELSE 0 END")), 'total_online']
+// 				],
+// 				where: {
+// 					type_payment: 0,
+// 					date: {
+// 						[Op.between]: [from, to]
+// 					}
+// 				}
+// 			}),
+// 			AccountModel.findAll({
+// 				attributes: [
+// 					[sequelize.fn('SUM', sequelize.col('amount')), 'total_expense'],
+// 				],
+// 				where: {
+// 					type_payment: 1,
+// 					date: {
+// 						[Op.between]: [from, to]
+// 					}
+// 				}
+// 			})
 
-        ]);
+//         ]);
 
-        // Calculating totals
-        const totalOrders = parseInt(orders.length)+parseInt(monthlyServices.length);
-        const totalCompleted = orders.filter(order => order.pending === 3).length;
-        const totalCancel = orders.filter(order => order.pending === 5).length;
-        const totalHold = orders.filter(order => order.pending === 1).length;
-        const totalPending = orders.filter(order => order.pending === 0).length;
-        const totalRunning = orders.filter(order => order.pending === 4).length;
-        const totalDue = orders.filter(order => order.pending === 2).length;
+//         // Calculating totals
+//         const totalOrders = parseInt(orders.length)+parseInt(monthlyServices.length);
+//         const totalCompleted = orders.filter(order => order.pending === 3).length;
+//         const totalCancel = orders.filter(order => order.pending === 5).length;
+//         const totalHold = orders.filter(order => order.pending === 1).length;
+//         const totalPending = orders.filter(order => order.pending === 0).length;
+//         const totalRunning = orders.filter(order => order.pending === 4).length;
+//         const totalDue = orders.filter(order => order.pending === 2).length;
 
-        const totalMonthlyService = monthlyServices.length;
-        const TotalserviceFees = monthlyServices.reduce((total, service) => total + parseFloat(service.serviceFees), 0);
+//         const totalMonthlyService = monthlyServices.length;
+//         const TotalserviceFees = monthlyServices.reduce((total, service) => total + parseFloat(service.serviceFees), 0);
 
-		const Netbalance = TotalAcount[0]?.dataValues?.total_cash + TotalAcount[0]?.dataValues?.total_online  - TotalExpenses[0]?.dataValues?.total_expense
+// 		const Netbalance = TotalAcount[0]?.dataValues?.total_cash + TotalAcount[0]?.dataValues?.total_online  - TotalExpenses[0]?.dataValues?.total_expense
         
         
-        // Constructing summary object
-        const summary = {
-            totalOrders,
-            totalCompleted,
-            totalCancel,
-            totalHold,
-            totalPending,
-            totalMonthlyService,
-            TotalserviceFees,
-            TotalExpenses: TotalExpenses[0]?.dataValues?.total_expense || 0,
-			TotalCash: TotalAcount[0]?.dataValues?.total_cash || 0,
-			TotalBank: TotalAcount[0]?.dataValues?.total_online || 0,
-			totalRunning,
-			totalDue,
-			Netbalance
-        };
+//         // Constructing summary object
+//         const summary = {
+//             totalOrders,
+//             totalCompleted,
+//             totalCancel,
+//             totalHold,
+//             totalPending,
+//             totalMonthlyService,
+//             TotalserviceFees,
+//             TotalExpenses: TotalExpenses[0]?.dataValues?.total_expense || 0,
+// 			TotalCash: TotalAcount[0]?.dataValues?.total_cash || 0,
+// 			TotalBank: TotalAcount[0]?.dataValues?.total_online || 0,
+// 			totalRunning,
+// 			totalDue,
+// 			Netbalance
+//         };
 
-        // Sending the summary as JSON response
-        res.status(200).json({ status: 200, data: summary });
+//         // Sending the summary as JSON response
+//         res.status(200).json({ status: 200, data: summary });
 
-    } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
+//     } catch (error) {
+//         console.error("Error:", error);
+//         res.status(500).json({ error: "Internal Server Error" });
+//     }
+// };
 
 const GetTimeSlot = async (req, res) => {
 	try {
@@ -1043,9 +1043,7 @@ module.exports = {
 	GetOrderAssing,
 	GetOrderAssingwithStatus,
 	GetOrderAssingwithSupervisor,
-	GetTotalSummary,
 	GetTimeSlot,
-	GetTotalSummary,
 	GetOrderAssingServiceProvider,
 	AddOrderCustomer,
 	AddOrderCustomer,

@@ -71,16 +71,16 @@ const AdminDashboard = () => {
   const [to, setTo] = useState(null)
   const [orderDate, setOrderDate] = useState(null)
 
-  const GetTotalSummary = async () =>{
-    const res = await axios.get(`${API_URL}/order/filter-order?from=${from}&to=${to}`);
-   if(res.status === 200){
-    setTotalSummary(res.data.data)
-   }
-    }
+  // const GetTotalSummary = async () =>{
+  //   const res = await axios.get(`${API_URL}/order/filter-order?from=${from}&to=${to}`);
+  //  if(res.status === 200){
+  //   setTotalSummary(res.data.data)
+  //  }
+  //   }
 
-  useEffect(() => {
-    GetTotalSummary()
-  }, [orders]);
+  // useEffect(() => {
+  //   GetTotalSummary()
+  // }, [orders]);
  
   const status= [
   {0: "Pending"},
@@ -1012,7 +1012,7 @@ const AdminDashboard = () => {
         GetAllOrders={GetAllOrders}
         role={role}
         currentUser={currentUser.id}
-        GetTotalSummary={GetTotalSummary}
+        // GetTotalSummary={GetTotalSummary}
       />
     }
     
@@ -1242,7 +1242,7 @@ const AdminDashboard = () => {
             
           </div>
             <div className="p-4 ">
-            {!complain && !inventry && summary && 
+            {/* {!complain && !inventry && summary && 
             <Card className="p-4">
             <div className="">
             <h3>Order Summary</h3>
@@ -1315,7 +1315,7 @@ const AdminDashboard = () => {
             </Table>
             </div>
             </Card>             
-              }
+              } */}
             {!complain && !summary && !inventry && <AdminDataTable
                 rows={DataWithID(orders.data)}
                 // columns={columns}

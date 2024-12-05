@@ -186,7 +186,6 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 					</>
 				);
 				setFormData(prevFormData => ({
-					
 					...prevFormData,
 					name: item?.customerData?.NewCustomer?.name,
 					email: item?.customerData?.NewCustomer?.email,
@@ -257,7 +256,7 @@ const AddOrderForm = ({prop, GetAllOrders, role, currentUser, mobileNo, setModal
 			setErrors(errors);
 			setIsLoading(false)
 			return false;
-		  }
+		}
 		
 		const data ={
 			...formData,

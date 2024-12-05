@@ -15,7 +15,11 @@ module.exports = (sequelize) => {
             type: DataTypes.BOOLEAN,
             allowNull: true,
         },
-        balance: {
+        online: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        cash: {
             type: DataTypes.INTEGER,
             allowNull: true,
         },
@@ -35,8 +39,8 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        amount: {
-            type: DataTypes.STRING,
+        balance: {
+            type: DataTypes.INTEGER,
             allowNull: true,
         },
         approve: {

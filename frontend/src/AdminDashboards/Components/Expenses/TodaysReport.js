@@ -78,14 +78,13 @@ const TodaysReport = () => {
 
     const all_columns = [
         { field: "date", headerName: "Date", flex: 1, minWidth: 200 },
-        // { field: "order_no", headerName: "Order No", flex: 1, minWidth: 120 },
         { field: "person_name", headerName: "Party Name", flex: 1, minWidth: 120 },
         { field: "about_payment", headerName: "Particular (Service Desc.)", flex: 1, minWidth: 250 },
-        { field: "payment_mode", headerName: "Payment Mode", flex: 1, minWidth: 120 },
-        { field: "debit", headerName: "Amount Debit", flex: 1, minWidth: 120 },
-        { field: "credit", headerName: "Amount Credit", flex: 1, minWidth: 120 },
-        { field: "balance", headerName: "Balance Amount", flex: 1, minWidth: 150 },
-        { field: "balance_opening", headerName: "Outstanding Balance", flex: 1, minWidth: 120 },
+        { field: "type_payment", headerName: "Type Payment", flex: 1, minWidth: 250 },
+        { field: "payment_mode", headerName: "Payment Mode", flex: 1, minWidth: 140 },
+        { field: "cash", headerName: "Cash", flex: 1, minWidth: 120 },
+        { field: "online", headerName: "Online", flex: 1, minWidth: 120 },
+        { field: "balance", headerName: "Due Balance", flex: 1, minWidth: 120 },
         { field: "expense_remark", headerName: "Expense Remark", flex: 1, minWidth: 220 },
         { field: "approve", headerName: "Approve", flex: 1, minWidth: 120,
             renderCell: (params) => {
@@ -101,32 +100,23 @@ const TodaysReport = () => {
                   />
                 )
         }
-    },
+        },
         { field: "remark", headerName: "Final Remark", flex: 1, minWidth: 120 },
     ];
 
     const DataWithID = (data, payment_mode) => {
         return useMemo(() => {
             const newData = [];
-            let cumulativeBalance = 0;
-    
             if (data) {
                 for (let item of data) {
                     // Filter based on payment_mode if it's not 'All'
                     if (payment_mode === 'All' || item.payment_mode === payment_mode) {
-                        const credit = item.type_payment ? 0 : (item.amount || 0);
-                        const debit = item.type_payment ? (item.amount || 0) : 0;
-    
-                        cumulativeBalance += parseInt(credit, 10);
-                        cumulativeBalance -= parseInt(debit, 10);
-    
+                        const payment_type = item.type_payment ? 'Debit' : 'Credit';
                         newData.push({
                             ...item,
                             _id: data.indexOf(item), // Use a unique ID if available
                             date: moment(item.date).format("DD-MM-YYYY"),
-                            credit,
-                            debit,
-                            balance_opening: cumulativeBalance,
+                            payment_type: payment_type,
                         });
                     }
                 }

@@ -14,7 +14,6 @@ const {
 	GetOrderAssing,
 	GetOrderAssingwithStatus,
     GetOrderAssingwithSupervisor,
-	GetTotalSummary,
 	GetTimeSlot,
 	GetOrderAssingServiceProvider,
 	AddOrderCustomer,
@@ -44,7 +43,6 @@ router.post("/assign-service-provider/:order_no", GetOrderAssing)
 router.put("/assign-supervisor/:order_no", OrderAssingSupervisor)
 router.get("/getall/supervisor/:id", GetOrderAssingwithSupervisor)
 router.get('/getall/:sup_id/:status_id', GetOrderAssingwithStatus)
-router.get("/filter-order", GetTotalSummary)
 router.get("/time-slot", GetTimeSlot)
 router.get("/getall-service-provider/:id", GetOrderAssingServiceProvider)
 router.post("/add-customer-order", AddOrderCustomer)
