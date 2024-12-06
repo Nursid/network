@@ -3,7 +3,10 @@ const Sequelize = require('sequelize');
 const sequelize = require('../../config/sequalize'); 
 const Op = Sequelize.Op;
 const db = require("../../model/index");
-const { name } = require("ejs");
+const ejs = require("ejs");
+const path = require("path")
+// const jwt = require("jsonwebtoken");
+const Transporter = require("../../helpers/mail")
 const CustomerModel = db.CustomerModel
 const CustomerID = db.CustomerID
 const OrderModel = db.OrderModel
@@ -90,20 +93,12 @@ const GetOrderNow = async (req, res) => {
 	const formattedOrderNumber = nextOrderNumber.toString().padStart(5, '0');
 	formdata.order_no = formattedOrderNumber
 
-	  formdata.cust_id = userId;
+	formdata.cust_id = userId;
   
 	  if (formdata?.serviceDateTime) {
 		const [bookdate, booktime] =  formdata.serviceDateTime.split('T');
 		formdata.bookdate = bookdate;
 		formdata.booktime = booktime;
-
-		// const currentDate = new Date();
-		// const currentDateFormatted = currentDate.toISOString().split('T')[0]; 
-
-		// Ensure bookdate is defined and in the correct format
-		// if (bookdate && currentDateFormatted !== bookdate) {
-		// 	formdata.pending = 2;
-		// }
 
 	  }
   
@@ -113,6 +108,12 @@ const GetOrderNow = async (req, res) => {
 		await transaction.rollback();
 		return res.status(202).json({ status: false, message: "Order not placed! Try again" });
 	  }
+
+	const templatePath = path.join(__dirname, '../../helpers/connection.ejs');
+
+	const emailData = await ejs.renderFile(templatePath, {date: formdata.bookdate });
+
+	Transporter.transporter.sendMail({from: "nursid299@gmail.com", to: formdata.email, subject: "Connection Successfully", html: emailData});
   
 	  const allot_time_range = formdata.allot_time_range;
 
