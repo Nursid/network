@@ -187,6 +187,7 @@ const UpdateOrderForm = ({ orderData, prop, GetAllOrders, role, currentUser }) =
           person_name: orderData?.NewCustomer?.name,
           about_payment: formData?.service_name?.value,
           balance: formData?.totalamt,
+          total_amount: formData?.netpayamt,
           type_payment: 0
         }	
 

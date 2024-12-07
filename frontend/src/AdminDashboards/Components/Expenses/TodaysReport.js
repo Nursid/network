@@ -82,6 +82,7 @@ const TodaysReport = () => {
         { field: "about_payment", headerName: "Particular (Service Desc.)", flex: 1, minWidth: 250 },
         { field: "type_payment", headerName: "Type Payment", flex: 1, minWidth: 250 },
         { field: "payment_mode", headerName: "Payment Mode", flex: 1, minWidth: 140 },
+        { field: "total_amount", headerName: "Total Amount", flex: 1, minWidth: 140 },
         { field: "cash", headerName: "Cash", flex: 1, minWidth: 120 },
         { field: "online", headerName: "Online", flex: 1, minWidth: 120 },
         { field: "balance", headerName: "Due Balance", flex: 1, minWidth: 120 },

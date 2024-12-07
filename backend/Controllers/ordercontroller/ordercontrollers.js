@@ -104,10 +104,10 @@ const GetOrderNow = async (req, res) => {
   
 	  const data = await OrderModel.create(formdata, { transaction });
   
-	  if (!data) {
+	if (!data) {
 		await transaction.rollback();
 		return res.status(202).json({ status: false, message: "Order not placed! Try again" });
-	  }
+	}
 
 	const templatePath = path.join(__dirname, '../../helpers/connection.ejs');
 

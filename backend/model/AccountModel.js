@@ -2,7 +2,6 @@ const { Sequelize, DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
     const Account = sequelize.define('accounts', {
-
         person_name: {
             type: DataTypes.STRING,
             allowNull: true,
@@ -14,6 +13,10 @@ module.exports = (sequelize) => {
         type_payment: {
             type: DataTypes.BOOLEAN,
             allowNull: true,
+        },
+        total_amount: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
         },
         online: {
             type: DataTypes.INTEGER,

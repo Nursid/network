@@ -51,5 +51,34 @@ const GetAllServices = async (req, res) => {
 }
 
 
+const DeletePlan = async (req, res) => {
+    const id = req.params.id;
+    
+    // Store the data to the Database
+    try {
+        
+        // If service does not exist, create a new one
+        const NewPlan = await PlanModel.destroy({
+            where:{
+                id:id
+            }
+        });
+        res.status(200).json({
+            error: false,
+            data: NewPlan,
+            message: "Plan Added Successfully!"
+        });
+        
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: "Failed to add service",
+            details: error.message // Optionally include more details about the error
+        });
+    }
+};
 
-module.exports ={AddPlans, GetAllServices } 
+
+
+
+module.exports ={AddPlans, GetAllServices, DeletePlan} 
