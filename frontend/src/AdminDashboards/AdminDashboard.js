@@ -42,7 +42,7 @@ const AdminDashboard = () => {
   const { rows, Show, setShow } = UseStateManager();
   const { userRole } = useUserRoleContext();
   const { currentUser, setCurrentUser } = useAuth();
-  const [role, setRole] = useState(userRole.role || '');
+  const [role, setRole] = useState(userRole?.role || '');
   const dispatch = useDispatch();
   const token = currentUser.token
   
