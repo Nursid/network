@@ -3,23 +3,19 @@ import {Fragment} from "react";
 import AdminHeader from "../AdminHeader";
 import AnimatedBackground from "../../Elements/AnimatedBacground";
 import AdminNavItems from "../../Elements/AdminNavItems";
+import ManageFlow from "./ManageFlow";
 
 const Network = () => {
 	return (
 		<>
 			<Fragment>
       <AdminHeader />
-      <div className="d-flex">
+      <div className="d-flex" style={{ height: "calc(100vh - 60px)", overflow: "hidden" }}>
         <div
           className="sidebar bg-light"
-          style={{
-            width: "300px",
-            position: "sticky",
-            top: 0,
-            height: "100vh",
-          }}
+          style={{ overflow: "hidden" }}
         >
-          <AdminNavItems  />
+          <AdminNavItems />
         </div>
 
         {/* Main Content */}
@@ -27,14 +23,12 @@ const Network = () => {
           className="main-content flex-grow-1 position-relative"
           style={{
             width: "calc(100% - 300px)",
-            overflowY: "auto",
+            overflow: "hidden",
           }}
         >
           <AnimatedBackground />
-          <div className="BackgroundTopContents">
-						<div className="AttendenceTabs">
-							<Flow/>
-						</div>
+          <div className="BackgroundTopContents" style={{ height: "100%" }}>
+							<ManageFlow/>
 						</div>
 				</div>
 			</div>

@@ -13,7 +13,6 @@ import dagre from '@dagrejs/dagre';
 import CustomNode from './CustomNode';
 import { Button, Input } from 'reactstrap';
 import '@xyflow/react/dist/style.css';
- 
 // Initialize a new dagre graph for each layout calculation
 const createNewDagreGraph = () => {
   return new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
@@ -719,7 +718,7 @@ const Flow = () => {
             </div>
           </div>
         </Panel>
-    </ReactFlow>
+    </ReactFlow>  
     </div>
   );
 };
