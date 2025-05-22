@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -32,15 +33,20 @@ import PonSelector from './PonSelector';
 
 // Main NetworkFlow component wrapped with ReactFlowProvider
 const NetworkFlow = () => {
+  const location = useLocation();
+  const flowData = location.state?.flowData;  
   return (
     <ReactFlowProvider>
-      <FlowContent />
+      <FlowContent flowData={flowData} />
     </ReactFlowProvider>
   );
 };
 
 // The main content of the flow component
-const FlowContent = () => {
+const FlowContent = ({ flowData }) => {
+
+  console.log("flowData----",flowData);
+
   const nodeTypes = useMemo(() => ({ CustomNode: CustomNode }), []);
   const [rfInstance, setRfInstance] = useState(null);
   // Use useRef for idCounter to maintain consistent reference

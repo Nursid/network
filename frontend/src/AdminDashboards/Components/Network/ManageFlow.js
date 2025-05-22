@@ -2,16 +2,27 @@ import { Button } from '@mui/material';
 import { GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import React, { Fragment, useEffect, useState } from 'react'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import { useNavigate } from 'react-router-dom/dist';
+import { useNavigate } from 'react-router-dom';
 import AdminDataTable from '../../Elements/AdminDataTable';
 import moment from 'moment';
 import axios from 'axios';
 import { API_URL } from '../../../config';
+import { Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
 
 const ManageFlow = () => {
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [formData, setFormData] = useState({
+        name: '',
+        olt_name: '',
+        port: '',
+        status: true,
+        data: ''
+    });
 
     const navigate = useNavigate();
 
@@ -35,6 +46,61 @@ const ManageFlow = () => {
         fetchFlowData();
     }, []);
 
+    // Handle input changes
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    // Handle form submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setErrorMessage('');
+        setSuccessMessage('');
+
+        try {
+            // Create data object to match the FlowModel schema
+            const flowData = {
+                name: formData.name,
+                olt_name: formData.olt_name,
+                port: parseInt(formData.port),
+                status: formData.status,
+                data: formData.data || JSON.stringify({ type: formData.name }) // Store the type (EPON/GPON) in data field
+            };
+
+            const response = await axios.post(`${API_URL}/api/flow/add`, flowData);
+            if (response.data.status) {
+                setSuccessMessage(response.data.message || 'Flow added successfully!');
+                // Reset form after successful submission
+                setFormData({
+                    name: '',
+                    olt_name: '',
+                    port: '',
+                    status: true,
+                    data: ''
+                });
+                // Refresh the flow data
+                fetchFlowData();
+                // Close modal after a brief delay
+                setTimeout(() => {
+                    setModalOpen(false);
+                    setSuccessMessage('');
+                }, 2000);
+            } else {
+                setErrorMessage(response.data.message || 'Failed to add flow');
+            }
+        } catch (error) {
+            console.error('Error adding flow:', error);
+            setErrorMessage(error.response?.data?.message || 'An error occurred while adding the flow');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const DataWithID = (data) => {
         const NewData = []
         if (data !== undefined && data.length > 0) {
@@ -52,10 +118,18 @@ const ManageFlow = () => {
         return NewData
     }
    
+    // Handle view flow details
+    const handleViewFlow = (flowData) => {
+        console.log(flowData);
+        navigate('/admin/flow', { state: { flowData } });
+    };
+
     const column = [
         { field: "_id", headerName: "Sr No", minWidth: 50, flex: 1 },       
+        { field: "name", headerName: "Name", minWidth: 120, flex: 1 },
         { field: "olt_name", headerName: "OLT Name", minWidth: 120, flex: 1 },
         { field: "port", headerName: "Port", flex: 1, minWidth: 120 }, 
+        { field: "date", headerName: "Created Date", flex: 1, minWidth: 120 },
         { field: "status", headerName: "Status", flex: 1, minWidth: 120,
           renderCell: (params) => (
             <div className={`badge ${params.row.status ? 'bg-success' : 'bg-danger'}`}>
@@ -63,7 +137,26 @@ const ManageFlow = () => {
             </div>
           )
         },
-        { field: "date", headerName: "Created Date", flex: 1, minWidth: 120 }
+        { 
+            field: "actions", 
+            headerName: "Actions", 
+            flex: 1, 
+            minWidth: 120,
+            renderCell: (params) => (
+                <div className="d-flex">
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        size="small" 
+                        startIcon={<VisibilityIcon />}
+                        onClick={() => handleViewFlow(params.row.data)}
+                        style={{ margin: "0 5px" }}
+                    >
+                        View
+                    </Button>
+                </div>
+            )
+        }
      ];
 
     const CustomToolbar = () => {
@@ -79,7 +172,23 @@ const ManageFlow = () => {
     }
 
     const handleAddFlow = () => {
-        navigate('/admin/flow/add');
+        // Reset form and messages
+        setFormData({
+            name: '',
+            olt_name: '',
+            port: '',
+            status: true,
+            data: ''
+        });
+        setErrorMessage('');
+        setSuccessMessage('');
+        setModalOpen(true);
+    }
+
+    const toggleModal = () => {
+        setModalOpen(!modalOpen);
+        setErrorMessage('');
+        setSuccessMessage('');
     }
 
     return (
@@ -108,6 +217,91 @@ const ManageFlow = () => {
                     />
                 </div>
             </div>
+
+            {/* Add Flow Modal */}
+            <Modal isOpen={modalOpen} toggle={toggleModal} size="lg">
+                <ModalHeader toggle={toggleModal}>Add New Flow</ModalHeader>
+                <ModalBody>
+                    {errorMessage && (
+                        <Alert color="danger">{errorMessage}</Alert>
+                    )}
+                    {successMessage && (
+                        <Alert color="success">{successMessage}</Alert>
+                    )}
+                    <Form onSubmit={handleSubmit}>
+                        <FormGroup>
+                            <Label for="name">Connection Type</Label>
+                            <Input
+                                type="select"
+                                name="name"
+                                id="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="">Select Connection Type</option>
+                                <option value="EPON">EPON</option>
+                                <option value="GPON">GPON</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="olt_name">OLT Name</Label>
+                            <Input
+                                type="text"
+                                name="olt_name"
+                                id="olt_name"
+                                placeholder="Enter OLT Name"
+                                value={formData.olt_name}
+                                onChange={handleChange}
+                                required
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="port">Port</Label>
+                            <Input
+                                type="number"
+                                name="port"
+                                id="port"
+                                placeholder="Enter Port Number"
+                                value={formData.port}
+                                onChange={handleChange}
+                                required
+                            />
+                        </FormGroup>
+                        <FormGroup check className="mb-3">
+                            <Label check>
+                                <Input
+                                    type="checkbox"
+                                    name="status"
+                                    checked={formData.status}
+                                    onChange={handleChange}
+                                />{' '}
+                                Active
+                            </Label>
+                        </FormGroup>
+                        <div className="d-flex justify-content-end">
+                            <Button 
+                                type="button" 
+                                color="secondary" 
+                                className="me-2" 
+                                onClick={toggleModal}
+                                disabled={loading}
+                                style={{ marginRight: "10px" }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                                type="submit" 
+                                variant="contained"
+                                color="primary" 
+                                disabled={loading}
+                            >
+                                {loading ? 'Saving...' : 'Save Flow'}
+                            </Button>
+                        </div>
+                    </Form>
+                </ModalBody>
+            </Modal>
         </Fragment>
     )
 }

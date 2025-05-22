@@ -2,6 +2,10 @@ const { Sequelize, DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
     const FlowModel = sequelize.define('flows', {
+        name: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         olt_name: {
             type: DataTypes.STRING,
             allowNull: true,

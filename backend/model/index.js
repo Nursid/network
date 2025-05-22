@@ -43,7 +43,6 @@ db.Empservices=require("./Misc/empservices")(sequelize, DataTypes);
 db.EnquiryModel=require("./enquirymodel")(sequelize, DataTypes);
 db.VerifyModel=require("./VerifyModel")(sequelize, DataTypes);
 db.MemberModels=require("./CustomerModels/MemberModels")(sequelize, DataTypes);
-db.OrderProcessModel=require("./OrderModel/OrderProcessModel")(sequelize,DataTypes);
 db.DepartmentsModel=require("./AuthModels/DepartmentsModel")(sequelize, DataTypes);
 db.DesignationModel=require("./AuthModels/DesignationModel")(sequelize, DataTypes);
 db.MonthlyServiceModel=require("./AuthModels/MonthlyServiceModel")(sequelize, DataTypes);
@@ -80,7 +79,6 @@ db.ServiceProviderAttendance.belongsTo(db.ServiceProviderModel, { foreignKey: 's
 
 db.CustomerModel.belongsTo(db.NewCustomerModel, { foreignKey: 'user_id' });
 db.ComplainModel.belongsTo(db.NewCustomerModel, { foreignKey: 'cust_id' });
-db.OrderProcessModel.belongsTo(db.NewCustomerModel, { foreignKey: 'registered_id'});
 db.EmployeeModel.belongsTo(db.DepartmentsModel,{foreignKey: 'department_id'});
 db.EmployeeModel.belongsTo(db.DesignationModel,{foreignKey: 'designation_id'});
 db.EmployeeModel.hasMany(db.Empservices, { foreignKey: 'mobile_no', sourceKey: 'mobile_no' });

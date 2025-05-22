@@ -18,6 +18,7 @@ import Reports from './AdminDashboards/Components/Reports';
 import MonthService from './AdminDashboards/Components/MonthlyService';
 import Network from './AdminDashboards/Components/Network';
 import Tickets from './AdminDashboards/Components/Tickets';
+import NetworkFlow from './AdminDashboards/Components/Network/components/NetworkFlow';
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
             <Route path='network' element={<Network />} />
             <Route path='monthly-service' element={<MonthService />} />
             <Route path='tickets' element={<Tickets />} />
+            <Route path='flow' element={<NetworkFlow />} />
           </Route>
         </Routes>
       </BrowserRouter>
