@@ -15,6 +15,7 @@ import {
 import { Button } from 'reactstrap';
 import '@xyflow/react/dist/style.css';
 import './NetworkStyles.css';
+import Swal from 'sweetalert2';
 
 // Import components
 import DebugPanel from './DebugPanel';
@@ -30,6 +31,8 @@ import {
 import CustomNode from '../CustomNode';
 import EdgeContextMenu from './EdgeContextMenu';
 import PonSelector from './PonSelector';
+import axios from 'axios';
+import { API_URL } from '../../../../config';
 
 // Main NetworkFlow component wrapped with ReactFlowProvider
 const NetworkFlow = () => {
@@ -45,7 +48,15 @@ const NetworkFlow = () => {
 // The main content of the flow component
 const FlowContent = ({ flowData }) => {
 
-  console.log("flowData----",flowData);
+  // Use useRef to track if the component has mounted
+  const isMounted = useRef(false);
+  
+  // Better console logging
+  useEffect(() => {
+    if (flowData) {
+      console.log("flowData received:", flowData);
+    }
+  }, [flowData]);
 
   const nodeTypes = useMemo(() => ({ CustomNode: CustomNode }), []);
   const [rfInstance, setRfInstance] = useState(null);
@@ -54,8 +65,6 @@ const FlowContent = ({ flowData }) => {
   
   // Debug state to show current state
   const [debugInfo, setDebugInfo] = useState({});
-  // State to track selected node for deletion
-  // const [selectedNode, setSelectedNode] = useState(null);
   
   // State for context menu
   const [contextMenu, setContextMenu] = useState(null);
@@ -69,47 +78,7 @@ const FlowContent = ({ flowData }) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { setViewport } = useReactFlow();
   
-  // Custom node change handler to update NodeStore when nodes are moved
-  const handleNodesChange = useCallback((changes) => {
-    // Apply the changes to the nodes state first
-    onNodesChange(changes);
-    
-    // Update NodeStore with new positions for dragged nodes
-    changes.forEach(change => {
-      if (change.type === 'position' && change.dragging === false) {
-        // Node dragging has completed - update NodeStore
-        const node = nodes.find(n => n.id === change.id);
-        if (node) {
-          NodeStore.updateNodePosition(change.id, change.position);
-        }
-      }
-    });
-  }, [nodes, onNodesChange]);
-  
-  // Suppress ResizeObserver loop warning
-  useEffect(() => {
-    // Save the original console error function
-    const originalConsoleError = console.error;
-    
-    // Override console.error to suppress specific ResizeObserver warning
-    console.error = (...args) => {
-      if (args[0]?.includes?.('ResizeObserver loop') || 
-          args[0]?.message?.includes?.('ResizeObserver loop') ||
-          (typeof args[0] === 'string' && args[0].includes('ResizeObserver loop'))) {
-        // Don't log the ResizeObserver warning
-        return;
-      }
-      // Log all other errors normally
-      originalConsoleError(...args);
-    };
-    
-    // Cleanup function to restore original console.error when component unmounts
-    return () => {
-      console.error = originalConsoleError;
-    };
-  }, []);
-  
-  // Debugging helper
+  // Functions
   const logState = (action) => {
     console.log(`[${action}] Nodes:`, nodes);
     console.log(`[${action}] Edges:`, edges);
@@ -122,20 +91,6 @@ const FlowContent = ({ flowData }) => {
       timestamp: new Date().toISOString()
     });
   };
-
-  // Handle node deletion
-  const handleDeleteNode = useCallback((nodeId) => {
-    console.log("Deleting node:", nodeId);
-    deleteNodeHandler(
-      nodeId,
-      NodeStore,
-      nodes,
-      edges,
-      setNodes,
-      setEdges,
-      logState
-    );
-  }, [nodes, edges]);
 
   // Define onNodeUpdate first - before using it in handler functions
   const onNodeUpdate = useCallback((id, updatedData) => {
@@ -189,6 +144,7 @@ const FlowContent = ({ flowData }) => {
     logState
   );
 
+  // Define handlePonNodeClick after its dependencies
   const handlePonNodeClick = (ponId) => {
     createPonClickHandler(
       ponId,
@@ -203,6 +159,152 @@ const FlowContent = ({ flowData }) => {
       logState
     );
   };
+
+  // Setup initial nodes function wrapped in useCallback
+  const setupInitialNodes = useCallback(() => {
+    // Reset counter and store
+    idCounterRef.current = 1;
+    NodeStore.clear();
+    
+    // Use flowData if available, otherwise use default values
+    const eponName = flowData?.name || 'EPON';
+    const oltName = flowData?.olt_name || 'OLT';
+    const portCount = flowData?.port || 8;
+    
+    const eponNode = {
+      id: 'epon-1',
+      type: 'CustomNode',
+      data: { 
+        label: eponName, 
+        nodeType: 'simple',
+        color: '#e74c3c',
+        id: 'epon-1',
+        oltName: oltName
+      },
+      position: { x: 0, y: 0 }
+    };
+    
+    // Add to nodeStore
+    NodeStore.addNode(eponNode);
+
+    const ponNodes = [];
+    const ponEdges = [];
+
+    // Create PON nodes based on port count from flowData
+    for (let i = 1; i <= portCount; i++) {
+      const ponId = `pon-${i}`;
+      const ponNode = {
+        id: ponId,
+        type: 'CustomNode',
+        data: { 
+          label: `PON ${i}`, 
+          nodeType: 'simple',
+          color: '#3498db',
+          onClick: (id) => handlePonNodeClick(id),
+          id: ponId
+        },
+        position: { x: 0, y: 0 } // Position will be calculated by dagre
+      };
+
+      ponNodes.push(ponNode);
+      // Add to nodeStore
+      NodeStore.addNode(ponNode);
+
+      // Connect EPON to each PON
+      const edge = {
+        id: `e-epon-1-pon-${i}`,
+        source: 'epon-1',
+        target: ponId,
+        type: 'smoothstep',
+        animated: true
+      };
+
+      ponEdges.push(edge);
+    }
+
+    const allNodes = [eponNode, ...ponNodes];
+    const allEdges = [...ponEdges];
+
+    setInitialNodes(allNodes);
+    setInitialEdges(allEdges);
+    
+    // Apply layout and set nodes/edges
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+      allNodes,
+      allEdges
+    );
+    
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+    
+    // Log initial state
+    setTimeout(() => {
+      logState('Initial Setup');
+    }, 100);
+  }, [flowData, logState, setNodes, setEdges, setInitialNodes, setInitialEdges, idCounterRef, handlePonNodeClick]);
+  
+  // Set up initial EPON and PON nodes when component mounts and flowData is available
+  useEffect(() => {
+    // Only run setup once when component mounts and we have flowData
+    if (!isMounted.current && flowData) {
+      setupInitialNodes();
+      isMounted.current = true;
+    }
+  }, [flowData, setupInitialNodes]);
+
+  // Custom node change handler to update NodeStore when nodes are moved
+  const handleNodesChange = useCallback((changes) => {
+    // Apply the changes to the nodes state first
+    onNodesChange(changes);
+    
+    // Update NodeStore with new positions for dragged nodes
+    changes.forEach(change => {
+      if (change.type === 'position' && change.dragging === false) {
+        // Node dragging has completed - update NodeStore
+        const node = nodes.find(n => n.id === change.id);
+        if (node) {
+          NodeStore.updateNodePosition(change.id, change.position);
+        }
+      }
+    });
+  }, [nodes, onNodesChange]);
+  
+  // Suppress ResizeObserver loop warning
+  useEffect(() => {
+    // Save the original console error function
+    const originalConsoleError = console.error;
+    
+    // Override console.error to suppress specific ResizeObserver warning
+    console.error = (...args) => {
+      if (args[0]?.includes?.('ResizeObserver loop') || 
+          args[0]?.message?.includes?.('ResizeObserver loop') ||
+          (typeof args[0] === 'string' && args[0].includes('ResizeObserver loop'))) {
+        // Don't log the ResizeObserver warning
+        return;
+      }
+      // Log all other errors normally
+      originalConsoleError(...args);
+    };
+    
+    // Cleanup function to restore original console.error when component unmounts
+    return () => {
+      console.error = originalConsoleError;
+    };
+  }, []);
+  
+  // Handle node deletion
+  const handleDeleteNode = useCallback((nodeId) => {
+    console.log("Deleting node:", nodeId);
+    deleteNodeHandler(
+      nodeId,
+      NodeStore,
+      nodes,
+      edges,
+      setNodes,
+      setEdges,
+      logState
+    );
+  }, [nodes, edges]);
 
   // Handle PON rewiring
   const handleRewirePon = useCallback((nodeId, newPonId) => {
@@ -339,11 +441,6 @@ const FlowContent = ({ flowData }) => {
     });
   }, [nodes]);
 
-  // Set up initial EPON and PON nodes when component mounts
-  useEffect(() => {
-    setupInitialNodes();
-  }, []);
-
   // Keep nodeStore in sync with nodes state
   useEffect(() => {
     // Clear the store first
@@ -359,6 +456,9 @@ const FlowContent = ({ flowData }) => {
 
   // Apply layout and update the flow when nodes or edges change
   useEffect(() => {
+    // Avoid layout calculations during initial render
+    if (!isMounted.current) return;
+    
     if (nodes.length > 0 && edges.length > 0) {
       // Use a ref to track if we're already calculating layout
       const layoutTimeoutRef = { current: null };
@@ -420,87 +520,6 @@ const FlowContent = ({ flowData }) => {
     }
   };
 
-  const setupInitialNodes = () => {
-    // Reset counter and store
-    idCounterRef.current = 1;
-    NodeStore.clear();
-    
-    const eponNode = {
-      id: 'epon-1',
-      type: 'CustomNode',
-      data: { 
-        label: 'EPON', 
-        nodeType: 'simple',
-        color: '#e74c3c',
-        id: 'epon-1'
-      },
-      position: { x: 0, y: 0 }
-    };
-    
-    // Add to nodeStore
-    NodeStore.addNode(eponNode);
-
-    const ponNodes = [];
-    const ponEdges = [];
-
-    // Create 8 PON nodes
-    for (let i = 1; i <= 8; i++) {
-      const ponId = `pon-${i}`;
-      const ponNode = {
-        id: ponId,
-        type: 'CustomNode',
-        data: { 
-          label: `PON ${i}`, 
-          nodeType: 'simple',
-          color: '#3498db',
-          onClick: (id) => handlePonNodeClick(id),
-          id: ponId
-        },
-        position: { x: 0, y: 0 } // Position will be calculated by dagre
-      };
-
-      ponNodes.push(ponNode);
-      // Add to nodeStore
-      NodeStore.addNode(ponNode);
-
-      // Connect EPON to each PON
-      const edge = {
-        id: `e-epon-1-pon-${i}`,
-        source: 'epon-1',
-        target: ponId,
-        type: 'smoothstep',
-        animated: true
-      };
-
-      ponEdges.push(edge);
-    }
-
-    const allNodes = [eponNode, ...ponNodes];
-    const allEdges = [...ponEdges];
-
-    setInitialNodes(allNodes);
-    setInitialEdges(allEdges);
-    
-    // Apply layout and set nodes/edges
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-      allNodes,
-      allEdges
-    );
-    
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges);
-    
-    // Log initial state
-    setTimeout(() => {
-      logState('Initial Setup');
-    }, 100);
-  };
-
-  const resetFlow = () => {
-    idCounterRef.current = 1;
-    setupInitialNodes();
-  };
-
   // Find all nodes that can be deleted (all nodes except PON and EPON nodes)
   const getDeletableNodes = () => {
     return nodes.filter(node => 
@@ -511,28 +530,34 @@ const FlowContent = ({ flowData }) => {
     );
   };
 
-  // Find all nodes that are OLT nodes (have OLT in their label)
-
-
   // Process nodes to include onDelete callback and openPonSelector
   useEffect(() => {
-    setNodes(nds => 
-      nds.map(node => {
-        // Check if this is an OLT node (has OLT in label and a ponId)
-        const isOltNode = node.data?.label?.includes('OLT') && node.data?.ponId;
-        
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            onDelete: handleDeleteNode,
-            // onClick: handlePonNodeClick(node.id),
-            // Only add the openPonSelector callback to OLT nodes
-            ...(isOltNode && { openPonSelector })
-          }
-        };
-      })
-    );
+    // Add a check to prevent unnecessary updates
+    const nodesNeedUpdate = nodes.some(node => {
+      // Check if this is an OLT node that doesn't have the openPonSelector or onDelete attached
+      const isOltNode = node.data?.label?.includes('OLT') && node.data?.ponId;
+      return !node.data.onDelete || (isOltNode && !node.data.openPonSelector);
+    });
+
+    // Only update if necessary
+    if (nodesNeedUpdate) {
+      setNodes(nds => 
+        nds.map(node => {
+          // Check if this is an OLT node (has OLT in label and a ponId)
+          const isOltNode = node.data?.label?.includes('OLT') && node.data?.ponId;
+          
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              onDelete: node.data.onDelete || handleDeleteNode,
+              // Only add the openPonSelector callback to OLT nodes if not already present
+              ...(isOltNode && !node.data.openPonSelector && { openPonSelector })
+            }
+          };
+        })
+      );
+    }
   }, [handleDeleteNode, openPonSelector]);
 
   // Handle edge click to open context menu
@@ -650,8 +675,7 @@ const FlowContent = ({ flowData }) => {
 
   const flowKey = 'example-flow';
 
-
-  const onSave = useCallback(() => {
+  const onSave = useCallback(async () => {
     if (rfInstance) {
       // Get the current flow state with all positions
       const flow = rfInstance.toObject();
@@ -671,9 +695,25 @@ const FlowContent = ({ flowData }) => {
         }
         return node;
       });
-      // Save to localStorage
-      localStorage.setItem(flowKey, JSON.stringify(flow));
-      console.log("Flow saved with node positions");
+      // Save to MongoDB
+      try {
+        const response = await axios.put(`${API_URL}/api/flow/update/${flowData.id}`, {
+          data: JSON.stringify(flow),
+        });
+        console.log("Flow saved to MongoDB:", response.data);
+        Swal.fire(
+          'Successfully!',
+          'Flow saved',
+          'success'
+        )
+      } catch (error) {
+        console.error("Error saving flow to MongoDB:", error);
+        Swal.fire(
+          'Error!',
+          error.response.data.message,
+          'error'
+        )
+      }
     }
   }, [rfInstance]);
  
@@ -752,15 +792,9 @@ const FlowContent = ({ flowData }) => {
 
   return (
     <div style={{ height: '100vh', width: '100%', backgroundColor: '#f5f5f5' }}>
-      <Panel position="top-center">
-        <Button color="primary" onClick={resetFlow} style={{ marginRight: '10px' }}>
-          Reset Network Flow
-        </Button>
+      <Panel position="top-center"> 
         <Button color="success" onClick={onSave}>
           Save
-        </Button>
-        <Button color="success" onClick={onRestore}>
-          Restore
         </Button>
       </Panel>
       

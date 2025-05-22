@@ -40,7 +40,7 @@ const AddFlow = () => {
                 olt_name: formData.olt_name,
                 port: parseInt(formData.port),
                 status: formData.status,
-                data: formData.data || JSON.stringify({ type: formData.name }) // Store the type (EPON/GPON) in data field
+                // Store the type (EPON/GPON) in data field
             };
 
             const response = await axios.post(`${API_URL}/api/flow/add`, flowData);

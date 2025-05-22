@@ -149,7 +149,7 @@ const ManageFlow = () => {
                         color="primary" 
                         size="small" 
                         startIcon={<VisibilityIcon />}
-                        onClick={() => handleViewFlow(params.row.data)}
+                        onClick={() => handleViewFlow(params.row)}
                         style={{ margin: "0 5px" }}
                     >
                         View
