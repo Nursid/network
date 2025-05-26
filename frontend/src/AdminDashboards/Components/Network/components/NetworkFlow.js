@@ -822,7 +822,7 @@ const FlowContent = ({ flowData }) => {
       </Navbar>
       
       {/* Delete Nodes Button in top-right */}
-      <Panel position="top-right">
+      <Panel position="top-right" style={{ marginTop: '10px' }}>
         <Button 
           color="danger" 
           style={{ margin: '10px' }}
@@ -855,7 +855,7 @@ const FlowContent = ({ flowData }) => {
       </Panel>
       
       {/* Debug panel */}
-      <DebugPanel debugInfo={debugInfo} />
+      <DebugPanel debugInfo={debugInfo} nodes={nodes} edges={edges} />
       
       {/* Context menu for edge click */}
       {contextMenu && (
