@@ -14,7 +14,6 @@ const AddFlow = () => {
         olt_name: '',
         port: '',
         status: true,
-        data: ''
     });
 
     // Handle input changes
@@ -39,8 +38,7 @@ const AddFlow = () => {
                 name: formData.name,
                 olt_name: formData.olt_name,
                 port: parseInt(formData.port),
-                status: formData.status,
-                // Store the type (EPON/GPON) in data field
+                status: formData.status
             };
 
             const response = await axios.post(`${API_URL}/api/flow/add`, flowData);
@@ -51,8 +49,7 @@ const AddFlow = () => {
                     name: '',
                     olt_name: '',
                     port: '',
-                    status: true,
-                    data: ''
+                    status: true
                 });
                 // Navigate to flow list after a brief delay
                 setTimeout(() => {

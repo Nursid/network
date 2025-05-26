@@ -20,8 +20,7 @@ const ManageFlow = () => {
         name: '',
         olt_name: '',
         port: '',
-        status: true,
-        data: ''
+        status: true
     });
 
     const navigate = useNavigate();
@@ -68,8 +67,7 @@ const ManageFlow = () => {
                 name: formData.name,
                 olt_name: formData.olt_name,
                 port: parseInt(formData.port),
-                status: formData.status,
-                data: formData.data || JSON.stringify({ type: formData.name }) // Store the type (EPON/GPON) in data field
+                status: formData.status
             };
 
             const response = await axios.post(`${API_URL}/api/flow/add`, flowData);
@@ -80,8 +78,7 @@ const ManageFlow = () => {
                     name: '',
                     olt_name: '',
                     port: '',
-                    status: true,
-                    data: ''
+                    status: true
                 });
                 // Refresh the flow data
                 fetchFlowData();
@@ -177,8 +174,7 @@ const ManageFlow = () => {
             name: '',
             olt_name: '',
             port: '',
-            status: true,
-            data: ''
+            status: true
         });
         setErrorMessage('');
         setSuccessMessage('');

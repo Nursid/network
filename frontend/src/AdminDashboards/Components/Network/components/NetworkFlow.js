@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -12,7 +12,7 @@ import {
   useEdgesState,
   useReactFlow
 } from '@xyflow/react';
-import { Button } from 'reactstrap';
+import { Button, Navbar, NavbarBrand, Nav, NavItem } from 'reactstrap';
 import '@xyflow/react/dist/style.css';
 import './NetworkStyles.css';
 import Swal from 'sweetalert2';
@@ -47,6 +47,7 @@ const NetworkFlow = () => {
 
 // The main content of the flow component
 const FlowContent = ({ flowData }) => {
+  const navigate = useNavigate();
 
   // Use useRef to track if the component has mounted
   const isMounted = useRef(false);
@@ -719,7 +720,8 @@ const FlowContent = ({ flowData }) => {
  
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
-      const flow = JSON.parse(localStorage.getItem(flowKey));
+      
+      const flow = JSON.parse(flowData.data);
  
       if (flow) {
         const { x = 0, y = 0, zoom = 1 } = flow.viewport;
@@ -790,13 +792,34 @@ const FlowContent = ({ flowData }) => {
       !node.data.label.includes('EPON');
   };
 
+  // Handle back navigation
+  const handleBack = () => {
+    navigate(-1); // Go back to previous page
+  };
+
   return (
     <div style={{ height: '100vh', width: '100%', backgroundColor: '#f5f5f5' }}>
-      <Panel position="top-center"> 
-        <Button color="success" onClick={onSave}>
-          Save
-        </Button>
-      </Panel>
+      {/* Top Navbar */}
+      <Navbar color="dark" dark expand="md" style={{ zIndex: 1000 }}>
+        <NavbarBrand>
+          <Button color="secondary" onClick={handleBack} style={{ marginRight: '15px' }}>
+            ← Back
+          </Button>
+          Network Flow - {flowData?.name || 'EPON'}
+        </NavbarBrand>
+        <Nav className="ml-auto" navbar>
+          <NavItem>
+            <Button color="success" onClick={onSave} style={{ marginRight: '10px' }}>
+              Save
+            </Button>
+          </NavItem>
+          <NavItem>
+            <Button color="info" onClick={onRestore}>
+              Restore
+            </Button>
+          </NavItem>
+        </Nav>
+      </Navbar>
       
       {/* Delete Nodes Button in top-right */}
       <Panel position="top-right">
@@ -856,28 +879,30 @@ const FlowContent = ({ flowData }) => {
         />
       )}
       
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={handleNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onEdgeClick={onEdgeClick}
-        onPaneClick={onPaneClick}
-        connectionLineType={ConnectionLineType.SmoothStep}
-        fitView
-        fitViewOptions={{ padding: 0.2, includeHiddenNodes: false }}
-        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-        minZoom={0.2}
-        maxZoom={2}
-        onInit={setRfInstance}
-        nodeTypes={nodeTypes}
-        proOptions={{ hideAttribution: true }}
-        nodesDraggable={true}
-      >
-        <Background variant="dots" gap={12} size={1} />
-        <Controls />
-      </ReactFlow>
+      <div style={{ height: 'calc(100vh - 56px)', width: '100%' }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={handleNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onEdgeClick={onEdgeClick}
+          onPaneClick={onPaneClick}
+          connectionLineType={ConnectionLineType.SmoothStep}
+          fitView
+          fitViewOptions={{ padding: 0.2, includeHiddenNodes: false }}
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+          minZoom={0.2}
+          maxZoom={2}
+          onInit={setRfInstance}
+          nodeTypes={nodeTypes}
+          proOptions={{ hideAttribution: true }}
+          nodesDraggable={true}
+        >
+          <Background variant="dots" gap={12} size={1} />
+          <Controls />
+        </ReactFlow>
+      </div>
     </div>
   );
 };
