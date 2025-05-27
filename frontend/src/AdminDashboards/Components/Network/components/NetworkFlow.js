@@ -721,6 +721,7 @@ const FlowContent = ({ flowData }) => {
           'Flow saved',
           'success'
         )
+        onRestore()
       } catch (error) {
         console.error("Error saving flow to MongoDB:", error);
         Swal.fire(
@@ -867,6 +868,11 @@ const FlowContent = ({ flowData }) => {
     navigate(-1); // Go back to previous page
   };
 
+  useEffect(() => {
+    onRestore();
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <div style={{ height: '100vh', width: '100%', backgroundColor: '#f5f5f5' }}>
       {/* Top Navbar */}
@@ -881,11 +887,6 @@ const FlowContent = ({ flowData }) => {
           <NavItem>
             <Button color="success" onClick={onSave} style={{ marginRight: '10px' }}>
               Save
-            </Button>
-          </NavItem>
-          <NavItem>
-            <Button color="info" onClick={onRestore}>
-              Restore
             </Button>
           </NavItem>
         </Nav>
