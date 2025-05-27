@@ -43,9 +43,24 @@ const UpdateFlow = async (req, res)=> {
     }
 }
 
+const GetFlow = async (req, res)=> {
+    try{
+        const id=req.params.id;
+        const data=await FlowModel.findOne({
+            where:{id:id}
+        });
+        if(!data){
+            res.status(202).json({status: true,message:"Flow Not Found!", data: []});
+        }
+        res.status(200).json({status: true, data: data});
+    }catch(error){
+        res.status(400).json({status: true ,message:"Internal Server Error"});
+    }
+}
 
 module.exports = {
     AddFlow,
     GetAllFlow,
-    UpdateFlow
+    UpdateFlow,
+    GetFlow
 }

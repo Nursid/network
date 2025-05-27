@@ -444,15 +444,19 @@ const FlowContent = ({ flowData }) => {
 
   // Keep nodeStore in sync with nodes state
   useEffect(() => {
-    // Clear the store first
-    NodeStore.clear();
-    
-    // Add all current nodes to the store
-    nodes.forEach(node => {
-      NodeStore.addNode(node);
-    });
-    
-    // console.log("Node store updated:", NodeStore.getAllNodes().length, "nodes");
+    // Only sync if we're not in the middle of restoration
+    // This prevents interference during the restore process
+    if (isMounted.current) {
+      // Clear the store first
+      NodeStore.clear();
+      
+      // Add all current nodes to the store
+      nodes.forEach(node => {
+        NodeStore.addNode(node);
+      });
+      
+      // console.log("Node store updated:", NodeStore.getAllNodes().length, "nodes");
+    }
   }, [nodes]);
 
   // Apply layout and update the flow when nodes or edges change
@@ -533,6 +537,9 @@ const FlowContent = ({ flowData }) => {
 
   // Process nodes to include onDelete callback and openPonSelector
   useEffect(() => {
+    // Only process if component is mounted and not during restoration
+    if (!isMounted.current) return;
+    
     // Add a check to prevent unnecessary updates
     const nodesNeedUpdate = nodes.some(node => {
       // Check if this is an OLT node that doesn't have the openPonSelector or onDelete attached
@@ -559,7 +566,7 @@ const FlowContent = ({ flowData }) => {
         })
       );
     }
-  }, [handleDeleteNode, openPonSelector]);
+  }, [handleDeleteNode, openPonSelector, nodes]);
 
   // Handle edge click to open context menu
   const onEdgeClick = useCallback((event, edge) => {
@@ -681,21 +688,28 @@ const FlowContent = ({ flowData }) => {
       // Get the current flow state with all positions
       const flow = rfInstance.toObject();
       
-      // Ensure nodes in the flow have correct positions from NodeStore
+      // Clean and prepare nodes for saving
       flow.nodes = flow.nodes.map(node => {
         const storedNode = NodeStore.getNode(node.id);
-        if (storedNode && storedNode.position) {
-          return {
-            ...node,
-            position: storedNode.position,
-            data: {
-                ...node.data,
-                onClick: () => handlePonNodeClick(node.id)
-            }
-          };
-        }
-        return node;
+        
+        // Create a clean data object without callback functions
+        const cleanData = { ...node.data };
+        
+        // Remove callback functions that shouldn't be saved
+        delete cleanData.onUpdate;
+        delete cleanData.onSplitterSelect;
+        delete cleanData.onDeviceSelect;
+        delete cleanData.onDelete;
+        delete cleanData.openPonSelector;
+        delete cleanData.onClick;
+        
+        return {
+          ...node,
+          position: storedNode?.position || node.position,
+          data: cleanData
+        };
       });
+      
       // Save to MongoDB
       try {
         const response = await axios.put(`${API_URL}/api/flow/update/${flowData.id}`, {
@@ -711,79 +725,135 @@ const FlowContent = ({ flowData }) => {
         console.error("Error saving flow to MongoDB:", error);
         Swal.fire(
           'Error!',
-          error.response.data.message,
+          error.response?.data?.message || error.message,
           'error'
         )
       }
     }
-  }, [rfInstance]);
+  }, [rfInstance, flowData.id]);
  
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
-      
-      const flow = JSON.parse(flowData.data);
- 
-      if (flow) {
-        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+      try {
+        const response = await axios.get(`${API_URL}/api/flow/get/${flowData.id}`);
+        console.log("Flow restored:-----", response.data.data.data);
         
-        // Reattach callback functions to nodes before setting them
-        const restoredNodes = flow.nodes.map(node => {
-          // Create a new node with the same data but reattach callbacks
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              onUpdate: (updatedData) => onNodeUpdate(node.id, updatedData),
-              onSplitterSelect: (event, _, numChildren, splitterType) => {
-                console.log("Splitter callback with restored ID:", node.id);
-                handleSplitterSelect(event, node.id, numChildren, splitterType, node.data.ponId);
-              },
-              onClick: () => handlePonNodeClick(node.id),
-              onDeviceSelect: (event, _, deviceType) => {
-                console.log("Device callback with restored ID:", node.id);
-                handleDeviceSelect(event, node.id, deviceType);
-              },
-              openPonSelector: node.data.ponId ? (e, nodeId, x, y) => {
-                // Get all available PON nodes
-                const ponNodes = nodes.filter(n => 
-                  n.data.label && (n.data.label.includes('PON') || n.data.label.includes('EPON'))
+        const flow = JSON.parse(response.data.data.data);
+        console.log("Flow restored:-----", flow);
+   
+        if (flow) {
+          const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+          
+          // Clear NodeStore before restoration
+          NodeStore.clear();
+          
+          // Update idCounter to be higher than any existing node ID
+          const maxId = Math.max(
+            ...flow.nodes.map(node => {
+              const match = node.id.match(/(\d+)$/);
+              return match ? parseInt(match[1]) : 0;
+            }),
+            0
+          );
+          idCounterRef.current = maxId + 1;
+          
+          // Reattach callback functions to nodes before setting them
+          const restoredNodes = flow.nodes.map(node => {
+            // Create a new node with the same data but reattach callbacks
+            const restoredNode = {
+              ...node,
+              data: {
+                ...node.data,
+                onUpdate: (updatedData) => onNodeUpdate(node.id, updatedData),
+                onSplitterSelect: (event, _, numChildren, splitterType) => {
+                  console.log("Splitter callback with restored ID:", node.id);
+                  handleSplitterSelect(event, node.id, numChildren, splitterType, node.data.ponId);
+                },
+                onClick: () => handlePonNodeClick(node.id),
+                onDeviceSelect: (event, _, deviceType) => {
+                  console.log("Device callback with restored ID:", node.id);
+                  handleDeviceSelect(event, node.id, deviceType);
+                },
+                openPonSelector: node.data.ponId ? (e, nodeId, x, y) => {
+                  // Use a function that will get fresh nodes state
+                  const getCurrentPonNodes = () => {
+                    // Get current nodes from React Flow instance
+                    const currentNodes = rfInstance ? rfInstance.getNodes() : [];
+                    return currentNodes.filter(n => 
+                      n.data.label && n.data.label.includes('PON') && !n.data.label.includes('EPON')
+                    );
+                  };
+                  
+                  setPonSelector({
+                    nodeId,
+                    x,
+                    y,
+                    currentPonId: node.data.ponId,
+                    ponOptions: getCurrentPonNodes().map(pon => ({
+                      id: pon.id,
+                      label: pon.data.label
+                    }))
+                  });
+                } : undefined,
+                onDelete: isDeletableNode(node) ? () => handleDeleteNode(node.id) : undefined,
+              }
+            };
+            
+            // Add to NodeStore immediately
+            NodeStore.addNode(restoredNode);
+            return restoredNode;
+          });
+          
+          // Set nodes and edges
+          setNodes(restoredNodes);
+          setEdges(flow.edges || []);
+          
+          // Set viewport after a short delay to ensure nodes are rendered
+          setTimeout(() => {
+            setViewport({ x, y, zoom });
+          }, 100);
+          
+          // Apply layout after restoration to ensure proper positioning
+          setTimeout(() => {
+            if (restoredNodes.length > 0 && flow.edges.length > 0) {
+              try {
+                const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+                  restoredNodes,
+                  flow.edges
                 );
+                setNodes(layoutedNodes);
+                setEdges(layoutedEdges);
                 
-                setPonSelector({
-                  nodeId,
-                  x,
-                  y,
-                  currentPonId: node.data.ponId,
-                  ponOptions: ponNodes.map(pon => ({
-                    id: pon.id,
-                    label: pon.data.label
-                  }))
+                // Update NodeStore with layouted positions
+                layoutedNodes.forEach(node => {
+                  NodeStore.updateNodePosition(node.id, node.position);
                 });
-              } : undefined,
-              onDelete: isDeletableNode(node) ? () => handleDeleteNode(node.id) : undefined,
-             
+              } catch (error) {
+                console.warn("Layout calculation error during restore:", error);
+              }
             }
-          };
-        });
-        
-        // Update NodeStore with restored nodes
-        restoredNodes.forEach(node => {
-          NodeStore.addNode(node);
-        });
-        
-        setNodes(restoredNodes);
-        setEdges(flow.edges || []);
-        setViewport({ x, y, zoom });
-        
-        // Log state after restoration
-        setTimeout(() => {
-          logState('Restored Flow');
-        }, 100);
+            
+            // Log state after restoration
+            logState('Restored Flow');
+          }, 200);
+          
+          // Mark as mounted to prevent initial setup from running again
+          isMounted.current = true;
+          
+          console.log("Flow restoration completed successfully");
+        }
+      } catch (error) {
+        console.error("Error restoring flow:", error);
+        Swal.fire(
+          'Error!',
+          'Failed to restore flow: ' + (error.response?.data?.message || error.message),
+          'error'
+        );
       }
     };
  
     restoreFlow();
-  }, [setNodes, setViewport, handleSplitterSelect, handleDeviceSelect, onNodeUpdate, handleDeleteNode, nodes]);
+  }, [setNodes, setEdges, setViewport, handleSplitterSelect, handleDeviceSelect, onNodeUpdate, handleDeleteNode, rfInstance, logState]);
 
   // Helper function to determine if a node is deletable
   const isDeletableNode = (node) => {
