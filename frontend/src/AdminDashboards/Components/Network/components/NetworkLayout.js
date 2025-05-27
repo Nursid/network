@@ -12,7 +12,7 @@ export const getLayoutedElements = (nodes, edges, direction = 'TB') => {
   // Configure graph settings
   graphUtils.setGraph({ 
     rankdir: direction, 
-    ranksep: 400,      // Increased vertical separation
+    ranksep: 600,      // Increased vertical separation (was 400)
     nodesep: 200,      // Increased horizontal separation
     edgesep: 150,      // Edge separation
     marginx: 50,       // Margin x

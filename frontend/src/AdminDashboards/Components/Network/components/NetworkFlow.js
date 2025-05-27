@@ -51,13 +51,6 @@ const FlowContent = ({ flowData }) => {
 
   // Use useRef to track if the component has mounted
   const isMounted = useRef(false);
-  
-  // Better console logging
-  useEffect(() => {
-    if (flowData) {
-      console.log("flowData received:", flowData);
-    }
-  }, [flowData]);
 
   const nodeTypes = useMemo(() => ({ CustomNode: CustomNode }), []);
   const [rfInstance, setRfInstance] = useState(null);
@@ -680,8 +673,6 @@ const FlowContent = ({ flowData }) => {
     setContextMenu(null);
     setPonSelector(null);
   }, []);
-
-  const flowKey = 'example-flow';
 
   const onSave = useCallback(async () => {
     if (rfInstance) {
