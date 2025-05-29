@@ -10,7 +10,8 @@ export const createPonClickHandler = (
   onNodeUpdate,
   handleSplitterSelect,
   handleDeviceSelect,
-  logState
+  logState,
+  flowData
 ) => {
   console.log("handlePonNodeClick called with:", ponId);
   
@@ -54,7 +55,7 @@ export const createPonClickHandler = (
     id: newStepId,
     type: 'CustomNode',
     data: { 
-      label: `Step 1 - OLT-99 PON ${ponNumber}`,
+      label: `Step 1 - ${flowData?.olt_name} PON ${ponNumber}`,
       ponId: ponId, // Store original PON ID for reference
       onUpdate: (updatedData) => onNodeUpdate(newStepId, updatedData),
       // Use a closure to capture the correct node ID
@@ -108,7 +109,8 @@ export const createSplitterHandler = (
   setEdges,
   onNodeUpdate,
   idCounterRef,
-  logState
+  logState,
+  flowData
 ) => {
   return (event, parentId, numChildren, splitterType, originalPonId) => {
     console.log("handleSplitterSelect called with parentId:", parentId);
@@ -183,20 +185,20 @@ export const createSplitterHandler = (
         id: newId,
         type: 'CustomNode',
         data: { 
-          label: `Step ${stepNumber}(${letterLabel}) - OLT-99 ${ponPart}`,
+          label: `Step ${stepNumber}(${letterLabel}) - ${flowData?.olt_name} ${ponPart}`,
           ponId: ponId, // Store original PON ID for reference
           onUpdate: (updatedData) => onNodeUpdate(newId, updatedData),
           // Use a closure to capture the correct node ID
           onSplitterSelect: (event, _, numChildren, splitterType) => {
             console.log("Splitter callback with captured ID:", newId);
             const handler = createSplitterHandler(
-              nodeStore, nodes, setNodes, setEdges, onNodeUpdate, idCounterRef, logState
+              nodeStore, nodes, setNodes, setEdges, onNodeUpdate, idCounterRef, logState, flowData
             );
             handler(event, newId, numChildren, splitterType, ponId);
           },
           onDeviceSelect: (event, _, deviceType) => {
             console.log("Device callback with captured ID:", newId);
-            createDeviceHandler(nodeStore, onNodeUpdate, idCounterRef, nodes, setNodes, setEdges, logState)(event, newId, deviceType);
+            createDeviceHandler(nodeStore, onNodeUpdate, idCounterRef, nodes, setNodes, setEdges, logState, flowData)(event, newId, deviceType);
           },
           id: newId // Explicitly store ID in data as well
         },
@@ -250,7 +252,8 @@ export const createDeviceHandler = (
   nodes, 
   setNodes, 
   setEdges,
-  logState
+  logState,
+  flowData
 ) => {
   return (event, parentId, deviceType) => {
     console.log("handleDeviceSelect called with parentId:", parentId, "deviceType:", deviceType);

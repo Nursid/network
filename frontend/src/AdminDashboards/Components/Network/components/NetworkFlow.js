@@ -137,7 +137,8 @@ const FlowContent = ({ flowData }) => {
     setEdges,
     onNodeUpdate,
     idCounterRef,
-    logState
+    logState,
+    flowData
   );
 
   // Define handlePonNodeClick after its dependencies
