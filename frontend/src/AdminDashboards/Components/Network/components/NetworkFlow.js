@@ -33,6 +33,9 @@ import EdgeContextMenu from './EdgeContextMenu';
 import PonSelector from './PonSelector';
 import axios from 'axios';
 import { API_URL } from '../../../../config';
+import OnuNode from './nodes/OnuNode';
+import OntNode from './nodes/OntNode';
+import RouterNode from './nodes/RouterNode';
 
 // Main NetworkFlow component wrapped with ReactFlowProvider
 const NetworkFlow = () => {
@@ -52,7 +55,12 @@ const FlowContent = ({ flowData }) => {
   // Use useRef to track if the component has mounted
   const isMounted = useRef(false);
 
-  const nodeTypes = useMemo(() => ({ CustomNode: CustomNode }), []);
+  const nodeTypes = useMemo(() => ({ 
+    CustomNode: CustomNode,
+    OnuNode: OnuNode,
+    OntNode: OntNode,
+    RouterNode: RouterNode
+  }), []);
   const [rfInstance, setRfInstance] = useState(null);
   // Use useRef for idCounter to maintain consistent reference
   const idCounterRef = useRef(1);
@@ -127,7 +135,8 @@ const FlowContent = ({ flowData }) => {
     nodes,
     setNodes,
     setEdges,
-    logState
+    logState,
+    flowData
   );
   
   const handleSplitterSelect = createSplitterHandler(

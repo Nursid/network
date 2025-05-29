@@ -296,19 +296,41 @@ export const createDeviceHandler = (
     // Generate a unique ID for the new device node
     const newDeviceId = getNextStepId(idCounterRef);
     
-    // Create new device node (ONU or ONT)
+    // Determine the specific node type based on device type
+    let nodeType = 'CustomNode'; // fallback
+    if (deviceType === 'ONU') {
+      nodeType = 'OnuNode';
+    } else if (deviceType === 'ONT') {
+      nodeType = 'OntNode';
+    } else if (deviceType === 'Router') {
+      nodeType = 'RouterNode';
+    }
+    
+    // Create new device node (ONU, ONT, or Router)
     const newDeviceNode = {
       id: newDeviceId,
-      type: 'CustomNode',
+      type: nodeType, // Use specific node type
       data: {
         label: `${deviceType} - ${stepInfo} ${ponInfo}`,
         ponId: ponId,
         nodeType: 'device',  // Add nodeType to identify this as a device node
         deviceType: deviceType,
         id: newDeviceId,
-        // Add device-specific color based on type
-        color: deviceType === 'ONU' ? '#27ae60' : '#8e44ad', // Green for ONU, Purple for ONT
-        onUpdate: (updatedData) => onNodeUpdate(newDeviceId, updatedData)
+        // Add device-specific color based on type (for backward compatibility)
+        color: deviceType === 'ONU' ? '#27ae60' : 
+               deviceType === 'ONT' ? '#8e44ad' : 
+               deviceType === 'Router' ? '#3498db' : '#95a5a6',
+        onUpdate: (updatedData) => onNodeUpdate(newDeviceId, updatedData),
+        onDelete: (nodeId) => {
+          // Use a closure to access current state
+          setEdges((currentEdges) => {
+            setNodes((currentNodes) => {
+              deleteNodeHandler(nodeId, nodeStore, currentNodes, currentEdges, setNodes, setEdges, logState);
+              return currentNodes; // Return unchanged since deleteNodeHandler handles the update
+            });
+            return currentEdges; // Return unchanged since deleteNodeHandler handles the update
+          });
+        }
       },
       position: {
         x: parentX,

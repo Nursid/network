@@ -418,6 +418,7 @@ const CustomNode = ({ data }) => {
             <option value="" >Select device</option>
             <option value="ONU">ONU</option>
             <option value="ONT">ONT</option>
+            <option value="Router">Router</option>
           </select>
         </>
       )}
