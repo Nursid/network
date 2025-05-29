@@ -64,6 +64,8 @@ const FlowContent = ({ flowData }) => {
   const [contextMenu, setContextMenu] = useState(null);
   // State for PON selector
   const [ponSelector, setPonSelector] = useState(null);
+  // State for showing/hiding the report panel
+  const [showReport, setShowReport] = useState(true);
 
   // React Flow state
   const [initialNodes, setInitialNodes] = useState([]);
@@ -876,6 +878,15 @@ const FlowContent = ({ flowData }) => {
         </NavbarBrand>
         <Nav className="ml-auto" navbar>
           <NavItem>
+            <Button 
+              color={showReport ? "warning" : "info"} 
+              onClick={() => setShowReport(!showReport)} 
+              style={{ marginRight: '10px' }}
+            >
+              {showReport ? "Hide Report" : "Show Report"}
+            </Button>
+          </NavItem>
+          <NavItem>
             <Button color="success" onClick={onSave} style={{ marginRight: '10px' }}>
               Save
             </Button>
@@ -917,7 +928,9 @@ const FlowContent = ({ flowData }) => {
       </Panel>
       
       {/* Debug panel */}
-      <DebugPanel debugInfo={debugInfo} nodes={nodes} edges={edges} />
+      {showReport && (
+        <DebugPanel debugInfo={debugInfo} nodes={nodes} edges={edges} flowData={flowData} />
+      )}
       
       {/* Context menu for edge click */}
       {contextMenu && (
