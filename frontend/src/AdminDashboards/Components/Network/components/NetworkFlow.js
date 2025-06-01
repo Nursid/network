@@ -52,6 +52,8 @@ const NetworkFlow = () => {
 const FlowContent = ({ flowData }) => {
   const navigate = useNavigate();
 
+ 
+
   // Use useRef to track if the component has mounted
   const isMounted = useRef(false);
 
@@ -162,7 +164,8 @@ const FlowContent = ({ flowData }) => {
       onNodeUpdate,
       handleSplitterSelect,
       handleDeviceSelect,
-      logState
+      logState,
+      flowData
     );
   };
 

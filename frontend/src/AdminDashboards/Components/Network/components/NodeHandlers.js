@@ -113,9 +113,6 @@ export const createSplitterHandler = (
   flowData
 ) => {
   return (event, parentId, numChildren, splitterType, originalPonId) => {
-    console.log("handleSplitterSelect called with parentId:", parentId);
-    console.log("Current React nodes array:", nodes.length);
-    console.log("Current nodes in store:", nodeStore.getAllNodes().length);
     
     // Guard against undefined parentId
     if (!parentId) {
