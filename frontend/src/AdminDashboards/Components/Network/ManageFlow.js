@@ -102,11 +102,68 @@ const ManageFlow = () => {
         const NewData = []
         if (data !== undefined && data.length > 0) {
             for (let item of data) {
+                // Parse the JSON data to calculate totals
+                let totalONU = 0;
+                let totalRouter = 0;
+                let totalONT = 0;
+                
+                try {
+                    if (item.data) {
+                        const parsedData = JSON.parse(item.data);
+                        
+                        if (parsedData.nodes && Array.isArray(parsedData.nodes)) {
+                            parsedData.nodes.forEach(node => {
+                                // Count OLT devices (nodes with oltName or deviceType OLT)
+                               
+                                
+                                // Count device nodes only (nodeType: "device")
+                                if (node.data?.nodeType === "device") {
+                                    switch (node.data?.deviceType) {
+                                        case "ONU":
+                                            totalONU++;
+                                            break;
+                                        case "Router":
+                                            totalRouter++;
+                                            break;
+                                        case "ONT":
+                                            totalONT++;
+                                            break;
+                                    }
+                                }
+                                
+                                // Also check deviceModel for backup counting
+                                if (node.data?.deviceModel) {
+                                    switch (node.data?.deviceModel) {
+                                        case "ONU":
+                                            if (node.data?.deviceType !== "ONU") totalONU++;
+                                            break;
+                                        case "Router":
+                                            if (node.data?.deviceType !== "Router") totalRouter++;
+                                            break;
+                                        case "ONT":
+                                            if (node.data?.deviceType !== "ONT") totalONT++;
+                                            break;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error parsing flow data:", error);
+                }
+                
+                // Calculate total users (ONU + Router)
+                const totalUsers = totalONU + totalRouter;
+                
                 NewData.push({ 
                     ...item, 
                     _id: data.indexOf(item) + 1,
                     date: item.createdAt ? moment(item.createdAt).format("DD/MM/YYYY") : "-",
-                    statusText: item.status ? "Active" : "Inactive"
+                    statusText: item.status ? "Active" : "Inactive",
+                    totalONU,
+                    totalRouter,
+                    totalONT,
+                    totalUsers
                 })
             }
         } else {
@@ -117,15 +174,24 @@ const ManageFlow = () => {
    
     // Handle view flow details
     const handleViewFlow = (flowData) => {
-        console.log(flowData);
         navigate('/admin/flow', { state: { flowData } });
     };
 
     const column = [
         { field: "_id", headerName: "Sr No", minWidth: 50, flex: 1 },       
-        { field: "name", headerName: "Name", minWidth: 120, flex: 1 },
+        { field: "name", headerName: "Connection Type", minWidth: 120, flex: 1 },
         { field: "olt_name", headerName: "OLT Name", minWidth: 120, flex: 1 },
         { field: "port", headerName: "Port", flex: 1, minWidth: 120 }, 
+        { field: "totalONU", headerName: "Total ONU", flex: 1, minWidth: 100 },
+        { field: "totalRouter", headerName: "Total Router", flex: 1, minWidth: 120 },
+        { field: "totalONT", headerName: "Total ONT", flex: 1, minWidth: 100 },
+        { field: "totalUsers", headerName: "Total Users", flex: 1, minWidth: 120, 
+          renderCell: (params) => (
+            <div className="badge bg-info text-dark">
+                {params.row.totalUsers}
+            </div>
+          )
+        },
         { field: "date", headerName: "Created Date", flex: 1, minWidth: 120 },
         { field: "status", headerName: "Status", flex: 1, minWidth: 120,
           renderCell: (params) => (
