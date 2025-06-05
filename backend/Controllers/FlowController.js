@@ -1,4 +1,5 @@
 const db=require("../model/index")
+const { Op } = require('sequelize');
 
 const FlowModel=db.FlowModel
 
@@ -58,9 +59,57 @@ const GetFlow = async (req, res)=> {
     }
 }
 
+const SearchFlow = async (req, res) => {
+    try {
+        const { query } = req.query;
+        
+        if (!query) {
+            return res.status(400).json({
+                status: false, 
+                message: "Search query is required"
+            });
+        }
+
+        // Search for flows where the data field contains nodes with matching mac or userId
+        const flows = await FlowModel.findAll({
+            where: {
+                [Op.or]: [
+                    // Search for MAC address in nodes data
+                    {
+                        data: {
+                            [Op.like]: `%"mac":"${query}"%`
+                        }
+                    },
+                    // Search for userId in nodes data
+                    {
+                        data: {
+                            [Op.like]: `%"userId":"${query}"%`
+                        }
+                    }
+                ]
+            },
+            order: [['createdAt', 'DESC']]
+        });
+
+        res.status(200).json({
+            status: true, 
+            data: flows,
+            message: `Found ${flows.length} flow(s) matching "${query}"`
+        });
+
+    } catch (error) {
+        console.error("SearchFlow error:", error);
+        res.status(500).json({
+            status: false, 
+            message: "Internal Server Error"
+        });
+    }
+}
+
 module.exports = {
     AddFlow,
     GetAllFlow,
     UpdateFlow,
-    GetFlow
+    GetFlow,
+    SearchFlow
 }

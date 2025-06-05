@@ -2,6 +2,8 @@ import { Button } from '@mui/material';
 import { GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import React, { Fragment, useEffect, useState } from 'react'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import { useNavigate } from 'react-router-dom';
 import AdminDataTable from '../../Elements/AdminDataTable';
 import moment from 'moment';
@@ -16,6 +18,10 @@ const ManageFlow = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchResults, setSearchResults] = useState([]);
+    const [searchTimeout, setSearchTimeout] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         olt_name: '',
@@ -38,6 +44,68 @@ const ManageFlow = () => {
             console.error("Error fetching flow data:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Search flows by MAC or userId
+    const searchFlows = async (query) => {
+        if (!query.trim()) {
+            setSearchResults([]);
+            setIsSearching(false);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await axios.get(`${API_URL}/api/flow/search?query=${encodeURIComponent(query)}`);
+            if (response.data.status) {
+                setSearchResults(response.data.data);
+                setIsSearching(true);
+            } else {
+                console.error("Failed to search flows");
+                setSearchResults([]);
+            }
+        } catch (error) {
+            console.error("Error searching flows:", error);
+            setSearchResults([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle search input change
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        
+        // Auto-search as user types (with debounce)
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+        
+        const newTimeout = setTimeout(() => {
+            searchFlows(query);
+        }, 500); // 500ms debounce
+        
+        setSearchTimeout(newTimeout);
+    };
+
+    // Handle search button click
+    const handleSearchClick = () => {
+        searchFlows(searchQuery);
+    };
+
+    // Clear search results
+    const clearSearch = () => {
+        setSearchQuery('');
+        setSearchResults([]);
+        setIsSearching(false);
+    };
+
+    // Handle Enter key press in search input
+    const handleSearchKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            searchFlows(searchQuery);
         }
     };
 
@@ -257,9 +325,60 @@ const ManageFlow = () => {
         <Fragment>
             <div style={{ height: "calc(100vh - 20px)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
                 <div className='flex'>  
-                    <h4 className='p-2 px-4 mt-2 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}>Flow List</h4>
+                    <h4 className='p-2 px-4 mt-2 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}>
+                        {isSearching ? `Search Results (${searchResults.length})` : 'Flow List'}
+                    </h4>
 
                     <div className='AttendenceNavBtn w-100 py-1 px-4 gap-3 justify-content-end'>
+                        {/* Search Input Section */}
+                        <div className='d-flex align-items-center gap-2' style={{ minWidth: "25rem" }}>
+                            <div className='d-flex align-items-center border rounded-2 bg-white' style={{ flex: 1 }}>
+                                <input
+                                    type="text"
+                                    placeholder="Search by MAC address or User ID..."
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    onKeyPress={handleSearchKeyPress}
+                                    className="form-control border-0"
+                                    style={{ 
+                                        boxShadow: 'none',
+                                        fontSize: '14px'
+                                    }}
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    size="small"
+                                    onClick={handleSearchClick}
+                                    disabled={loading}
+                                    style={{ 
+                                        minWidth: '40px',
+                                        margin: '2px',
+                                        borderRadius: '4px'
+                                    }}
+                                >
+                                    <SearchIcon fontSize="small" />
+                                </Button>
+                            </div>
+                            
+                            {/* Clear Search Button */}
+                            {isSearching && (
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={clearSearch}
+                                    startIcon={<ClearIcon />}
+                                    style={{ 
+                                        minWidth: '100px',
+                                        color: 'white',
+                                        borderColor: 'white'
+                                    }}
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </div>
+
                         <div 
                             className={`py-1 px-4 border shadow rounded-2 cursor-p hoverThis text-white Fw_500 d-flex align-items-center justify-content-center`} 
                             style={{ minWidth: "15rem", maxWidth: "15rem" }} 
@@ -272,7 +391,7 @@ const ManageFlow = () => {
 
                 <div style={{ flex: 1, overflow: "auto", padding: "0 16px 0 16px", marginBottom: 0 }}>
                     <AdminDataTable 
-                        rows={DataWithID(data)} 
+                        rows={DataWithID(isSearching ? searchResults : data)} 
                         columns={column} 
                         CustomToolbar={CustomToolbar} 
                         loading={loading}
