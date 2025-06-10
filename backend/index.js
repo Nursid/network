@@ -54,7 +54,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes section
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 6000;
 
 app.get("/", (req, res) => {
   res.status(200).json({path: __dirname});
