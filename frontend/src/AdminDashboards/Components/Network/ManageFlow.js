@@ -174,6 +174,7 @@ const ManageFlow = () => {
                 let totalONU = 0;
                 let totalRouter = 0;
                 let totalONT = 0;
+                let matchingNodes = []; // Track nodes that match the search query
                 
                 try {
                     if (item.data) {
@@ -213,6 +214,33 @@ const ManageFlow = () => {
                                             break;
                                     }
                                 }
+
+                                // Check if this node matches the current search query
+                                if (isSearching && searchQuery.trim()) {
+                                    const query = searchQuery.toLowerCase().trim();
+                                    const nodeData = node.data || {};
+                                    
+                                    // Check various fields that might match the search
+                                    const searchableFields = [
+                                        nodeData.macAddress,
+                                        nodeData.userId,
+                                        nodeData.deviceId,
+                                        nodeData.label,
+                                        nodeData.name
+                                    ];
+                                    
+                                    if (searchableFields.some(field => 
+                                        field && field.toString().toLowerCase().includes(query)
+                                    )) {
+                                        matchingNodes.push({
+                                            nodeId: node.id,
+                                            nodeData: nodeData,
+                                            matchedField: searchableFields.find(field => 
+                                                field && field.toString().toLowerCase().includes(query)
+                                            )
+                                        });
+                                    }
+                                }
                             });
                         }
                     }
@@ -231,7 +259,8 @@ const ManageFlow = () => {
                     totalONU,
                     totalRouter,
                     totalONT,
-                    totalUsers
+                    totalUsers,
+                    matchingNodes: isSearching ? matchingNodes : [] // Include matching nodes info
                 })
             }
         } else {
@@ -242,12 +271,36 @@ const ManageFlow = () => {
    
     // Handle view flow details
     const handleViewFlow = (flowData) => {
-        navigate('/admin/flow', { state: { flowData } });
+        // Pass search context if we're currently searching
+        const navigationState = {
+            flowData,
+            searchContext: isSearching ? {
+                searchQuery,
+                isFromSearch: true,
+                matchingNodes: flowData.matchingNodes || []
+            } : null
+        };
+        navigate('/admin/flow', { state: navigationState });
     };
 
     const column = [
         { field: "_id", headerName: "Sr No", minWidth: 50, flex: 1 },       
-        { field: "name", headerName: "Connection Type", minWidth: 120, flex: 1 },
+        { field: "name", headerName: "Connection Type", minWidth: 120, flex: 1,
+          renderCell: (params) => (
+            <div className="d-flex align-items-center">
+                <span>{params.row.name}</span>
+                {params.row.matchingNodes && params.row.matchingNodes.length > 0 && (
+                    <span 
+                        className="badge bg-warning text-dark ms-2" 
+                        style={{ fontSize: '10px' }}
+                        title={`${params.row.matchingNodes.length} matching node(s) found`}
+                    >
+                        {params.row.matchingNodes.length}
+                    </span>
+                )}
+            </div>
+          )
+        },
         { field: "olt_name", headerName: "OLT Name", minWidth: 120, flex: 1 },
         { field: "port", headerName: "Port", flex: 1, minWidth: 120 }, 
         { field: "totalONU", headerName: "Total ONU", flex: 1, minWidth: 100 },

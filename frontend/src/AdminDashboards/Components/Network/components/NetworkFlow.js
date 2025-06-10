@@ -51,8 +51,10 @@ const NetworkFlow = () => {
 // The main content of the flow component
 const FlowContent = ({ flowData }) => {
   const navigate = useNavigate();
-
- 
+  const location = useLocation();
+  
+  // Extract search context from location state
+  const searchContext = location.state?.searchContext;
 
   // Use useRef to track if the component has mounted
   const isMounted = useRef(false);
@@ -869,6 +871,143 @@ const FlowContent = ({ flowData }) => {
       !node.data.label.includes('EPON');
   };
 
+  // Function to center view on searched nodes
+  const centerOnSearchedNodes = useCallback(() => {
+    if (!searchContext || !searchContext.isFromSearch || !rfInstance) {
+      return;
+    }
+
+    const { searchQuery, matchingNodes } = searchContext;
+    
+    if (!matchingNodes || matchingNodes.length === 0) {
+      console.log("No matching nodes found in search context");
+      return;
+    }
+
+    // Find the actual nodes in the current flow that match the search
+    const foundNodes = [];
+    
+    nodes.forEach(node => {
+      // Check if this node matches any of the search criteria
+      const nodeData = node.data || {};
+      const query = searchQuery.toLowerCase().trim();
+      
+      const searchableFields = [
+        nodeData.macAddress,
+        nodeData.userId,
+        nodeData.deviceId,
+        nodeData.label,
+        nodeData.name
+      ];
+      
+      const hasMatch = searchableFields.some(field => 
+        field && field.toString().toLowerCase().includes(query)
+      );
+      
+      if (hasMatch) {
+        foundNodes.push(node);
+      }
+    });
+
+    if (foundNodes.length === 0) {
+      console.log("No matching nodes found in current flow");
+      return;
+    }
+
+    console.log(`Found ${foundNodes.length} matching nodes, centering view...`);
+
+    // Calculate the center position of all matching nodes
+    let totalX = 0;
+    let totalY = 0;
+    
+    foundNodes.forEach(node => {
+      totalX += node.position.x;
+      totalY += node.position.y;
+    });
+    
+    const centerX = totalX / foundNodes.length;
+    const centerY = totalY / foundNodes.length;
+
+    // Get the current viewport
+    const viewport = rfInstance.getViewport();
+    
+    // Calculate new viewport to center on the found nodes
+    const newViewport = {
+      x: -centerX * viewport.zoom + window.innerWidth / 2,
+      y: -centerY * viewport.zoom + (window.innerHeight - 56) / 2, // Account for navbar height
+      zoom: Math.max(viewport.zoom, 0.8) // Ensure reasonable zoom level
+    };
+
+    // Set the viewport to center on the found nodes
+    setViewport(newViewport);
+
+    // Temporarily highlight the found nodes
+    const highlightNodes = foundNodes.map(node => ({
+      ...node,
+      data: {
+        ...node.data,
+        isHighlighted: true
+      },
+      style: {
+        ...node.style,
+        border: '3px solid #ff6b6b',
+        boxShadow: '0 0 20px rgba(255, 107, 107, 0.6)'
+      }
+    }));
+
+    // Update nodes with highlight
+    setNodes(nds => nds.map(node => {
+      const highlightedNode = highlightNodes.find(hn => hn.id === node.id);
+      return highlightedNode || node;
+    }));
+
+    // Remove highlight after 3 seconds
+    setTimeout(() => {
+      setNodes(nds => nds.map(node => ({
+        ...node,
+        data: {
+          ...node.data,
+          isHighlighted: false
+        },
+        style: {
+          ...node.style,
+          border: node.data.isHighlighted ? undefined : node.style?.border,
+          boxShadow: node.data.isHighlighted ? undefined : node.style?.boxShadow
+        }
+      })));
+    }, 3000);
+
+    // Show notification
+    const searchNotification = document.createElement('div');
+    searchNotification.style.position = 'fixed';
+    searchNotification.style.top = '80px'; // Below navbar
+    searchNotification.style.left = '50%';
+    searchNotification.style.transform = 'translateX(-50%)';
+    searchNotification.style.backgroundColor = 'rgba(52, 152, 219, 0.95)';
+    searchNotification.style.color = 'white';
+    searchNotification.style.padding = '12px 24px';
+    searchNotification.style.borderRadius = '8px';
+    searchNotification.style.zIndex = '1001';
+    searchNotification.style.fontSize = '14px';
+    searchNotification.style.fontWeight = '500';
+    searchNotification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    searchNotification.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span>🎯</span>
+        <span>Found ${foundNodes.length} node(s) matching "${searchQuery}"</span>
+      </div>
+    `;
+    document.body.appendChild(searchNotification);
+
+    // Remove notification after 4 seconds
+    setTimeout(() => {
+      if (document.body.contains(searchNotification)) {
+        document.body.removeChild(searchNotification);
+      }
+    }, 4000);
+
+  }, [searchContext, nodes, rfInstance, setViewport, setNodes]);
+
   // Handle back navigation
   const handleBack = () => {
     navigate(-1); // Go back to previous page
@@ -879,6 +1018,19 @@ const FlowContent = ({ flowData }) => {
     // eslint-disable-next-line
   }, []);
 
+  // Effect to center on searched nodes after flow is loaded
+  useEffect(() => {
+    // Only run if we have search context and nodes are loaded
+    if (searchContext && searchContext.isFromSearch && nodes.length > 0 && rfInstance) {
+      // Add a small delay to ensure the flow is fully rendered
+      const timer = setTimeout(() => {
+        centerOnSearchedNodes();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [searchContext, nodes.length, rfInstance, centerOnSearchedNodes]);
+
   return (
     <div style={{ height: '100vh', width: '100%', backgroundColor: '#f5f5f5' }}>
       {/* Top Navbar */}
@@ -887,9 +1039,35 @@ const FlowContent = ({ flowData }) => {
           <Button color="secondary" onClick={handleBack} style={{ marginRight: '15px' }}>
             ← Back
           </Button>
-          Network Flow - {flowData?.name || 'EPON'}
+          <span>Network Flow - {flowData?.name || 'EPON'}</span>
+          {searchContext && searchContext.isFromSearch && (
+            <span 
+              style={{ 
+                marginLeft: '15px', 
+                padding: '4px 8px', 
+                backgroundColor: 'rgba(255, 193, 7, 0.2)', 
+                borderRadius: '4px',
+                fontSize: '12px',
+                color: '#ffc107'
+              }}
+            >
+              📍 Searched: "{searchContext.searchQuery}"
+            </span>
+          )}
         </NavbarBrand>
         <Nav className="ml-auto" navbar>
+          {searchContext && searchContext.isFromSearch && (
+            <NavItem>
+              <Button 
+                color="warning" 
+                onClick={centerOnSearchedNodes} 
+                style={{ marginRight: '10px', fontSize: '12px' }}
+                title="Re-center view on searched nodes"
+              >
+                🎯 Re-center Search
+              </Button>
+            </NavItem>
+          )}
           <NavItem>
             <Button 
               color={showReport ? "warning" : "info"} 

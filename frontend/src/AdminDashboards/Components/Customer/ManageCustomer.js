@@ -169,9 +169,9 @@ const ManageCustomer = () => {
         { field: "id", headerName: "Sr No", minWidth: 50, editable: true },
         { field: "name", headerName: "Name", minWidth: 120, editable: true },
         { field: "mobileno", headerName: "Mobile No.", minWidth: 120, editable: true },
-        { field: "date", headerName: "To Date.", minWidth: 120, editable: true },
+        { field: "date", headerName: "Date", minWidth: 120, editable: true },
         { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 120, editable: true },
-        { field: "block", headerName: "Block", minWidth: 250, editable: true },
+        { field: "username", headerName: "Username", minWidth: 250, editable: true },
         { field: "area", headerName: "Area", minWidth: 250, editable: true },
         { field: "apartment", headerName: "Apartment", minWidth: 250, editable: true },
         {

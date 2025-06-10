@@ -7,101 +7,96 @@ module.exports = (sequelize) => {
             primaryKey: true,
             autoIncrement: true
           },
-          user_id: {
-            type: DataTypes.BIGINT,
-            allowNull: true
-          },
           address: {
-            type: DataTypes.STRING,
-            allowNull: true
+            type: DataTypes.STRING
           },
           t_address: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
-          mobile: {
+          mobile: { 
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false,
           },
           whatsapp_no: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           alternate_no: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           aadhar_no: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           other_id: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           pan_no: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           dob: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           doa: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           area: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           block: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           apartment: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           bill_date: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           image: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           cash: {
             type: DataTypes.BIGINT,
-            allowNull: true
+            
           },
           online: {
             type: DataTypes.BIGINT,
-            allowNull: true
+            
           },
           payment_method: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           frontAadharImage: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           backAadharImage: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           panImage: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           otherIdImage: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
           signature: {
             type: DataTypes.STRING,
-            allowNull: true
+            
           },
     }, 
    {

@@ -8,7 +8,7 @@ import {
 	Row,
 } from 'reactstrap';
 import SelectBox from '../../../Elements/SelectBox';
-import {Formik} from 'formik';
+import {Formik, Form, Field, ErrorMessage} from 'formik';
 import * as ALlIcon from "react-icons/fa"
 import {useDispatch, useSelector} from 'react-redux';
 import SeviceAddReducer from '../../../../Store/Reducers/Dashboard/ServiceAddReducer';
@@ -24,11 +24,88 @@ import { useAuth } from '../../../../Context/userAuthContext';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
+// Custom validation function
+const validateForm = (values) => {
+	const errors = {};
+
+	// Name validation
+	if (!values.name) {
+		errors.name = 'Name is required';
+	} else if (values.name.length > 50) {
+		errors.name = 'Name must be less than 50 characters';
+	} else if (!/^[a-zA-Z\s]+$/.test(values.name)) {
+		errors.name = 'Name can only contain letters and spaces';
+	}
+
+	// Username validation
+	if (!values.username) {
+		errors.username = 'Username is required';
+	} else if (values.username.length < 3) {
+		errors.username = 'Username must be at least 3 characters';
+	} else if (values.username.length > 30) {
+		errors.username = 'Username must be less than 30 characters';
+	}
+
+	// Address validation
+	if (!values.address) {
+		errors.address = 'Address is required';
+	} else if (values.address.length > 200) {
+		errors.address = 'Address must be less than 200 characters';
+	}
+
+	// Temporary address validation
+	if (values.t_address && values.t_address.length > 200) {
+		errors.t_address = 'Temporary address must be less than 200 characters';
+	}
+
+	// Mobile validation
+	if (!values.mobile) {
+		errors.mobile = 'Mobile number is required';
+	} else if (!/^\d{10}$/.test(values.mobile)) {
+		errors.mobile = 'Mobile number must be exactly 10 digits';
+	}
+
+	// WhatsApp number validation
+	if (values.whatsapp_no && !/^\d{10}$/.test(values.whatsapp_no)) {
+		errors.whatsapp_no = 'WhatsApp number must be exactly 10 digits';
+	}
+
+	// Alternate number validation
+	if (values.alternate_no && !/^\d{10}$/.test(values.alternate_no)) {
+		errors.alternate_no = 'Alternate number must be exactly 10 digits';
+	}
+
+	// Aadhar number validation
+	if (values.aadhar_no && !/^\d{12}$/.test(values.aadhar_no)) {
+		errors.aadhar_no = 'Aadhar number must be exactly 12 digits';
+	}
+
+	// Other ID validation
+	if (values.other_id && values.other_id.length > 50) {
+		errors.other_id = 'Other ID must be less than 50 characters';
+	}
+
+	// PAN number validation
+	if (values.pan_no && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(values.pan_no)) {
+		errors.pan_no = 'Invalid PAN format (e.g., ABCDE1234F)';
+	}
+
+	// Date of birth validation
+	if (values.dob && new Date(values.dob) > new Date()) {
+		errors.dob = 'Date of birth cannot be in the future';
+	}
+
+	// Email validation
+	if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+		errors.email = 'Invalid email format';
+	}
+
+	return errors;
+};
+
 const AddNewCustomerForm = ({prop, data}) => {
 
 	const dispatch = useDispatch()
-	const [inputValue, setInputValue] = useState([]);
-    const [errors, setErrors]= useState([]);
     const [isLoading, SetIsLoading]= useState(false)
 	const [image, setImage] = useState(null)
 	const [frontAadharImage, setFrontAadharImage] = useState(null);
@@ -41,6 +118,24 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const [appartment, setAppartment] = useState('')
 	const [block, setBlock] = useState('')
 	const [area, setArea] = useState('')
+
+	// Initial form values
+	const initialValues = {
+		name: '',
+		username: '',
+		address: '',
+		t_address: '',
+		mobile: '',
+		whatsapp_no: '',
+		alternate_no: '',
+		aadhar_no: '',
+		other_id: '',
+		pan_no: '',
+		dob: '',
+		doa: '',
+		bill_date: '',
+		email: '',
+	};
 
 	const handleImageChange = (event, setImageFunction) => {
 		const file = event.target.files[0];
@@ -57,20 +152,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 		}
 	};	
 
-	const payment_options = [
-		{
-			label: "Cash",
-			value: "Cash"
-		}, 
-		{
-			label: "Online",
-			value: "Online"
-		}, 
-		{
-			label: "Both",
-			value: "Both"
-		}
-	];
 
 	const gender_option = [
 		{
@@ -136,59 +217,57 @@ const AddNewCustomerForm = ({prop, data}) => {
 		{ value: "H", label: "H" },
 	];
 	
-	const createCustomer = (e) => {
-		e.preventDefault();
+	const createCustomer = (values, { setSubmitting, setErrors }) => {
         SetIsLoading(true)
-        let errors = {};
-
-        if (!inputValue.name) {
-			errors.name = "Name is required";
-		}
-		
-		if (!inputValue.address) {
-			errors.address = "Address is required";
-		}
-
-		if (!inputValue.mobile) {
-			errors.mobile = "Mobile number is required";
-		} else if (!/^\d{10}$/.test(inputValue.mobile)) {
-			errors.mobile = "Mobile number should be 10 digits";
-		}
-	
-		if (errors && Object.keys(errors).length === 0) {
-			console.log("Form submitted successfully!",);
-		  } else {
-			console.log("Validation Errors:", errors);
-			setErrors(errors);
-			SetIsLoading(false);
-			return false;
-		  }
 		  
 		  const data ={
-			...inputValue,
+			...values,
 			image: image,
 			frontAadharImage: frontAadharImage,
 			backAadharImage: backAadharImage,
 			panImage: panImage,
 			otherIdImage: otherIdImage,
 			signature: signature,
-			gender: gender?.value,
-			block: block?.value,
-			area: area?.value,
-			apartment: appartment?.value,
-			payment_method: payment_method?.value
+			gender: gender?.value || null,
+			block: block?.value || null,
+			area: area?.value || null,
+			apartment: appartment?.value || null,
+			payment_method: payment_method?.value || null
 		  }
 
 		  const formData = new FormData();
 
 		  for (const key in data) {
-			  formData.append(key, data[key]);
+			  // Only append non-null and non-undefined values
+			  if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
+				  formData.append(key, data[key]);
+			  }
+		  }
+
+		  // Debug: Log the data being sent
+		  console.log('Data being sent:', data);
+		  console.log('FormData entries:');
+		  for (let [key, value] of formData.entries()) {
+			  console.log(key, value);
 		  }
 
 		const apiUrl = `${API_URL}/customer/signup`;
 		axios.post(apiUrl, formData)
 			.then(response => {
 				if (response.data.status === true) {
+					// Reset form and state
+					setImage(null);
+					setFrontAadharImage(null);
+					setBackAadharImage(null);
+					setPanImage(null);
+					setOtherIdImage(null);
+					setSignature(null);
+					setGender(null);
+					setBlock(null);
+					setArea(null);
+					setAppartment(null);
+					setPaymentMethod(null);
+					
 					prop();
 					Swal.fire(
 						'Successfully!',
@@ -206,8 +285,14 @@ const AddNewCustomerForm = ({prop, data}) => {
 			})
 			.catch(error => {
 				console.error('Error:', error);
+				if (error.response?.data?.errors) {
+					setErrors(error.response.data.errors);
+				}
+			})
+			.finally(() => {
+				SetIsLoading(false);
+				setSubmitting(false);
 			});
-			SetIsLoading(false);
 	};
 
 	const handleKeyPress = (e) => {
@@ -218,284 +303,262 @@ const AddNewCustomerForm = ({prop, data}) => {
             }
     };
 
-	const handleChange = (e, maxLength) => {
-		const { name, type, checked, value } = e.target;
-			const newValue = type === 'checkbox' ? checked : value;
-			if (value.length <= maxLength) {
-			setInputValue((prevState) => ({
-			...prevState,
-			[name]: newValue
-			})); 
-		}
-	};
-
 	return (
 		<Fragment>
-			<Row>
-			<Col md={6}>
-					<FormGroup>
-						<Label for="name">Name  <span style={{color: "red"}}>*</span></Label>
-						<Input name='name'
-							onChange={(e) => handleChange(e, 50)}
-							value={inputValue?.name}
-							placeholder='Name'
-							onKeyPress={handleKeyPress}
-							/>
-							{errors?.name && (
-						<span className='validationError'>
-							{errors?.name}
-						</span>
-					)}
-					</FormGroup>
-				</Col>
-			<Col md={6}>
-				<FormGroup>
-					<Label for="gender">Gender </Label>
-					<SelectBox options={gender_option} setSelcted={setGender} initialValue={gender}/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="address">Address</Label>
-				<Input
-					type="textarea"
-					name="address"
-					value={inputValue?.address}
-					onChange={(e) => handleChange(e, 200)}
-					placeholder="Enter Address"
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="t_address">Temporary Address</Label>
-				<Input
-					type="textarea"
-					name="t_address"
-					value={inputValue?.t_address}
-					onChange={(e) => handleChange(e, 200)}
-					placeholder="Enter Temporary Address"
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="mobile">Mobile No.</Label>
-				<Input
-					type="text"
-					name="mobile"
-					value={inputValue?.mobile}
-					onChange={(e) => handleChange(e, 10)}
-					placeholder="Enter Mobile No."
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="whatsapp_no">WhatsApp No.</Label>
-				<Input
-					type="text"
-					name="whatsapp_no"
-					value={inputValue?.whatsapp_no}
-					onChange={(e) => handleChange(e, 10)}
-					placeholder="Enter WhatsApp No."
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="alternate_no">Alternate No.</Label>
-				<Input
-					type="text"
-					name="alternate_no"
-					value={inputValue?.alternate_no}
-					onChange={(e) => handleChange(e, 10)}
-					placeholder="Enter Alternate No."
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="aadhar_no">Aadhar No.</Label>
-				<Input
-					type="text"
-					name="aadhar_no"
-					value={inputValue?.aadhar_no}
-					onChange={(e) => handleChange(e, 12)}
-					placeholder="Enter Aadhar No."
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="other_id">Other ID</Label>
-				<Input
-					type="text"
-					name="other_id"
-					value={inputValue?.other_id}
-					onChange={(e) => handleChange(e, 50)}
-					placeholder="Enter Other ID"
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="pan_no">PAN No.</Label>
-				<Input
-					type="text"
-					name="pan_no"
-					value={inputValue?.pan_no}
-					onChange={(e) => handleChange(e, 10)}
-					placeholder="Enter PAN No."
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="dob">Date of Birth</Label>
-				<Input
-					type="date"
-					name="dob"
-					value={inputValue?.dob}
-					onChange={(e) => handleChange(e, 50)}
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="doa">Date of Anniversary</Label>
-				<Input
-					type="date"
-					name="doa"
-					value={inputValue?.doa}
-					onChange={(e) => handleChange(e, 50)}
-				/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="area">Area</Label>
-				<SelectBox options={area_option} setSelcted={setArea} initialValue={area}/>
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="block">Block</Label>
-				
-				<SelectBox options={block_option} setSelcted={setBlock} initialValue={block}/>
-
-				</FormGroup>
-			</Col>
-			<Col md={6}>
-				<FormGroup>
-				<Label for="apartment">Apartment</Label>
-				<SelectBox options={apartment_options} setSelcted={setAppartment} initialValue={appartment}/>
-				</FormGroup>
-			</Col>
-
-			<Col md={6}>
-				<FormGroup>
-				<Label for="bill_date">Bill Date</Label>
-				<Input
-					type="date"
-					name="bill_date"
-					value={inputValue?.bill_date}
-					onChange={(e) => handleChange(e, 50)}
-				/>
-				</FormGroup>
-			</Col>
-
-			<Col md={6}>
-				<FormGroup>
-				<Label for="image">Upload Image</Label>
-				<Input type="file" name="image" onChange={(e) => handleImageChange(e, setImage)} />
-				</FormGroup>
-			</Col>
-
-			<Col md={6}>
-				<FormGroup>
-				<Label for="front_aadhar_image">Front Aadhar Image</Label>
-				<Input type="file" name="front_aadhar_image" onChange={(e) => handleImageChange(e, setFrontAadharImage)} />
-				</FormGroup>
-			</Col>
-
-			<Col md={6}>
-				<FormGroup>
-				<Label for="back_aadhar_image">Back Aadhar Image</Label>
-				<Input type="file" name="back_aadhar_image" onChange={(e) => handleImageChange(e, setBackAadharImage)} />
-				</FormGroup>
-			</Col>
-
-			<Col md={6}>
-				<FormGroup>
-				<Label for="pan_image">PAN Image</Label>
-				<Input type="file" name="pan_image" onChange={(e) => handleImageChange(e, setPanImage)} />
-				</FormGroup>
-			</Col>
-
-			<Col md={6}>
-				<FormGroup>
-				<Label for="other_id_image">Other ID Image</Label>
-				<Input type="file" name="other_id_image" onChange={(e) => handleImageChange(e, setOtherIdImage)} />
-				</FormGroup>
-			</Col>
-
-			<Col md={6}>
-				<FormGroup>
-				<Label for="signature">Signature</Label>
-				<Input type="file" name="signature" onChange={(e) => handleImageChange(e, setSignature)} />
-				</FormGroup>
-			</Col>
-
-			{/* <Col md={6}>
-				<FormGroup>
-				<Label for="payment_method">Payment Method</Label>
-				<SelectBox
-					options={payment_options}
-					setSelcted={setPaymentMethod}
-					initialValue={payment_method}
-				/>
-				</FormGroup>
-			</Col>
-
-			{(payment_method?.value === "Both" || payment_method?.value === "Online") && 
-				<Col md={6}>
-					<FormGroup>
-					<Label for="payment">Online Amount</Label>
-					<Input
-						type="text"
-						name="online"
-						value={inputValue?.online}
-						onChange={(e) => handleChange(e, 10)}
-						placeholder="Enter Payment Amount"
-					/>
-					</FormGroup>
-				</Col>
-				}
-				
-			{(payment_method?.value === "Both" || payment_method?.value === "Cash") && 
-			<Col md={6}>
-				<FormGroup>
-				<Label for="payment">Cash Amount</Label>
-				<Input
-					type="text"
-					name="cash"
-					value={inputValue?.cash}
-					onChange={(e) => handleChange(e, 10)}
-					placeholder="Enter Payment Amount"
-				/>
-				</FormGroup>
-			</Col>
-			} */}
-						
-			<Button
-				className="bg-primary h-fit text-blue"
-				onClick={createCustomer}
-				disabled={isLoading}
+			<Formik
+				initialValues={initialValues}
+				validate={validateForm}
+				onSubmit={createCustomer}
 			>
-				Submit
-			</Button>
-			</Row>
+				{({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
+					<Form>
+						<Row>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="name">Name <span style={{color: "red"}}>*</span></Label>
+									<Field
+										as={Input}
+										name="name"
+										placeholder="Name"
+										onKeyPress={handleKeyPress}
+									/>
+									<ErrorMessage name="name" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="username">Username <span style={{color: "red"}}>*</span></Label>
+									<Field
+										as={Input}
+										name="username"
+										placeholder="Username"
+									/>
+									<ErrorMessage name="username" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="gender">Gender</Label>
+									<SelectBox options={gender_option} setSelcted={setGender} initialValue={gender}/>
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="address">Address <span style={{color: "red"}}>*</span></Label>
+									<Field
+										as={Input}
+										type="textarea"
+										name="address"
+										placeholder="Enter Address"
+									/>
+									<ErrorMessage name="address" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="t_address">Temporary Address</Label>
+									<Field
+										as={Input}
+										type="textarea"
+										name="t_address"
+										placeholder="Enter Temporary Address"
+									/>
+									<ErrorMessage name="t_address" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="mobile">Mobile No. <span style={{color: "red"}}>*</span></Label>
+									<Field
+										as={Input}
+										type="text"
+										name="mobile"
+										placeholder="Enter Mobile No."
+									/>
+									<ErrorMessage name="mobile" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="whatsapp_no">WhatsApp No.</Label>
+									<Field
+										as={Input}
+										type="text"
+										name="whatsapp_no"
+										placeholder="Enter WhatsApp No."
+									/>
+									<ErrorMessage name="whatsapp_no" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="alternate_no">Alternate No.</Label>
+									<Field
+										as={Input}
+										type="text"
+										name="alternate_no"
+										placeholder="Enter Alternate No."
+									/>
+									<ErrorMessage name="alternate_no" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="aadhar_no">Aadhar No.</Label>
+									<Field
+										as={Input}
+										type="text"
+										name="aadhar_no"
+										placeholder="Enter Aadhar No."
+									/>
+									<ErrorMessage name="aadhar_no" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="other_id">Other ID</Label>
+									<Field
+										as={Input}
+										type="text"
+										name="other_id"
+										placeholder="Enter Other ID"
+									/>
+									<ErrorMessage name="other_id" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="pan_no">PAN No.</Label>
+									<Field
+										as={Input}
+										type="text"
+										name="pan_no"
+										placeholder="Enter PAN No."
+									/>
+									<ErrorMessage name="pan_no" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="dob">Date of Birth</Label>
+									<Field
+										as={Input}
+										type="date"
+										name="dob"
+									/>
+									<ErrorMessage name="dob" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="doa">Date of Anniversary</Label>
+									<Field
+										as={Input}
+										type="date"
+										name="doa"
+									/>
+									<ErrorMessage name="doa" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="area">Area</Label>
+									<SelectBox options={area_option} setSelcted={setArea} initialValue={area}/>
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="block">Block</Label>
+									<SelectBox options={block_option} setSelcted={setBlock} initialValue={block}/>
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="apartment">Apartment</Label>
+									<SelectBox options={apartment_options} setSelcted={setAppartment} initialValue={appartment}/>
+								</FormGroup>
+							</Col>
+
+							<Col md={6}>
+								<FormGroup>
+									<Label for="bill_date">Bill Date</Label>
+									<Field
+										as={Input}
+										type="date"
+										name="bill_date"
+									/>
+									<ErrorMessage name="bill_date" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+
+							<Col md={6}>
+								<FormGroup>
+									<Label for="email">Email</Label>
+									<Field
+										as={Input}
+										type="email"
+										name="email"
+										placeholder="Enter Email"
+									/>
+									<ErrorMessage name="email" component="span" className="validationError" />
+								</FormGroup>
+							</Col>
+
+							<Col md={6}>
+								<FormGroup>
+									<Label for="image">Upload Image</Label>
+									<Input type="file" name="image" onChange={(e) => handleImageChange(e, setImage)} />
+								</FormGroup>
+							</Col>
+
+							<Col md={6}>
+								<FormGroup>
+									<Label for="front_aadhar_image">Front Aadhar Image</Label>
+									<Input type="file" name="front_aadhar_image" onChange={(e) => handleImageChange(e, setFrontAadharImage)} />
+								</FormGroup>
+							</Col>
+
+							<Col md={6}>
+								<FormGroup>
+									<Label for="back_aadhar_image">Back Aadhar Image</Label>
+									<Input type="file" name="back_aadhar_image" onChange={(e) => handleImageChange(e, setBackAadharImage)} />
+								</FormGroup>
+							</Col>
+
+							<Col md={6}>
+								<FormGroup>
+									<Label for="pan_image">PAN Image</Label>
+									<Input type="file" name="pan_image" onChange={(e) => handleImageChange(e, setPanImage)} />
+								</FormGroup>
+							</Col>
+
+							<Col md={6}>
+								<FormGroup>
+									<Label for="other_id_image">Other ID Image</Label>
+									<Input type="file" name="other_id_image" onChange={(e) => handleImageChange(e, setOtherIdImage)} />
+								</FormGroup>
+							</Col>
+
+							<Col md={6}>
+								<FormGroup>
+									<Label for="signature">Signature</Label>
+									<Input type="file" name="signature" onChange={(e) => handleImageChange(e, setSignature)} />
+								</FormGroup>
+							</Col>
+
+							<Col md={12}>
+								<Button
+									type="submit"
+									className="bg-primary h-fit text-blue"
+									disabled={isLoading || isSubmitting}
+								>
+									Submit
+								</Button>
+							</Col>
+						</Row>
+					</Form>
+				)}
+			</Formik>
 		</Fragment>
 	)
 }
