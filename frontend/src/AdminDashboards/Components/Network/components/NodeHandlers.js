@@ -57,6 +57,8 @@ export const createPonClickHandler = (
     data: { 
       label: `Step 1 - ${flowData?.olt_name} PON ${ponNumber}`,
       ponId: ponId, // Store original PON ID for reference
+      fms: '', // Initialize FMS field
+      fmsPort: '', // Initialize FMS PORT field
       onUpdate: (updatedData) => onNodeUpdate(newStepId, updatedData),
       // Use a closure to capture the correct node ID
       onSplitterSelect: (event, _, numChildren, splitterType) => {
@@ -142,6 +144,10 @@ export const createSplitterHandler = (
     // Get PON ID either from the passed parameter or from parent node data
     const ponId = originalPonId || parentNode?.data?.ponId;
     
+    // Get FMS and FMS PORT values from parent node
+    const parentFms = parentNode?.data?.fms || '';
+    const parentFmsPort = parentNode?.data?.fmsPort || '';
+    
     // Determine step number from parent node label
     let stepNumber = 1;
     if (parentLabel.includes('Step')) {
@@ -184,6 +190,8 @@ export const createSplitterHandler = (
         data: { 
           label: `Step ${stepNumber}(${letterLabel}) - ${flowData?.olt_name} ${ponPart}`,
           ponId: ponId, // Store original PON ID for reference
+          fms: parentFms, // Inherit FMS from parent
+          fmsPort: parentFmsPort, // Inherit FMS PORT from parent
           onUpdate: (updatedData) => onNodeUpdate(newId, updatedData),
           // Use a closure to capture the correct node ID
           onSplitterSelect: (event, _, numChildren, splitterType) => {
@@ -276,6 +284,10 @@ export const createDeviceHandler = (
     const parentY = parentNode.position?.y || 0;
     const parentX = parentNode.position?.x || 0;
     
+    // Get FMS and FMS PORT values from parent node
+    const parentFms = parentNode?.data?.fms || '';
+    const parentFmsPort = parentNode?.data?.fmsPort || '';
+    
     // Extract step and pon info from parent label
     let stepInfo = "";
     let ponInfo = "";
@@ -313,6 +325,8 @@ export const createDeviceHandler = (
         nodeType: 'device',  // Add nodeType to identify this as a device node
         deviceType: deviceType,
         id: newDeviceId,
+        fms: parentFms, // Inherit FMS from parent
+        fmsPort: parentFmsPort, // Inherit FMS PORT from parent
         // Add device-specific color based on type (for backward compatibility)
         color: deviceType === 'ONU' ? '#27ae60' : 
                deviceType === 'ONT' ? '#8e44ad' : 
