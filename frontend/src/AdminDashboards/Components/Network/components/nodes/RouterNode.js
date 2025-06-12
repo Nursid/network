@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Handle } from '@xyflow/react';
+import { useDispatch, useSelector } from 'react-redux';
+import { GetAllCustomers } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
 
 const RouterNode = ({ data }) => {
+  const dispatch = useDispatch();
+  const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerReducer)
+
+  console.log("customers---->",customers)
+
+
   const [fields, setFields] = useState({
     ponOp: data.ponOp || '',
     mac: data.mac || '',
@@ -10,6 +18,10 @@ const RouterNode = ({ data }) => {
     description: data.description || '',
     currentGoogleLocation: data.currentGoogleLocation || ''
   });
+
+  useEffect(() => {
+    dispatch(GetAllCustomers());
+  }, [dispatch]);
 
   useEffect(() => {
     setFields({
@@ -127,8 +139,7 @@ const RouterNode = ({ data }) => {
       />
 
       <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>User ID:</div>
-      <input
-        type="text"
+      <select
         name="userId"
         value={fields.userId}
         onChange={handleFieldChange}
@@ -140,7 +151,19 @@ const RouterNode = ({ data }) => {
           border: '1px solid #3498db',
           borderRadius: '4px'
         }}
-      />
+        disabled={isLoading}
+      >
+        <option value="">{isLoading ? "Loading customers..." : "Select Customer"}</option>
+        {customers?.data?.length > 0 ? (
+          customers.data.map((customer) => (
+            <option key={customer.id} value={customer.id}>
+              {customer.NewCustomer.name} ({customer.id})
+            </option>
+          ))
+        ) : !isLoading && (
+          <option value="" disabled>No customers found</option>
+        )}
+      </select>
 
       <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>POE Adaptor:</div>
       <input

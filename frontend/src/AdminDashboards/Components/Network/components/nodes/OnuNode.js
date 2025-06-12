@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Handle } from '@xyflow/react';
+import { useDispatch, useSelector } from 'react-redux';
+import { GetAllCustomers } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
 
 const OnuNode = ({ data }) => {
+  const dispatch = useDispatch();
+  const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerReducer)
+  
   const [fields, setFields] = useState({
     ponOp: data.ponOp || '',
     outputOp: data.outputOp || '',
@@ -14,6 +19,10 @@ const OnuNode = ({ data }) => {
     currentGoogleLocation: data.currentGoogleLocation || '',
     description: data.description || ''
   });
+
+  useEffect(() => {
+    dispatch(GetAllCustomers());
+  }, [dispatch]);
 
   useEffect(() => {
     setFields({
@@ -214,8 +223,7 @@ const OnuNode = ({ data }) => {
       />
 
       <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>User ID:</div>
-      <input
-        type="text"
+      <select
         name="userId"
         value={fields.userId}
         onChange={handleFieldChange}
@@ -227,7 +235,19 @@ const OnuNode = ({ data }) => {
           border: '1px solid #27ae60',
           borderRadius: '4px'
         }}
-      />
+        disabled={isLoading}
+      >
+        <option value="">{isLoading ? "Loading customers..." : "Select Customer"}</option>
+        {customers?.data?.length > 0 ? (
+          customers.data.map((customer) => (
+            <option key={customer._id} value={customer._id}>
+              {customer.name} ({customer._id})
+            </option>
+          ))
+        ) : !isLoading && (
+          <option value="" disabled>No customers found</option>
+        )}
+      </select>
 
       <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Google Location:</div>
       <input
