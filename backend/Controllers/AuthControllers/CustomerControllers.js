@@ -334,29 +334,29 @@ const GetUpdateTheCustomer = async (req, res) => {
 		console.log('Customer data to update:', customer_data);
 
 		// Update main customer record
-		const [updatedCustomerRows] = await NewCustomerModel.update(newCustomer_data, {
+		const updatedCustomerRows = await NewCustomerModel.update(newCustomer_data, {
 			where: {
 				id: user_id
 			}
 		});
 
-		if (updatedCustomerRows === 0) {
-			return res.status(404).json({status: false, message: "Customer not found!"});
+		console.log('Updated Customer Rows:--------', updatedCustomerRows);
+
+		if (!updatedCustomerRows) {
+			return res.status(404).json({status: false, message: "Customer not updated!"});
 		}
 
 		// Update extended customer details
-		const [updatedRows] = await CustomerModel.update(customer_data, {
+		const updatedRows= await CustomerModel.update(customer_data, {
 			where: {
 				user_id: user_id
 			}
 		});
-		
-		if (updatedRows === 0) {
-			// If no record exists in CustomerModel, create one
-			await CustomerModel.create({
-				user_id: user_id,
-				...customer_data
-			});
+
+		console.log('Updated Rows:', updatedRows);
+
+		if (!updatedRows) {
+			return res.status(404).json({status: false, message: "Customer not updated!"});
 		}
 
 		return res.status(200).json({

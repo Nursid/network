@@ -258,7 +258,8 @@ export const createDeviceHandler = (
   setNodes, 
   setEdges,
   logState,
-  flowData
+  flowData,
+  handleOnuDeviceCreate = null
 ) => {
   return (event, parentId, deviceType) => {
     console.log("handleDeviceSelect called with parentId:", parentId, "deviceType:", deviceType);
@@ -313,6 +314,10 @@ export const createDeviceHandler = (
       nodeType = 'OntNode';
     } else if (deviceType === 'Router') {
       nodeType = 'RouterNode';
+    } else if (deviceType === 'Switch-P') {
+      nodeType = 'SwitchPNode';
+    } else if (deviceType === 'Switch-S') {
+      nodeType = 'SwitchSNode';
     }
     
     // Create new device node (ONU, ONT, or Router)
@@ -330,7 +335,9 @@ export const createDeviceHandler = (
         // Add device-specific color based on type (for backward compatibility)
         color: deviceType === 'ONU' ? '#27ae60' : 
                deviceType === 'ONT' ? '#8e44ad' : 
-               deviceType === 'Router' ? '#3498db' : '#95a5a6',
+               deviceType === 'Router' ? '#3498db' : 
+               deviceType === 'Switch-P' ? '#9b59b6' :
+               deviceType === 'Switch-S' ? '#e67e22' : '#95a5a6',
         onUpdate: (updatedData) => onNodeUpdate(newDeviceId, updatedData),
         onDelete: (nodeId) => {
           // Use a closure to access current state
@@ -341,7 +348,11 @@ export const createDeviceHandler = (
             });
             return currentEdges; // Return unchanged since deleteNodeHandler handles the update
           });
-        }
+        },
+        // Add device creation handler specifically for OnuNode
+        ...(deviceType === 'ONU' && handleOnuDeviceCreate && {
+          onDeviceCreate: handleOnuDeviceCreate
+        })
       },
       position: {
         x: parentX,
@@ -372,12 +383,12 @@ export const createDeviceHandler = (
     
     setEdges((eds) => [...eds, newEdge]);
     
-    // Log state after update
+    // Log state after update 
     setTimeout(() => {
       logState(`Added ${deviceType} Node`);
     }, 100);
   };
-};
+};  
 
 export const deleteNodeHandler = (
   nodeId,
@@ -553,4 +564,121 @@ export const getNextStepId = (idCounterRef) => {
   const id = `node-${idCounterRef.current}`;
   idCounterRef.current += 1;
   return id;
+};
+
+// Function to create device nodes from ONU device selection
+export const createOnuDeviceHandler = (
+  nodeStore, 
+  onNodeUpdate, 
+  idCounterRef, 
+  nodes, 
+  setNodes, 
+  setEdges,
+  logState,
+  flowData
+) => {
+  return (parentId, deviceType) => {
+    console.log("createOnuDeviceHandler called with parentId:", parentId, "deviceType:", deviceType);
+    
+    if (!parentId) {
+      console.error("parentId is undefined");
+      return;
+    }
+    
+    // Find the parent node (OnuNode)
+    const parentNode = nodeStore.getNode(parentId) || nodes.find(node => node.id === parentId);
+    if (!parentNode) {
+      console.error("Parent ONU node not found:", parentId);
+      return;
+    }
+    
+    // Get information from parent node
+    const parentLabel = parentNode.data.label || '';
+    const ponId = parentNode.data.ponId;
+    const parentY = parentNode.position?.y || 0;
+    const parentX = parentNode.position?.x || 0;
+    
+    // Get values from parent ONU node to inherit
+    const parentFms = parentNode?.data?.fms || '';
+    const parentFmsPort = parentNode?.data?.fmsPort || '';
+    const parentUserId = parentNode?.data?.userId || '';
+    const parentGoogleLocation = parentNode?.data?.currentGoogleLocation || '';
+    
+    // Generate a unique ID for the new device node
+    const newDeviceId = getNextStepId(idCounterRef);
+    
+    // Determine the specific node type based on device type
+    let nodeType = 'CustomNode'; // fallback
+    if (deviceType === 'router') {
+      nodeType = 'RouterNode';
+    } else if (deviceType === 'switch-p') {
+      nodeType = 'SwitchPNode';
+    } else if (deviceType === 'switch-s') {
+      nodeType = 'SwitchSNode';
+    }
+    
+    // Create new device node
+    const newDeviceNode = {
+      id: newDeviceId,
+      type: nodeType, // Use specific node type
+      data: {
+        label: `${deviceType.toUpperCase()} - ${parentLabel}`,
+        ponId: ponId,
+        nodeType: 'device',  // Add nodeType to identify this as a device node
+        deviceType: deviceType,
+        id: newDeviceId,
+        fms: parentFms, // Inherit FMS from parent
+        fmsPort: parentFmsPort, // Inherit FMS PORT from parent
+        userId: parentUserId, // Inherit user ID from parent
+        currentGoogleLocation: parentGoogleLocation, // Inherit location from parent
+        // Add device-specific color based on type
+        color: deviceType === 'router' ? '#3498db' : 
+               deviceType === 'switch-p' ? '#9b59b6' :
+               deviceType === 'switch-s' ? '#e67e22' : '#95a5a6',
+        onUpdate: (updatedData) => onNodeUpdate(newDeviceId, updatedData),
+        onDelete: (nodeId) => {
+          // Use a closure to access current state
+          setEdges((currentEdges) => {
+            setNodes((currentNodes) => {
+              deleteNodeHandler(nodeId, nodeStore, currentNodes, currentEdges, setNodes, setEdges, logState);
+              return currentNodes; // Return unchanged since deleteNodeHandler handles the update
+            });
+            return currentEdges; // Return unchanged since deleteNodeHandler handles the update
+          });
+        }
+      },
+      position: {
+        x: parentX + 300, // Position to the right of the ONU node
+        y: parentY
+      },
+      targetPosition: 'left',
+      sourcePosition: 'right'
+    };
+    
+    // Add to nodeStore immediately
+    nodeStore.addNode(newDeviceNode);
+    
+    // Create edge from ONU to device
+    const newEdge = {
+      id: `e-${parentId}-${newDeviceId}`,
+      source: parentId,
+      target: newDeviceId,
+      type: 'smoothstep',
+      animated: true
+    };
+    
+    // Add the new node and edge
+    setNodes((nds) => {
+      const updatedNodes = [...nds, newDeviceNode];
+      console.log("Updated nodes array after adding device from ONU:", updatedNodes.length);
+      return updatedNodes;
+    });
+    
+    setEdges((eds) => [...eds, newEdge]);
+    
+    // Log state after update
+    setTimeout(() => {
+      logState(`Added ${deviceType} Node from ONU`);
+    }, 100);
+  };
 }; 

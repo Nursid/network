@@ -31,6 +31,7 @@ import { GetAvailability } from "../Store/Actions/Dashboard/AvailabilityAction";
 import SelectBox from "../AdminDashboards/Elements/SelectBox";
 import moment from "moment";
 import { GetAllTimeSlot } from "../Store/Actions/Dashboard/Orders/OrderAction";
+import { GetAllInventry } from "../Store/Actions/Dashboard/InventryAction";
 
 export const LoginModal = () => {
 	const [mobileNo, setMobileNo] = useState("");
@@ -1996,30 +1997,78 @@ export const AllotItemModal = ({allotItemModalOpen, allotItemModalfunction, inve
 	const [date, setDate] = useState('');
 	const [qty, setQty] = useState('')
 	const [remark, SetRemark] = useState('');
-	
-
-
+	const [selectedItem, setSelectedItem] = useState('');
 	const dispatch = useDispatch();
+	const { data: inventoryData } = useSelector(state => state.GetAllInventryReducers || []);
+
+	// Transform inventory data for SelectBox
+	const inventoryOptions = inventoryData ? inventoryData.map(item => ({
+		label: item.item,
+		value: item.item
+	})) : [];
+
+	// Load inventory data when modal opens
+	useEffect(() => {
+		if (allotItemModalOpen) {
+			dispatch(GetAllInventry());
+		}
+	}, [allotItemModalOpen, dispatch]);
+
+	// Set initial selected item if inventryData is provided
+	useEffect(() => {
+		if (inventryData?.item && inventoryOptions.length > 0) {
+			const initialItem = inventoryOptions.find(option => option.value === inventryData.item);
+			if (initialItem) {
+				setSelectedItem(initialItem);
+			}
+		}
+	}, [inventryData, inventoryOptions]);
 
 	const handleSubmit = () => {
+		// Form validation
+		if (!selectedItem?.value && !inventryData?.item) {
+			Swal.fire({title: 'Please select an item', icon: "error"});
+			return;
+		}
+		if (!allotedTo.trim()) {
+			Swal.fire({title: 'Please enter who to allot to', icon: "error"});
+			return;
+		}
+		if (!date) {
+			Swal.fire({title: 'Please select a date', icon: "error"});
+			return;
+		}
+		if (!qty || qty <= 0) {
+			Swal.fire({title: 'Please enter a valid quantity', icon: "error"});
+			return;
+		}
+
 		const formData = {
 			spname: allotedTo,
-			allotdate: date,
+			allotdate: moment(date).format("DD-MM-YYYY"),
 			aqty: qty,
-			item:inventryData.item
+			item: selectedItem?.value || inventryData?.item,
+			remark: remark
 		}
 		const apiUrl = `${API_URL}/inventry/allot`;
 		// Make a POST request using Axios
 		axios.post(apiUrl, formData).then(response => {
 			if (response.status === 200) {
 				allotItemModalfunction();
-				Swal.fire('Successfully!', response.data.message, 'success')
+				Swal.fire('Successfully!', response.data.message, 'success');
+				// Reset form
+				SetallotedTo('');
+				setDate('');
+				setQty('');
+				setSelectedItem('');
+				SetRemark('');
 			} else {
 				Swal.fire({title: 'failed to add try again', icon: "error"})
 			}
 			// dispatch(GetAllOrders());
 		}).catch(error => {
 			console.error('Error:', error);
+			Swal.fire({title: 'An error occurred', icon: "error"});
 		});
 	};
 
@@ -2033,9 +2082,20 @@ export const AllotItemModal = ({allotItemModalOpen, allotItemModalfunction, inve
 			<ModalBody>
 				<Fragment>
 					<Row>
-						<Col md={4}>
+						<Col md={6}>
 							<FormGroup>
-								<Label>Allot To</Label>
+								<Label>Select Item <span style={{color: "red"}}>*</span></Label>
+								<SelectBox
+									options={inventoryOptions}
+									setSelcted={setSelectedItem}
+									initialValue={selectedItem}
+									placeholder="Select an item"
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={6}>
+							<FormGroup>
+								<Label>Allot To <span style={{color: "red"}}>*</span></Label>
 								<Input onChange={
 										(e) => SetallotedTo(e.target.value)
 									}
@@ -2045,23 +2105,25 @@ export const AllotItemModal = ({allotItemModalOpen, allotItemModalfunction, inve
 						</Col>
 						<Col md={4}>
 							<FormGroup>
-								<Label>Date</Label>
+								<Label>Date <span style={{color: "red"}}>*</span></Label>
 								<Input onChange={
 										(e) => setDate(e.target.value)
 									}
 									type="date"
 									value={date}
-									placeholder='Mobile Number'/>
+									placeholder='Date'/>
 							</FormGroup>
 						</Col>
 
 						<Col md={4}>
 							<FormGroup>
-								<Label>Quantity</Label>
+								<Label>Quantity <span style={{color: "red"}}>*</span></Label>
 								<Input onChange={
 										(e) => setQty(e.target.value)
 									}
 									value={qty}
+									type="number"
+									min="1"
 									placeholder='Quantity'/>
 							</FormGroup>
 						</Col>
@@ -2087,7 +2149,7 @@ export const AllotItemModal = ({allotItemModalOpen, allotItemModalfunction, inve
 									style={
 										{marginRight: '10px'}
 								}>
-									Update
+									Save
 								</Button>
 								<Button color="danger"
 									onClick={allotItemModalfunction}>
@@ -2103,86 +2165,177 @@ export const AllotItemModal = ({allotItemModalOpen, allotItemModalfunction, inve
 };
 
 
-export const AddInventryModal = ({AddInventryModalOpen, AddInventryModalOpenFunction, data,GetAllInventry}) => {
+export const AddInventryModal = ({AddInventryModalOpen, AddInventryModalOpenFunction, data, GetAllInventry}) => {
 
 	const dispatch = useDispatch();
-	const [item, setItem] = useState(data.item || '');
-	const [qty, setQty] = useState(data.qty || '');
-	const handleSubmit = () => {
+	const [item, setItem] = useState('');
+	const [qty, setQty] = useState('');
+	const [errors, setErrors] = useState({});
+	const [isLoading, setIsLoading] = useState(false);
+
+	// Set initial values when data changes (for update mode)
+	useEffect(() => {
+		if (data) {
+			setItem(data.item || '');
+			setQty(data.qty || '');
+		} else {
+			// Reset form for add mode
+			setItem('');
+			setQty('');
+		}
+		setErrors({});
+	}, [data, AddInventryModalOpen]);
+
+	const validateForm = () => {
+		let newErrors = {};
+
+		if (!item.trim()) {
+			newErrors.item = "Item name is required";
+		}
+
+		if (!qty || qty <= 0) {
+			newErrors.qty = "Quantity must be greater than 0";
+		}
+
+		setErrors(newErrors);
+		return Object.keys(newErrors).length === 0;
+	};
+
+	const handleSubmit = async () => {
+		if (!validateForm()) {
+			return;
+		}
+
+		setIsLoading(true);
+		
 		const formData = {
-			item: item,
-			qty: qty
-		}
-		var apiUrl = '' 
-		if(!data.id){
+			item: item.trim(),
+			qty: parseInt(qty)
+		};
+
+		let apiUrl = '';
+		let method = 'POST';
+		
+		if (data?.id) {
+			// Update mode
+			apiUrl = `${API_URL}/inventry/update/${data.id}`;
+			method = 'POST'; // Use PUT for updates if your backend supports it
+		} else {
+			// Add mode
 			apiUrl = `${API_URL}/inventry/add`;
-		}else{
-			apiUrl = `${API_URL}/inventry/update/`+data.id;
+			method = 'POST';
 		}
-		 
-		// Make a POST request using Axios
-		axios.post(apiUrl, formData).then(response => {
+
+		try {
+			const response = await axios({
+				method: method,
+				url: apiUrl,
+				data: formData
+			});
+
 			if (response.status === 200) {
 				AddInventryModalOpenFunction();
-				Swal.fire('Successfully!', response.data.message, 'success')
+				Swal.fire('Successfully!', response.data.message, 'success');
+				
+				// Reset form only in add mode
+				if (!data?.id) {
+					setItem('');
+					setQty('');
+				}
+				
+				dispatch(GetAllInventry());
 			} else {
-				Swal.fire({title: 'failed to add try again', icon: "error"})
+				Swal.fire({title: 'Failed to save, try again', icon: "error"});
 			}
-			dispatch(GetAllInventry());
-		}).catch(error => {
+		} catch (error) {
 			console.error('Error:', error);
-		});
+			const errorMessage = error.response?.data?.message || 'An error occurred while saving';
+			Swal.fire({title: errorMessage, icon: "error"});
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleClose = () => {
+		// Reset form when closing
+		setItem('');
+		setQty('');
+		setErrors({});
+		AddInventryModalOpenFunction();
 	};
 
 	return (
 		<Modal className="modal-dialog-centered modal-lg"
 			isOpen={AddInventryModalOpen}
-			toggle={AddInventryModalOpenFunction}>
-			<ModalHeader toggle={AddInventryModalOpenFunction}>
-				{
-				(!data) ? "Add Item" : "Update Item"
-			} </ModalHeader>
+			toggle={handleClose}>
+			<ModalHeader toggle={handleClose}>
+				{!data?.id ? "Add Item" : "Update Item"}
+			</ModalHeader>
 			<ModalBody>
 				<Row>
-
 					<Col md={6}>
 						<FormGroup>
-							<Label>Item *</Label>
-							<Input onChange={
-									(e) => setItem(e.target.value)
-								}
+							<Label>Item Name <span style={{color: "red"}}>*</span></Label>
+							<Input 
+								onChange={(e) => setItem(e.target.value)}
 								value={item}
 								type='text'
-								placeholder='Item'/>
+								placeholder='Enter item name'
+								invalid={!!errors.item}
+							/>
+							{errors.item && (
+								<span className='validationError' style={{color: "red", fontSize: "12px"}}>
+									{errors.item}
+								</span>
+							)}
 						</FormGroup>
 					</Col>
 
 					<Col md={6}>
 						<FormGroup>
-							<Label>Quantity *</Label>
-							<Input onChange={
-									(e) => setQty(e.target.value)
-								}
+							<Label>Quantity <span style={{color: "red"}}>*</span></Label>
+							<Input 
+								onChange={(e) => setQty(e.target.value)}
 								value={qty}
 								type='number'
-								placeholder='Quantity'/>
+								min="1"
+								placeholder='Enter quantity'
+								invalid={!!errors.qty}
+							/>
+							{errors.qty && (
+								<span className='validationError' style={{color: "red", fontSize: "12px"}}>
+									{errors.qty}
+								</span>
+							)}
 						</FormGroup>
 					</Col>
 
-					<div className="d-flex justify-content-end ">
-						<Button color="success"
-							onClick={handleSubmit}
-							style={
-								{marginRight: '10px'}
-						}>
-							{
-							(!data) ? "Save" : "Update"
-						} </Button>
-						<Button color="danger"
-							onClick={AddInventryModalOpenFunction}>
-							Close
-						</Button>
-					</div>
+					<Col md={12}>
+						<div className="d-flex justify-content-end">
+							<Button 
+								color="success"
+								onClick={handleSubmit}
+								disabled={isLoading}
+								style={{marginRight: '10px'}}
+							>
+								{isLoading ? (
+									<>
+										<ClockLoader size={16} className="mr-2" color="#fff" />
+										{!data?.id ? "Saving..." : "Updating..."}
+									</>
+								) : (
+									!data?.id ? "Save" : "Update"
+								)}
+							</Button>
+							<Button 
+								color="danger"
+								onClick={handleClose}
+								disabled={isLoading}
+							>
+								Close
+							</Button>
+						</div>
+					</Col>
 				</Row>
 			</ModalBody>
 		</Modal>

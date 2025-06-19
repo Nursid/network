@@ -122,17 +122,17 @@ export default function ManageComplain(){
         //         </select>
         //     ),
         //     minWidth: 150,
-        //     editable: true,
+        //     editable: false,
         // },
-        { field: "cust_id", headerName: "Customer ID", flex:1, minWidth: 120, editable: true,  },
-        { field: "order_no", headerName: "Order Number", flex:1,minWidth: 120, editable: true },
-        { field: "name", headerName: "Customer Name",minWidth: 150,flex:1, editable: true },
-        { field: "mobileno", headerName: "Mobile",minWidth: 150,flex:1, editable: true },
-        { field: "user_type",flex: 1, headerName: "Type", minWidth: 80, editable: true },
-        { field: "service_name",flex: 1, headerName: "Service Type",minWidth: 150, editable: true },
-        { field: "booktime",flex: 1, headerName: "Booking Time", minWidth: 120, editable: true },
-        { field: "bookdate", flex: 1, headerName: "Booking Date", minWidth: 120, editable: true },
-        { field: "problem_des",flex: 1, headerName: "Problem Description ", minWidth: 150, editable: true },
+        { field: "cust_id", headerName: "Customer ID", flex:1, minWidth: 120, editable: false,  },
+        { field: "order_no", headerName: "Order Number", flex:1,minWidth: 120, editable: false },
+        { field: "name", headerName: "Customer Name",minWidth: 150,flex:1, editable: false },
+        { field: "mobileno", headerName: "Mobile",minWidth: 150,flex:1, editable: false },
+        { field: "user_type",flex: 1, headerName: "Type", minWidth: 80, editable: false },
+        { field: "service_name",flex: 1, headerName: "Service Type",minWidth: 150, editable: false },
+        { field: "booktime",flex: 1, headerName: "Booking Time", minWidth: 120, editable: false },
+        { field: "bookdate", flex: 1, headerName: "Booking Date", minWidth: 120, editable: false },
+        { field: "problem_des",flex: 1, headerName: "Problem Description ", minWidth: 150, editable: false },
         { field: "suprvisor_id", headerName: "Supervisor",flex:1,
         renderCell: (params) => ( 
             <>
@@ -151,7 +151,7 @@ export default function ManageComplain(){
                 params.row.suprvisor_id
               )
             ) :  params.row.suprvisor_id
-          } </> ), minWidth: 200, editable: true },
+          } </> ), minWidth: 200, editable: false },
     
         { field: "servicep_id", headerName: "Service Provider",flex:1,
         renderCell: (params) => ( 
@@ -168,13 +168,13 @@ export default function ManageComplain(){
               params.row.servicep_id
             )
           ) : params.row.servicep_id } </> ),
-        minWidth: 200, editable: true },
+        minWidth: 200, editable: false },
     
         // { field: "vehicle_inventory", headerName: "Vehicle Used",
         // renderCell: (params) => ( 
         //     <>
         //     {(!params.row.vehicle_inventory) ? (<><Button variant='contained' color='primary'> Choose Vehicle</Button></> ) : <>{params.row.vehicle_inventory} </> } </> ),
-        //  minWidth: 200, editable: true },
+        //  minWidth: 200, editable: false },
     //     { field: "netpayamt", headerName: "Billing Amount",
     //     renderCell: (params) => ( 
     //         <>
@@ -195,21 +195,21 @@ export default function ManageComplain(){
         //     { params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
         //     (params.row?.userRole?.role==="office" && !params.row.bakof_remark) ? (<><Button variant='contained' color='primary' onClick={()=>backOfficeRemark(params.row.order_no)}>Remark</Button></> ) : <>{params.row.bakof_remark} </>) : params.row.bakof_remark } </> ),
     
-        // minWidth: 180, editable: true},
+        // minWidth: 180, editable: false},
         // { field: "admin_remark", headerName: "Admin Remark",
         // renderCell: (params) => ( 
         //     <>
         //     {params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
             
         //     (params?.row?.userRole?.role==="admin" && !params.row.admin_remark) ? (<><Button variant='contained' color='primary' onClick={()=>AdminRemark(params.row.order_no)}>Remark</Button></> ) : <>{params.row.admin_remark} </> ) : params.row.admin_remark } </> ),
-        // minWidth: 150, editable: true },
+        // minWidth: 150, editable: false },
         // { field: "providerratings", headerName: "Provider Ratings",
         // // renderCell: (params) => ( 
         // //     <>
         // //     {console.log("params.row.userRole-----",params.row)}
         // //      </> ),
     
-        // minWidth: 150, editable: true },
+        // minWidth: 150, editable: false },
         // { field: "sueadmin_remark", headerName: "Super Admin Remark",
         // renderCell: (params) => ( 
         //     <>
@@ -217,7 +217,7 @@ export default function ManageComplain(){
         //     params.row.pending !== "Completed" && params.row.pending !== "Cancel" ? (
         //     (params.row?.userRole?.role==="super" && !params.row.sueadmin_remark) ? (<><Button variant='contained' color='primary' onClick={()=>SuperAdminRemark(params.row.order_no)}>Remark</Button></> ) : <>{params.row.sueadmin_remark} </> ) : params.row.sueadmin_remark} </> ),
     
-        // minWidth: 180, editable: true,},
+        // minWidth: 180, editable: false,},
         // { field: "servp_remark",
         //     headerName: "Service Provider Remark",
     
@@ -227,10 +227,10 @@ export default function ManageComplain(){
         //         ( params.row?.userRole?.role==="service" && !params.row.servp_remark) ? (<><Button variant='contained' color='primary' onClick={()=>ServiceProviderRemark(params.row.order_no)} >Remark</Button></> ) : <>{params.row.servp_remark} </>) : params.row.servp_remark }
         //         </> ),
         //     minWidth: 180,
-        //     editable: true,
+        //     editable: false,
         // },
-        { field: "pending", headerName: "Order Status",flex:1, minWidth: 150, editable: true },
-        // { field: "cancle_reson", headerName: "Cancel Reason", minWidth: 150, editable: true },
+        { field: "pending", headerName: "Order Status",flex:1, minWidth: 150, editable: false },
+        // { field: "cancle_reson", headerName: "Cancel Reason", minWidth: 150, editable: false },
       ];
 
     const handleComplain = () =>{

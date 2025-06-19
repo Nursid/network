@@ -145,9 +145,9 @@ const ManagePlans = () => {
 
     const column = [
         { field: "_id", headerName: "Sr No", minWidth: 50 },
-        // { field: "refName", headerName: "Ref Name", minWidth: 120, editable: true },
+        // { field: "refName", headerName: "Ref Name", minWidth: 120, editable: false },
         // { field: "date", headerName: "Date", minWidth: 160 },
-        { field: "connectionType", headerName: "connectionType", minWidth: 200, editable: true },
+        { field: "connectionType", headerName: "connectionType", minWidth: 200, editable: false },
         {
             field: "plan", headerName: "Plan", minWidth: 120 },
         {

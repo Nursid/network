@@ -97,6 +97,7 @@ const AllotedItems = async (req, res)=> {
         res.status(200).json({status: true, message:"Inventory Alloted Successfully!"});
 
     }catch(error){
+        console.log(error);
         res.status(400).json({status: true ,message:"Internal Server Error"});
     }
 }

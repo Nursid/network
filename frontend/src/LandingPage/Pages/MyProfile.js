@@ -141,7 +141,7 @@ const MyProfile = ({ serviceData }) => {
                 </>
             )
         },
-        { field: "", headerName: "Invoice", minWidth: 150, editable: true,
+        { field: "", headerName: "Invoice", minWidth: 150, editable: false,
             renderCell: (params) => {
             if(params.row.admin_approve){
               return (

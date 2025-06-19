@@ -70,8 +70,8 @@ const ManageHeadExpenses = () => {
     };
 
     const column = [
-        { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: true },
-        { field: "name", flex: 1, headerName: "Name", minWidth: 50, editable: true },
+        { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: false },
+        { field: "name", flex: 1, headerName: "Name", minWidth: 50, editable: false },
         {
             field: "status",
             minWidth: 150,

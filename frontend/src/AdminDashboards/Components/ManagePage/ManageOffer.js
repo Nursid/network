@@ -187,9 +187,9 @@ const ManageOffer = () => {
 
 
     const column = [
-        { field: "_id", headerName: "Sr No", minWidth: 10, editable: true },
-        { field: "date", headerName: "Date", minWidth: 120, editable: true },
-        { field: "description", headerName: "Description", minWidth: 400, editable: true },
+        { field: "_id", headerName: "Sr No", minWidth: 10, editable: false },
+        { field: "date", headerName: "Date", minWidth: 120, editable: false },
+        { field: "description", headerName: "Description", minWidth: 400, editable: false },
         { field: "image", headerName: "Image", minWidth: 120,
             renderCell: (params) => (
                 <>

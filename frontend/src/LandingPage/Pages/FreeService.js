@@ -41,7 +41,7 @@ const FreeService = ({registerId}) => {
             minWidth: 50,
         },
         { field: "date", headerName: "Date", minWidth: 160 },
-        { field: "serviceName", headerName: "Service Name", minWidth: 200, editable: true },
+        { field: "serviceName", headerName: "Service Name", minWidth: 200, editable: false },
         {
             field: "icon", headerName: "Icon", minWidth: 120, renderCell: (params) => (
                 <div className='w-80 h-80 rounded-circle'>

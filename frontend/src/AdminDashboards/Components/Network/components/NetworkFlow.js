@@ -26,7 +26,8 @@ import {
   createSplitterHandler, 
   createDeviceHandler,
   deleteNodeHandler,
-  createNodeOnEdge
+  createNodeOnEdge,
+  createOnuDeviceHandler
 } from './NodeHandlers';
 import CustomNode from '../CustomNode';
 import EdgeContextMenu from './EdgeContextMenu';
@@ -36,6 +37,8 @@ import { API_URL } from '../../../../config';
 import OnuNode from './nodes/OnuNode';
 import OntNode from './nodes/OntNode';
 import RouterNode from './nodes/RouterNode';
+import SwitchPNode from './nodes/SwitchPNode';
+import SwitchSNode from './nodes/SwitchSNode';
 
 // Main NetworkFlow component wrapped with ReactFlowProvider
 const NetworkFlow = () => {
@@ -63,7 +66,9 @@ const FlowContent = ({ flowData }) => {
     CustomNode: CustomNode,
     OnuNode: OnuNode,
     OntNode: OntNode,
-    RouterNode: RouterNode
+    RouterNode: RouterNode,
+    SwitchPNode: SwitchPNode,
+    SwitchSNode: SwitchSNode
   }), []);
   const [rfInstance, setRfInstance] = useState(null);
   // Use useRef for idCounter to maintain consistent reference
@@ -131,6 +136,18 @@ const FlowContent = ({ flowData }) => {
     );
   }, []);
 
+  // Create ONU device handler directly
+  const handleOnuDeviceCreate = createOnuDeviceHandler(
+    NodeStore, 
+    onNodeUpdate, 
+    idCounterRef, 
+    nodes, 
+    setNodes, 
+    setEdges,
+    logState,
+    flowData
+  );
+
   // Now define handlers that use onNodeUpdate
   const handleDeviceSelect = createDeviceHandler(
     NodeStore, 
@@ -140,7 +157,8 @@ const FlowContent = ({ flowData }) => {
     setNodes,
     setEdges,
     logState,
-    flowData
+    flowData,
+    handleOnuDeviceCreate // Pass the ONU device handler
   );
   
   const handleSplitterSelect = createSplitterHandler(
@@ -745,7 +763,6 @@ const FlowContent = ({ flowData }) => {
     const restoreFlow = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/flow/get/${flowData.id}`);
-        console.log("Flow restored:-----", response.data.data.data);
         
         const flow = JSON.parse(response.data.data.data);
         console.log("Flow restored:-----", flow);

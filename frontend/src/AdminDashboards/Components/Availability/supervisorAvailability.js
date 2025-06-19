@@ -174,12 +174,12 @@ const SupervisorAvailability = () => {
               </Button>
             ),
             minWidth: 100,
-            editable: true,
+            editable: false,
         },
-        { field: "id",  headerName: "Sr No", minWidth: 150, editable: true},
+        { field: "id",  headerName: "Sr No", minWidth: 150, editable: false},
 
-        { field: "name",  headerName: "Name", minWidth: 150, editable: true},
-        { field: "duty_hours",  headerName: "Duty Hours", minWidth: 150, editable: true},
+        { field: "name",  headerName: "Name", minWidth: 150, editable: false},
+        { field: "duty_hours",  headerName: "Duty Hours", minWidth: 150, editable: false},
         {
           field: "image",
           headerName: "Image",
@@ -193,7 +193,7 @@ const SupervisorAvailability = () => {
             );
           }
         },
-        { field: "date",  headerName: "Date", minWidth: 150, editable: true
+        { field: "date",  headerName: "Date", minWidth: 150, editable: false
          },
           
         { field: "09:30-10:00", headerName: "09:30-10:00 AM ", minWidth: 150, cellClassName: getCellClassName},

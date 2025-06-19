@@ -161,24 +161,24 @@ const ManagePost = () => {
     };
 
     const column = [
-        { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: true },
+        { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: false },
         { field: "image", headerName: "Image",
             renderCell: (params) => (
                 <>
                 <img src={IMG_URL+params.row.image} className='rounded-circle' alt="Image" style={{width: 100, height: 50 }} />
                 </>
             )},
-        { field: "cust_id", headerName: "Cust.ID", minWidth: 120, editable: true },
-        { field: "type", headerName: "Type", minWidth: 120, editable: true },
-        { field: "property", headerName: "Discription", minWidth: 400, editable: true },
-        { field: "from_date", headerName: "Post Date.", minWidth: 120, editable: true },
-        { field: "end_date", headerName: "End Date.", minWidth: 120, editable: true },
-        // { field: "mobileNumber", headerName: "Mobile No.", minWidth: 120, editable: true },
-        // { field: "email", headerName: "Email", minWidth: 120, editable: true },
-        // { field: "address", headerName: "Address", minWidth: 250, editable: true },
-        // { field: "username", headerName: "User Name", minWidth: 250, editable: true },
-        // { field: "password", headerName: "password", minWidth: 250, editable: true },
-        // { field: "zipCode", headerName: "Password", minWidth: 120, editable: true },
+        { field: "cust_id", headerName: "Cust.ID", minWidth: 120, editable: false },
+        { field: "type", headerName: "Type", minWidth: 120, editable: false },
+        { field: "property", headerName: "Discription", minWidth: 400, editable: false },
+        { field: "from_date", headerName: "Post Date.", minWidth: 120, editable: false },
+        { field: "end_date", headerName: "End Date.", minWidth: 120, editable: false },
+        // { field: "mobileNumber", headerName: "Mobile No.", minWidth: 120, editable: false },
+        // { field: "email", headerName: "Email", minWidth: 120, editable: false },
+        // { field: "address", headerName: "Address", minWidth: 250, editable: false },
+        // { field: "username", headerName: "User Name", minWidth: 250, editable: false },
+        // { field: "password", headerName: "password", minWidth: 250, editable: false },
+        // { field: "zipCode", headerName: "Password", minWidth: 120, editable: false },
         {
             field: "issapproved",
             minWidth: 150,

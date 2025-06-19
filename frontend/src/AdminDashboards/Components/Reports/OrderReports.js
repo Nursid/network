@@ -102,23 +102,23 @@ export default function OrderReports() {
   }, []);
 
     const columns = [
-        { field: "member_id", headerName: "Member ID", minWidth: 120, editable: true,  },
-        { field: "order_no", headerName: "Order Number", minWidth: 120, editable: true },
-        { field: "name", headerName: "Customer Name",minWidth: 150, editable: true },
-        { field: "mobileno", headerName: "Mobile",minWidth: 150, editable: true },
-        { field: "user_type", headerName: "Type", minWidth: 80, editable: true },
-        { field: "service_name", headerName: "Service Type",minWidth: 150, editable: true },
-        { field: "booktime", headerName: "Booking Time", minWidth: 120, editable: true },
-        { field: "bookdate", headerName: "Booking Date", minWidth: 120, editable: true },
-        { field: "problem_des", headerName: "Service Description ", minWidth: 150, editable: true, renderCell: (params) => (
+        { field: "member_id", headerName: "Member ID", minWidth: 120, editable: false,  },
+        { field: "order_no", headerName: "Order Number", minWidth: 120, editable: false },
+        { field: "name", headerName: "Customer Name",minWidth: 150, editable: false },
+        { field: "mobileno", headerName: "Mobile",minWidth: 150, editable: false },
+        { field: "user_type", headerName: "Type", minWidth: 80, editable: false },
+        { field: "service_name", headerName: "Service Type",minWidth: 150, editable: false },
+        { field: "booktime", headerName: "Booking Time", minWidth: 120, editable: false },
+        { field: "bookdate", headerName: "Booking Date", minWidth: 120, editable: false },
+        { field: "problem_des", headerName: "Service Description ", minWidth: 150, editable: false, renderCell: (params) => (
             <Tooltip title={params.value}>
                 <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {params.value}</div>
             </Tooltip>
-        ) },    { field: "allot_time_range", headerName: "Alloted Time Slot ", minWidth: 150, editable: true },
-        { field: "suprvisor_id", headerName: "Supervisor", minWidth: 200, editable: true },
+        ) },    { field: "allot_time_range", headerName: "Alloted Time Slot ", minWidth: 150, editable: false },
+        { field: "suprvisor_id", headerName: "Supervisor", minWidth: 200, editable: false },
     
-        { field: "servicep_id", headerName: "Service Provider",minWidth: 200, editable: true },
+        { field: "servicep_id", headerName: "Service Provider",minWidth: 200, editable: false },
 
         { field: "netpayamt", headerName: "Billing Amount",
         minWidth: 150 },
@@ -127,18 +127,18 @@ export default function OrderReports() {
         { field: "totalamt", headerName: "Balance Amount", minWidth: 150},
         { field: "cust_remark", headerName: "Customer Feedback", minWidth: 150 },
         { field: "bakof_remark", headerName: "Back Office Remark",
-        minWidth: 180, editable: true},
+        minWidth: 180, editable: false},
     
         { field: "suerv_remark", headerName: "Supervisor Remark",
-        minWidth: 150, editable: true },
+        minWidth: 150, editable: false },
     
         { field: "servp_remark",
             headerName: "Service Provider Remark",
             minWidth: 180,
-            editable: true,
+            editable: false,
         },
-        { field: "pending", headerName: "Order Status", minWidth: 150, editable: true },
-        { field: "cancle_reson", headerName: "Cancel Reason", minWidth: 150, editable: true },
+        { field: "pending", headerName: "Order Status", minWidth: 150, editable: false },
+        { field: "cancle_reson", headerName: "Cancel Reason", minWidth: 150, editable: false },
          
     
         ];

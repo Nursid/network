@@ -47,9 +47,9 @@ const AdminDashboard = () => {
   const token = currentUser.token
   
   const {  data: orders, isLoading: isOrderLoading} = useSelector(state => state.GetAllOrderReducer);
-  const { data: inventories, isLoading: isInventoryLoading } = useSelector(state => state.GetAllInventryReducers);
+ 
 
-  const { data: allotedItem, isLoading: isAllotedItemsLoading } = useSelector(state => state.GetAllAllotedItemReducers);
+
 
 
   useEffect(() => {
@@ -391,44 +391,6 @@ const AdminDashboard = () => {
 
   }
 
-  const Inventrycolumns = [
-    { field: "_id", headerName: "Sr No.", minWidth: 200,  editable: false},
-    { field: "item", headerName: "Name", minWidth: 220,  editable: false },
-    { field: "qty", headerName: "Quantity", minWidth: 220,  editable: false },
-    {
-      field: "action",
-      headerName: "Action",
-      minWidth: 400,
-      renderCell: (params) => (
-          <div className="d-flex gap-2">
-              <Button variant='contained' color='primary' onClick={() =>{ setallotItemModalOpen(!allotItemModalOpen);
-              SetInventryData(params.row)
-              }
-              }>Allot</Button>
-              <Button variant="contained" color="success"
-               onClick={() => {
-                setAddInventryModalOpen(!AddInventryModalOpen);
-                SetInventryData(params.row);
-            }}
-                >
-
-                Update Stock
-              </Button>
-              <Button onClick={() => handleDeleteInventry(params.row.id)} variant="contained" color="error">
-                  <DeleteForeverIcon />
-              </Button>
-          </div>
-      ),
-  },
-  ]
-  const AllotedItemsCollums = [
-    { field: "_id", headerName: "Sr No.  ", minWidth: 200,  editable: false },
-    { field: "allotdate", headerName: "Date", minWidth: 220,  editable: false },
-    { field: "spname", headerName: "Item", minWidth: 220,  editable: false },
-    { field: "item", headerName: "Alloted To", minWidth: 220,  editable: false },
-    { field: "aqty", headerName: "Quantity", minWidth: 220,  editable: false },
-    { field: "remark", headerName: "Remark", minWidth: 220,  editable: false }
-  ]
   const [modalTitle, setModalTitle] = useState('Add Order');
   const [summary, setSummary] = useState(false);
   const [inventry, setInventry] =useState(false);
@@ -1383,9 +1345,7 @@ const AdminDashboard = () => {
                             })}    
                           />
                           }
-              {inventry && !allotedItems && <AdminDataTable rows={inventories} CustomToolbar={InventryToolbar} columns={Inventrycolumns} />}  
-
-              {!complain && !summary && inventry && allotedItems && <AdminDataTable rows={allotedItem} CustomToolbar={InventryToolbar} columns={AllotedItemsCollums} />}   
+                
             </div>
             </div>
 				</div>

@@ -163,17 +163,15 @@ const ManageCustomer = () => {
         setViewModel(!viewModal)
     }
 
-    
-
     const column = [
-        { field: "id", headerName: "Sr No", minWidth: 50, editable: true },
-        { field: "name", headerName: "Name", minWidth: 120, editable: true },
-        { field: "mobileno", headerName: "Mobile No.", minWidth: 120, editable: true },
-        { field: "date", headerName: "Date", minWidth: 120, editable: true },
-        { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 120, editable: true },
-        { field: "username", headerName: "Username", minWidth: 250, editable: true },
-        { field: "area", headerName: "Area", minWidth: 250, editable: true },
-        { field: "apartment", headerName: "Apartment", minWidth: 250, editable: true },
+        { field: "id", headerName: "Sr No", minWidth: 50, editable: false },
+        { field: "name", headerName: "Name", minWidth: 120, editable: false },
+        { field: "mobileno", headerName: "Mobile No.", minWidth: 120, editable: false },
+        { field: "date", headerName: "Date", minWidth: 120, editable: false },
+        { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 120, editable: false },
+        { field: "username", headerName: "Username", minWidth: 250, editable: false },
+        { field: "area", headerName: "Area", minWidth: 250, editable: false },
+        { field: "apartment", headerName: "Apartment", minWidth: 250, editable: false },
         {
             field: "action",
             headerName: "Action",

@@ -157,11 +157,11 @@ const handleToggleBlock = (userId) => {
 };
 
     const column = [
-        { field: "_id", headerName: "Sr No", minWidth: 50, editable: true },
-        { field: "name", headerName: "Name", minWidth: 120, editable: true },
-        { field: "email", headerName: "Email", minWidth: 400, editable: true },
-        { field: "mobile", headerName: "Mobile No.", minWidth: 120, editable: true },
-        { field: "occupation", headerName: "Occupation", minWidth: 120, editable: true },
+        { field: "_id", headerName: "Sr No", minWidth: 50, editable: false },
+        { field: "name", headerName: "Name", minWidth: 120, editable: false },
+        { field: "email", headerName: "Email", minWidth: 400, editable: false },
+        { field: "mobile", headerName: "Mobile No.", minWidth: 120, editable: false },
+        { field: "occupation", headerName: "Occupation", minWidth: 120, editable: false },
         {
             field: "issapproved",
             minWidth: 150,

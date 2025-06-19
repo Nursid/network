@@ -106,7 +106,7 @@ const SupervisorAttendance = () => {
               );
             },
             minWidth: 150,
-            editable: true,
+            editable: false,
           },  
         { field: "status", headerName: "Attendance Mark", flex: 1, minWidth: 120, editable: false },
         { field: "name", headerName: "Supervisor Name", flex: 1, minWidth: 120, editable: false },

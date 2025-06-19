@@ -124,13 +124,13 @@ const ManageAdvertisement = () => {
         })
     }; 
     const column = [
-        { field: "_id", headerName: "Sr No", minWidth: 120, editable: true },
-        { field: "start_date", headerName: "To Date", minWidth: 120, editable: true },
-        { field: "end_date", headerName: "End Date", minWidth: 120, editable: true },
-        { field: "company_name", headerName: "Company Name", minWidth: 220, editable: true },
-        { field: "gst_no", headerName: "GST No.", minWidth: 220, editable: true },
-        { field: "payment", headerName: "Payment", minWidth: 220, editable: true },
-        { field: "mobile", headerName: "Mobile", minWidth: 120, editable: true },
+        { field: "_id", headerName: "Sr No", minWidth: 120, editable: false },
+        { field: "start_date", headerName: "To Date", minWidth: 120, editable: false },
+        { field: "end_date", headerName: "End Date", minWidth: 120, editable: false },
+        { field: "company_name", headerName: "Company Name", minWidth: 220, editable: false },
+        { field: "gst_no", headerName: "GST No.", minWidth: 220, editable: false },
+        { field: "payment", headerName: "Payment", minWidth: 220, editable: false },
+        { field: "mobile", headerName: "Mobile", minWidth: 120, editable: false },
         {   
             field: "action",
             headerName: "Action",

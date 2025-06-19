@@ -2,26 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Handle } from '@xyflow/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetAllCustomers } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
-import { API_URL } from '../../../../../config';
 
-const RouterNode = ({ data }) => {
+const SwitchPNode = ({ data }) => {
   const dispatch = useDispatch();
   const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerReducer)
 
-  console.log("customers---->",customers)
-
-
   const [fields, setFields] = useState({
-    ponOp: data.ponOp || '',
+    ports: data.ports || '',
+    vlanConfig: data.vlanConfig || '',
     mac: data.mac || '',
     userId: data.userId || '',
-    poeAdaptor: data.poeAdaptor || '',
-    description: data.description || '',
+    ipAddress: data.ipAddress || '',
+    subnetMask: data.subnetMask || '',
+    gateway: data.gateway || '',
+    managementInterface: data.managementInterface || '',
     currentGoogleLocation: data.currentGoogleLocation || '',
-    attachment: data.attachment || ''
+    description: data.description || ''
   });
-
-  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     dispatch(GetAllCustomers());
@@ -29,25 +26,21 @@ const RouterNode = ({ data }) => {
 
   useEffect(() => {
     setFields({
-      ponOp: data.ponOp || '',
+      ports: data.ports || '',
+      vlanConfig: data.vlanConfig || '',
       mac: data.mac || '',
       userId: data.userId || '',
-      poeAdaptor: data.poeAdaptor || '',
-      description: data.description || '',
+      ipAddress: data.ipAddress || '',
+      subnetMask: data.subnetMask || '',
+      gateway: data.gateway || '',
+      managementInterface: data.managementInterface || '',
       currentGoogleLocation: data.currentGoogleLocation || '',
-      attachment: data.attachment || ''
+      description: data.description || ''
     });
   }, [data]);
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
-    
-    // Handle file upload
-    if (name === 'attachment' && e.target.files && e.target.files[0]) {
-      handleImageUpload(e.target.files[0]);
-      return;
-    }
-    
     setFields((prevFields) => ({ ...prevFields, [name]: value }));
 
     if (data.onUpdate) {
@@ -55,43 +48,10 @@ const RouterNode = ({ data }) => {
     }
   };
 
-  const handleImageUpload = async (file) => {
-    if (!file) return;
-
-    setUploadingImage(true);
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-      const response = await fetch(`${API_URL}/api/flow/upload-image`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (result.status) {
-        const newFields = { ...fields, attachment: result.data.url };
-        setFields(newFields);
-        
-        if (data.onUpdate) {
-          data.onUpdate(newFields);
-        }
-      } else {
-        alert('Failed to upload image: ' + result.message);
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Error uploading image. Please try again.');
-    } finally {
-      setUploadingImage(false);
-    }
-  };
-
   const handleDeleteClick = (e) => {
     e.stopPropagation();
     
-    if (window.confirm("Are you sure you want to delete this Router node?")) {
+    if (window.confirm("Are you sure you want to delete this Switch-P node?")) {
       if (data.onDelete) {
         data.onDelete(data.id);
       }
@@ -102,12 +62,12 @@ const RouterNode = ({ data }) => {
     <div
       style={{ 
         padding: 12, 
-        border: '2px solid #3498db', 
+        border: '2px solid #9b59b6', 
         borderRadius: 8, 
         width: '250px',
-        backgroundColor: '#e8f4f8',
+        backgroundColor: '#f4f1f8',
         position: 'relative',
-        boxShadow: '0 2px 8px rgba(52, 152, 219, 0.2)'
+        boxShadow: '0 2px 8px rgba(155, 89, 182, 0.2)'
       }}
     >
       <button
@@ -138,30 +98,48 @@ const RouterNode = ({ data }) => {
         fontSize: '16px', 
         fontWeight: 'bold', 
         marginBottom: '8px',
-        color: '#3498db',
+        color: '#9b59b6',
         display: 'flex',
         alignItems: 'center'
       }}>
-        <span style={{ marginRight: '8px' }}>🌐</span>
-        Router Device
+        <span style={{ marginRight: '8px' }}>🔀</span>
+        Switch-P Device
       </div>
       
       <div style={{fontSize: '12px', marginBottom: '10px', color: '#666', fontStyle: 'italic'}}>
         {data.label}
       </div>
 
-      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>PON OP:</div>
+      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Ports:</div>
       <input
         type="text"
-        name="ponOp"
-        value={fields.ponOp}
+        name="ports"
+        value={fields.ports}
         onChange={handleFieldChange}
+        placeholder="e.g., 24, 48"
         style={{ 
           marginBottom: '8px', 
           width: '100%', 
           padding: '4px', 
           fontSize: '11px',
-          border: '1px solid #3498db',
+          border: '1px solid #9b59b6',
+          borderRadius: '4px'
+        }}
+      />
+
+      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>VLAN Config:</div>
+      <input
+        type="text"
+        name="vlanConfig"
+        value={fields.vlanConfig}
+        onChange={handleFieldChange}
+        placeholder="VLAN configuration"
+        style={{ 
+          marginBottom: '8px', 
+          width: '100%', 
+          padding: '4px', 
+          fontSize: '11px',
+          border: '1px solid #9b59b6',
           borderRadius: '4px'
         }}
       />
@@ -178,7 +156,75 @@ const RouterNode = ({ data }) => {
           width: '100%', 
           padding: '4px', 
           fontSize: '11px',
-          border: '1px solid #3498db',
+          border: '1px solid #9b59b6',
+          borderRadius: '4px'
+        }}
+      />
+
+      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>IP Address:</div>
+      <input
+        type="text"
+        name="ipAddress"
+        value={fields.ipAddress}
+        onChange={handleFieldChange}
+        placeholder="192.168.1.1"
+        style={{ 
+          marginBottom: '8px', 
+          width: '100%', 
+          padding: '4px', 
+          fontSize: '11px',
+          border: '1px solid #9b59b6',
+          borderRadius: '4px'
+        }}
+      />
+
+      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Subnet Mask:</div>
+      <input
+        type="text"
+        name="subnetMask"
+        value={fields.subnetMask}
+        onChange={handleFieldChange}
+        placeholder="255.255.255.0"
+        style={{ 
+          marginBottom: '8px', 
+          width: '100%', 
+          padding: '4px', 
+          fontSize: '11px',
+          border: '1px solid #9b59b6',
+          borderRadius: '4px'
+        }}
+      />
+
+      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Gateway:</div>
+      <input
+        type="text"
+        name="gateway"
+        value={fields.gateway}
+        onChange={handleFieldChange}
+        placeholder="192.168.1.1"
+        style={{ 
+          marginBottom: '8px', 
+          width: '100%', 
+          padding: '4px', 
+          fontSize: '11px',
+          border: '1px solid #9b59b6',
+          borderRadius: '4px'
+        }}
+      />
+
+      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Management Interface:</div>
+      <input
+        type="text"
+        name="managementInterface"
+        value={fields.managementInterface}
+        onChange={handleFieldChange}
+        placeholder="Web UI, SSH, SNMP"
+        style={{ 
+          marginBottom: '8px', 
+          width: '100%', 
+          padding: '4px', 
+          fontSize: '11px',
+          border: '1px solid #9b59b6',
           borderRadius: '4px'
         }}
       />
@@ -193,7 +239,7 @@ const RouterNode = ({ data }) => {
           width: '100%', 
           padding: '4px', 
           fontSize: '11px',
-          border: '1px solid #3498db',
+          border: '1px solid #9b59b6',
           borderRadius: '4px'
         }}
         disabled={isLoading}
@@ -201,8 +247,8 @@ const RouterNode = ({ data }) => {
         <option value="">{isLoading ? "Loading customers..." : "Select Customer"}</option>
         {customers?.data?.length > 0 ? (
           customers.data.map((customer) => (
-            <option key={customer.id} value={customer.id}>
-              {customer.NewCustomer.name} ({customer.id})
+            <option key={customer._id} value={customer._id}>
+              {customer.name} ({customer._id})
             </option>
           ))
         ) : !isLoading && (
@@ -210,23 +256,7 @@ const RouterNode = ({ data }) => {
         )}
       </select>
 
-      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>POE Adaptor:</div>
-      <input
-        type="text"
-        name="poeAdaptor"
-        value={fields.poeAdaptor}
-        onChange={handleFieldChange}
-        style={{ 
-          marginBottom: '8px', 
-          width: '100%', 
-          padding: '4px', 
-          fontSize: '11px',
-          border: '1px solid #3498db',
-          borderRadius: '4px'
-        }}
-      />
-
-      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Current Google Location:</div>
+      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Google Location:</div>
       <input
         type="text"
         name="currentGoogleLocation"
@@ -238,7 +268,7 @@ const RouterNode = ({ data }) => {
           width: '100%', 
           padding: '4px', 
           fontSize: '11px',
-          border: '1px solid #3498db',
+          border: '1px solid #9b59b6',
           borderRadius: '4px'
         }}
       />
@@ -254,51 +284,11 @@ const RouterNode = ({ data }) => {
           padding: '4px', 
           fontSize: '11px', 
           minHeight: '50px',
-          border: '1px solid #3498db',
+          border: '1px solid #9b59b6',
           borderRadius: '4px',
           resize: 'vertical'
         }}
       />
-
-      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Attachment:</div>
-      <input
-        type="file"
-        name="attachment"
-        onChange={handleFieldChange}
-        accept="image/*"
-        disabled={uploadingImage}
-        style={{ 
-          marginBottom: '8px', 
-          width: '100%', 
-          padding: '4px', 
-          fontSize: '11px',
-          border: '1px solid #3498db',
-          borderRadius: '4px'
-        }}
-      />
-      {uploadingImage && (
-        <div style={{fontSize: '11px', color: '#3498db', marginBottom: '8px'}}>
-          Uploading image...
-        </div>
-      )}
-      {fields.attachment && !uploadingImage && (
-        <div style={{marginBottom: '8px'}}>
-          <img 
-            src={`${API_URL}${fields.attachment}`} 
-            alt="Attachment" 
-            onClick={() => window.open(`${API_URL}${fields.attachment}`, '_blank')}
-            style={{
-              width: '100%',
-              maxHeight: '100px',
-              objectFit: 'cover',
-              borderRadius: '4px',
-              border: '1px solid #3498db',
-              cursor: 'pointer'
-            }}
-            title="Click to open in new tab"
-          />
-        </div>
-      )}
 
       <Handle type="target" position="top" />
       <Handle type="source" position="bottom" />
@@ -306,4 +296,4 @@ const RouterNode = ({ data }) => {
   );
 };
 
-export default RouterNode; 
+export default SwitchPNode; 

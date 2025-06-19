@@ -31,8 +31,8 @@ const validateForm = (values) => {
 	// Name validation
 	if (!values.name) {
 		errors.name = 'Name is required';
-	} else if (values.name.length > 50) {
-		errors.name = 'Name must be less than 50 characters';
+	} else if (values.name.length > 200) {
+		errors.name = 'Name must be less than 200 characters';
 	} else if (!/^[a-zA-Z\s]+$/.test(values.name)) {
 		errors.name = 'Name can only contain letters and spaces';
 	}
@@ -40,11 +40,12 @@ const validateForm = (values) => {
 	// Username validation
 	if (!values.username) {
 		errors.username = 'Username is required';
-	} else if (values.username.length < 3) {
-		errors.username = 'Username must be at least 3 characters';
-	} else if (values.username.length > 30) {
-		errors.username = 'Username must be less than 30 characters';
+	} else if (values.username.length > 50) {
+		errors.username = 'Username must be less than 50 characters';
 	}
+	//  else if (!/^[a-zA-Z0-9]+$/.test(values.username)) {
+	// 	errors.username = 'Username can only contain letters and numbers';
+	// }
 
 	// Address validation
 	if (!values.address) {
@@ -54,8 +55,10 @@ const validateForm = (values) => {
 	}
 
 	// Temporary address validation
-	if (values.t_address && values.t_address.length > 200) {
-		errors.t_address = 'Temporary address must be less than 200 characters';
+	if (values.t_address) {
+		if (values.t_address.length > 200) {
+			errors.t_address = 'Temporary address must be less than 200 characters';
+		}
 	}
 
 	// Mobile validation
@@ -76,28 +79,61 @@ const validateForm = (values) => {
 	}
 
 	// Aadhar number validation
-	if (values.aadhar_no && !/^\d{12}$/.test(values.aadhar_no)) {
-		errors.aadhar_no = 'Aadhar number must be exactly 12 digits';
-	}
-
-	// Other ID validation
-	if (values.other_id && values.other_id.length > 50) {
-		errors.other_id = 'Other ID must be less than 50 characters';
+	if (values.aadhar_no) {
+		if (!/^\d{12}$/.test(values.aadhar_no)) {
+			errors.aadhar_no = 'Aadhar number must be exactly 12 digits';
+		}
 	}
 
 	// PAN number validation
-	if (values.pan_no && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(values.pan_no)) {
-		errors.pan_no = 'Invalid PAN format (e.g., ABCDE1234F)';
+	if (values.pan_no) {
+		if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(values.pan_no.toUpperCase())) {
+			errors.pan_no = 'Invalid PAN format (e.g., ABCDE1234F)';
+		}
 	}
 
 	// Date of birth validation
-	if (values.dob && new Date(values.dob) > new Date()) {
-		errors.dob = 'Date of birth cannot be in the future';
+	if (values.dob) {
+		const today = new Date();
+		const birthDate = new Date(values.dob);
+		const age = today.getFullYear() - birthDate.getFullYear();
+		
+		if (birthDate > today) {
+			errors.dob = 'Date of birth cannot be in the future';
+		} else if (age < 18) {
+			errors.dob = 'Customer must be at least 18 years old';
+		} else if (age > 120) {
+			errors.dob = 'Please enter a valid date of birth';
+		}
+	}
+
+	// Date of anniversary validation
+	if (values.doa) {
+		const today = new Date();
+		const anniversaryDate = new Date(values.doa);
+		
+		if (anniversaryDate > today) {
+			errors.doa = 'Anniversary date cannot be in the future';
+		}
+	}
+
+	// Bill date validation
+	if (values.bill_date) {
+		const billDate = new Date(values.bill_date);
+		const day = billDate.getDate();
+		
+		if (day < 1 || day > 31) {
+			errors.bill_date = 'Please select a valid bill date';
+		}
 	}
 
 	// Email validation
-	if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-		errors.email = 'Invalid email format';
+	if (values.email) {
+		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+			errors.email = 'Invalid email format';
+		} else if (values.email.length > 100) {
+			errors.email = 'Email must be less than 100 characters';
+		}
 	}
 
 	return errors;
@@ -303,6 +339,29 @@ const AddNewCustomerForm = ({prop, data}) => {
             }
     };
 
+		const handleNumericKeyPress = (e) => {
+        const charCode = e.which || e.keyCode;
+        const charStr = String.fromCharCode(charCode);
+        // Allow only numeric characters
+        if (!/^[0-9]+$/.test(charStr)) {
+            e.preventDefault();
+        }
+    };
+
+	const handlePanKeyPress = (e) => {
+        const charCode = e.which || e.keyCode;
+        const charStr = String.fromCharCode(charCode);
+        // Allow alphanumeric characters for PAN
+        if (!/^[a-zA-Z0-9]+$/.test(charStr)) {
+            e.preventDefault();
+        }
+    };
+
+	const handlePanChange = (e, setFieldValue) => {
+        const value = e.target.value.toUpperCase();
+        setFieldValue('pan_no', value);
+    };
+
 	return (
 		<Fragment>
 			<Formik
@@ -310,7 +369,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 				validate={validateForm}
 				onSubmit={createCustomer}
 			>
-				{({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
+				{({ values, errors, touched, handleChange, handleBlur, isSubmitting, setFieldValue }) => (
 					<Form>
 						<Row>
 							<Col md={6}>
@@ -320,6 +379,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 										as={Input}
 										name="name"
 										placeholder="Name"
+										maxLength="50"
 										onKeyPress={handleKeyPress}
 									/>
 									<ErrorMessage name="name" component="span" className="validationError" />
@@ -332,6 +392,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 										as={Input}
 										name="username"
 										placeholder="Username"
+										maxLength="50"
 									/>
 									<ErrorMessage name="username" component="span" className="validationError" />
 								</FormGroup>
@@ -371,9 +432,11 @@ const AddNewCustomerForm = ({prop, data}) => {
 									<Label for="mobile">Mobile No. <span style={{color: "red"}}>*</span></Label>
 									<Field
 										as={Input}
-										type="text"
+										type="tel"
 										name="mobile"
 										placeholder="Enter Mobile No."
+										maxLength="10"
+										onKeyPress={handleNumericKeyPress}
 									/>
 									<ErrorMessage name="mobile" component="span" className="validationError" />
 								</FormGroup>
@@ -383,9 +446,11 @@ const AddNewCustomerForm = ({prop, data}) => {
 									<Label for="whatsapp_no">WhatsApp No.</Label>
 									<Field
 										as={Input}
-										type="text"
+										type="tel"
 										name="whatsapp_no"
 										placeholder="Enter WhatsApp No."
+										maxLength="10"
+										onKeyPress={handleNumericKeyPress}
 									/>
 									<ErrorMessage name="whatsapp_no" component="span" className="validationError" />
 								</FormGroup>
@@ -395,9 +460,11 @@ const AddNewCustomerForm = ({prop, data}) => {
 									<Label for="alternate_no">Alternate No.</Label>
 									<Field
 										as={Input}
-										type="text"
+										type="tel"
 										name="alternate_no"
 										placeholder="Enter Alternate No."
+										maxLength="10"
+										onKeyPress={handleNumericKeyPress}
 									/>
 									<ErrorMessage name="alternate_no" component="span" className="validationError" />
 								</FormGroup>
@@ -410,6 +477,8 @@ const AddNewCustomerForm = ({prop, data}) => {
 										type="text"
 										name="aadhar_no"
 										placeholder="Enter Aadhar No."
+										maxLength="12"
+										onKeyPress={handleNumericKeyPress}
 									/>
 									<ErrorMessage name="aadhar_no" component="span" className="validationError" />
 								</FormGroup>
@@ -433,7 +502,11 @@ const AddNewCustomerForm = ({prop, data}) => {
 										as={Input}
 										type="text"
 										name="pan_no"
-										placeholder="Enter PAN No."
+										placeholder="Enter PAN No. (e.g., ABCDE1234F)"
+										maxLength="10"
+										onKeyPress={handlePanKeyPress}
+										onChange={(e) => handlePanChange(e, setFieldValue)}
+										style={{ textTransform: 'uppercase' }}
 									/>
 									<ErrorMessage name="pan_no" component="span" className="validationError" />
 								</FormGroup>

@@ -163,17 +163,17 @@ const ManageEmployee = () => {
 
 
     const column = [
-        { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: true },
-        { field: "emp_id", headerName: "Emp Id", minWidth: 120, editable: true },
-        { field: "name", headerName: "Name", minWidth: 120, editable: true },
-        { field: "design_name", headerName: "Designation", minWidth: 120, editable: true },
-        { field: "dept_name", headerName: "Department", minWidth: 120, editable: true },
-        { field: "mobile_no", headerName: "Mobile No.", minWidth: 120, editable: true },
-        { field: "alterno", headerName: "Alternate No.", minWidth: 120, editable: true },
-        { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 150, editable: true },
-        { field: "pan_no", headerName: "Pan No", minWidth: 120, editable: true },
-        { field: "address", headerName: "Address", minWidth: 250, editable: true },
-        { field: "date", headerName: "Date Of Join", minWidth: 120, editable: true },
+        { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: false },
+        { field: "emp_id", headerName: "Emp Id", minWidth: 120, editable: false },
+        { field: "name", headerName: "Name", minWidth: 120, editable: false },
+        { field: "design_name", headerName: "Designation", minWidth: 120, editable: false },
+        { field: "dept_name", headerName: "Department", minWidth: 120, editable: false },
+        { field: "mobile_no", headerName: "Mobile No.", minWidth: 120, editable: false },
+        { field: "alterno", headerName: "Alternate No.", minWidth: 120, editable: false },
+        { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 150, editable: false },
+        { field: "pan_no", headerName: "Pan No", minWidth: 120, editable: false },
+        { field: "address", headerName: "Address", minWidth: 250, editable: false },
+        { field: "date", headerName: "Date Of Join", minWidth: 120, editable: false },
         {
             field: "status",
             minWidth: 150,

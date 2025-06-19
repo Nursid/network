@@ -19,6 +19,7 @@ import MonthService from './AdminDashboards/Components/MonthlyService';
 import Network from './AdminDashboards/Components/Network';
 import Tickets from './AdminDashboards/Components/Tickets';
 import NetworkFlow from './AdminDashboards/Components/Network/components/NetworkFlow';
+import AdminInventory from './AdminDashboards/Components/Inventory';
 
 function App() {
 
@@ -30,10 +31,10 @@ function App() {
           <Route path='/admin/*'  element={<AdminSignIn />}>
             <Route path='dashboard' element={<AdminPannel />} />
             <Route path='attendance' element={<AdminAttendance />} />
-            <Route path='account' element={<AdminExpenses />} />
-            <Route path='manage-hr' element={<AdminManageHr />} />
+            <Route path='account-transactions' element={<AdminExpenses />} />
+            <Route path='team-management' element={<AdminManageHr />} />
             <Route path='manage-hr/employee-form' element={<AdminAddEmployeeForm />} />
-            <Route path='manage-master' element={<AdminManageMaster />} />
+            <Route path='settings' element={<AdminManageMaster />} />
             <Route path='manage-website' element={<AdminManageWebsite />} />
             <Route path='customer' element={<AdminCustomerManage />} />
             <Route path='roles-&-permission' element={<AdminRolesAndPermission />} />
@@ -43,8 +44,9 @@ function App() {
             <Route path='reports' element={<Reports />} />
             <Route path='network' element={<Network />} />
             <Route path='monthly-service' element={<MonthService />} />
-            <Route path='tickets' element={<Tickets />} />
+            <Route path='task-management' element={<Tickets />} />
             <Route path='flow' element={<NetworkFlow />} />
+            <Route path='inventory-mananagement' element={<AdminInventory />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -189,10 +189,10 @@ const Availability = () => {
               </Button>
             ),
             minWidth: 100,
-            editable: true,
+            editable: false,
         },
 
-        { field: "name",  headerName: "Name", minWidth: 150, editable: true},
+        { field: "name",  headerName: "Name", minWidth: 150, editable: false},
         {
           field: "image",
           headerName: "Image",
@@ -206,8 +206,8 @@ const Availability = () => {
             );
           }
         },
-        { field: "provider_type",  headerName: "Provider Type", minWidth: 150, editable: true},
-        { field: "date",  headerName: "Date", minWidth: 150, editable: true
+        { field: "provider_type",  headerName: "Provider Type", minWidth: 150, editable: false},
+        { field: "date",  headerName: "Date", minWidth: 150, editable: false
          },
         { field: "09:30-10:00", headerName: "09:30-10:00 AM ", minWidth: 150, cellClassName: getCellClassName},
         { field: "10:00-10:30", headerName: "10:00-10:30 AM ", minWidth: 150, cellClassName: getCellClassName},

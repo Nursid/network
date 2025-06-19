@@ -151,26 +151,26 @@ const ManageEnquiry = () => {
 
 
     const column = [
-        { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: true },
-        { field: "date", headerName: "Date",flex: 1, minWidth: 120, editable: true },
-        { field: "service", headerName: "Serivce Name",flex: 1, minWidth: 120, editable: true },
-        { field: "name", headerName: "Name",flex: 1, minWidth: 120, editable: true },
-        { field: "mobileNo", headerName: "Mobile No.",flex: 1, minWidth: 120, editable: true },
-        { field: "email", headerName: "Email",flex: 1, minWidth: 350, editable: true },
-        { field: "refName", headerName: "Refrence",flex: 1, minWidth: 250, editable: true },
+        { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: false },
+        { field: "date", headerName: "Date",flex: 1, minWidth: 120, editable: false },
+        { field: "service", headerName: "Serivce Name",flex: 1, minWidth: 120, editable: false },
+        { field: "name", headerName: "Name",flex: 1, minWidth: 120, editable: false },
+        { field: "mobileNo", headerName: "Mobile No.",flex: 1, minWidth: 120, editable: false },
+        { field: "email", headerName: "Email",flex: 1, minWidth: 350, editable: false },
+        { field: "refName", headerName: "Refrence",flex: 1, minWidth: 250, editable: false },
         // {
         //     field: "referby", headerName: "Refer By", renderCell: (parmas) => (
         //         <div className='p-1 px-2 bg-blue text-white rounded-2 cursor-p'>Direct Enquiry</div>
-        //     ), minWidth: 150, editable: true
+        //     ), minWidth: 150, editable: false
         // },
         // {
         //     field: "status", headerName: "Status", renderCell: (parmas) => (
         //         <div className='p-1 px-2 bg-red text-white rounded-2 cursor-p'>On-Hold</div>
-        //     ), minWidth: 140, editable: true
+        //     ), minWidth: 140, editable: false
         // },
-        // { field: "aadhaarNumber", headerName: "Aadhaar No.", minWidth: 120, editable: true },
-        // { field: "email", headerName: "Email", minWidth: 120, editable: true },
-        // { field: "address", headerName: "Address", minWidth: 250, editable: true },
+        // { field: "aadhaarNumber", headerName: "Aadhaar No.", minWidth: 120, editable: false },
+        // { field: "email", headerName: "Email", minWidth: 120, editable: false },
+        // { field: "address", headerName: "Address", minWidth: 250, editable: false },
 
         {
             field: "action",
@@ -236,7 +236,7 @@ const ManageEnquiry = () => {
         //             <option value="Canel">Cancel</option>
         //             <option value="Continue">Continue</option>
         //         </select>
-        //     ), minWidth: 180, editable: true
+        //     ), minWidth: 180, editable: false
         // },
     ];
 

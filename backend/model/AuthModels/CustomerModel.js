@@ -96,7 +96,9 @@ module.exports = (sequelize) => {
           },
           signature: {
             type: DataTypes.STRING,
-            
+          },
+          gender: {
+            type: DataTypes.STRING,
           },
     }, 
    {

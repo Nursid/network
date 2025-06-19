@@ -144,9 +144,9 @@ const ManageService = () => {
 
     const column = [
         { field: "_id", headerName: "Sr No", minWidth: 50 },
-        // { field: "refName", headerName: "Ref Name", minWidth: 120, editable: true },
+        // { field: "refName", headerName: "Ref Name", minWidth: 120, editable: false },
         // { field: "date", headerName: "Date", minWidth: 160 },
-        { field: "serviceName", headerName: "Service Name", minWidth: 200, editable: true },
+        { field: "serviceName", headerName: "Service Name", minWidth: 200, editable: false },
         {
             field: "icon", headerName: "Icon", minWidth: 120, renderCell: (params) => (
                 <div className='w-80 h-80 rounded-circle'>

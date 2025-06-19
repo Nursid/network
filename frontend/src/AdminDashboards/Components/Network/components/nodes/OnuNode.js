@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Handle } from '@xyflow/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetAllCustomers } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
+import { API_URL } from '../../../../../config';
 
 const OnuNode = ({ data }) => {
   const dispatch = useDispatch();
   const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerReducer)
+  const childDeviceSelectRef = useRef(null);
   
   const [fields, setFields] = useState({
     ponOp: data.ponOp || '',
@@ -17,8 +19,13 @@ const OnuNode = ({ data }) => {
     mac: data.mac || '',
     userId: data.userId || '',
     currentGoogleLocation: data.currentGoogleLocation || '',
-    description: data.description || ''
+    description: data.description || '',
+    attachment: data.attachment || ''
   });
+
+  // Separate state for device creation dropdown
+  const [childDeviceType, setChildDeviceType] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     dispatch(GetAllCustomers());
@@ -35,16 +42,69 @@ const OnuNode = ({ data }) => {
       mac: data.mac || '',
       userId: data.userId || '',
       currentGoogleLocation: data.currentGoogleLocation || '',
-      description: data.description || ''
+      description: data.description || '',
+      attachment: data.attachment || ''
     });
   }, [data]);
 
-  const handleFieldChange = (e) => {
+    const handleFieldChange = (e) => {
     const { name, value } = e.target;
+    
+    // Handle file upload
+    if (name === 'attachment' && e.target.files && e.target.files[0]) {
+      handleImageUpload(e.target.files[0]);
+      return;
+    }
+    
+    // Handle child device type separately
+    if (name === 'childDeviceType') {
+      setChildDeviceType(value);
+      
+      // If a value is selected, create a new device node
+      if (value && data.onDeviceSelect) {
+        data.onDeviceSelect(null, data.id, value);
+      }
+      return; // Don't update other fields for device creation
+    }
+    
+    // Handle other fields normally
     setFields((prevFields) => ({ ...prevFields, [name]: value }));
 
     if (data.onUpdate) {
       data.onUpdate({ ...fields, [name]: value });
+    }
+  };
+
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+
+    setUploadingImage(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch(`${API_URL}/api/flow/upload-image`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.status) {
+        const newFields = { ...fields, attachment: result.data.url };
+        setFields(newFields);
+        
+        if (data.onUpdate) {
+          data.onUpdate(newFields);
+        }
+      } else {
+        alert('Failed to upload image: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error uploading image. Please try again.');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -109,6 +169,27 @@ const OnuNode = ({ data }) => {
       <div style={{fontSize: '12px', marginBottom: '10px', color: '#666', fontStyle: 'italic'}}>
         {data.label}
       </div>
+
+      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Create Device:</div>
+      <select
+        ref={childDeviceSelectRef}
+        name="childDeviceType"
+        value={childDeviceType}
+        onChange={handleFieldChange}
+        style={{ 
+          marginBottom: '8px', 
+          width: '100%', 
+          padding: '4px', 
+          fontSize: '11px',
+          border: '1px solid #27ae60',
+          borderRadius: '4px'
+        }}
+      >
+        <option value="">Select Device to Create</option>
+        <option value="router">Router</option>
+        <option value="switch-p">Switch-P</option>
+        <option value="switch-s">Switch-S</option>
+      </select>
 
       <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>PON OP:</div>
       <input
@@ -281,6 +362,46 @@ const OnuNode = ({ data }) => {
           resize: 'vertical'
         }}
       />
+
+      <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Attachment:</div>
+      <input
+        type="file"
+        name="attachment"
+        onChange={handleFieldChange}
+        accept="image/*"
+        disabled={uploadingImage}
+        style={{ 
+          marginBottom: '8px', 
+          width: '100%', 
+          padding: '4px', 
+          fontSize: '11px',
+          border: '1px solid #27ae60',
+          borderRadius: '4px'
+        }}
+      />
+      {uploadingImage && (
+        <div style={{fontSize: '11px', color: '#27ae60', marginBottom: '8px'}}>
+          Uploading image...
+        </div>
+      )}
+      {fields.attachment && !uploadingImage && (
+        <div style={{marginBottom: '8px'}}>
+          <img 
+            src={`${API_URL}${fields.attachment}`} 
+            alt="Attachment" 
+            onClick={() => window.open(`${API_URL}${fields.attachment}`, '_blank')}
+            style={{
+              width: '100%',
+              maxHeight: '100px',
+              objectFit: 'cover',
+              borderRadius: '4px',
+              border: '1px solid #27ae60',
+              cursor: 'pointer'
+            }}
+            title="Click to open in new tab"
+          />
+        </div>
+      )}
 
       <Handle type="target" position="top" />
       <Handle type="source" position="bottom" />
