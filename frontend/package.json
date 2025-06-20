@@ -41,6 +41,7 @@
     "react-spinners": "^0.13.8",
     "react-swipeable-views": "^0.14.0",
     "react-to-print": "^2.15.1",
+    "react-toastify": "^11.0.5",
     "reactstrap": "^9.1.10",
     "recharts": "^2.7.1",
     "redux": "^4.2.1",

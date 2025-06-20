@@ -41,11 +41,16 @@ function AdminSignIn() {
 
   const OnLoginSubmit = async (formdata, { resetForm }) => {
     sessionStorage.setItem("role", selectedRole);
-    UserRoleCalled(selectedRole);
+   
 
     getUserLogIn(formdata, selectedRole, otpid).then(() => {
       resetForm();
     });
+    if(selectedRole === "super"){
+        UserRoleCalled(selectedRole);
+    }else{
+      UserRoleCalled(selectedRole, formdata.number);
+    }
   };
 
   //   sendOtp Function
@@ -266,15 +271,15 @@ function AdminSignIn() {
               Super Admin Login
             </Button>
             <Button
-              // onClick={() => setSelectedRole(roles.admin)}
+              onClick={() => setSelectedRole(roles.admin)}
               variant={selectedRole === roles.admin ? "contained" : "outlined"}
               color="primary"
             >
               Admin/Staff Login
             </Button>
             <Button
-              // onClick={() => setSelectedRole(roles.admin)}
-              variant={selectedRole === roles.admin ? "contained" : "outlined"}
+              onClick={() => setSelectedRole(roles.customer)}
+              variant={selectedRole === roles.customer ? "contained" : "outlined"}
               color="primary"
             >
               Customer Login

@@ -23,7 +23,6 @@ const AdminNavItems = () => {
 
   const NavItems = [
     { field: "Dashboard", title: "Dashboard", icon: <CiViewList size={30} /> },
-    // { field: "MonthlyService", title: "Monthly Service", icon: <TbCalendarCheck size={30} /> },
     { field: "Expenses", title: "Account Transactions", icon: <GiPayMoney size={30} /> },
     { field: "Attendence", title: "Attendance", icon: <TbReport size={30} /> },
     { field: "ManageHR", title: "Team Management", icon: <MdPeopleOutline size={30} /> },
@@ -33,7 +32,7 @@ const AdminNavItems = () => {
     { field: "RolesAndPermission", title: "Roles & Permission", icon: <MdOutlinePeople size={30} /> },
     { field: "Tickets", title: "Task Management", icon: <MdAirplaneTicket size={30} /> },
     { field: "Network", title: "Network", icon: <IoIosGitNetwork size={30} /> },
-    { field: "Inventory", title: "Inventory Mananagement", icon: <MdInventory size={30} /> },
+    { field: "Inventory", title: "Inventory Management", icon: <MdInventory size={30} /> },
     { field: "ManageService", title: "Settings", icon: <CiGrid41 size={30} /> }
   ];
 

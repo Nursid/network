@@ -11,8 +11,4 @@ router.get("/get/:role", rolesController.GetRoles);
 router.get("/update/:role/:field/:value", rolesController.UpdateRoles)
 
 
-
-
-
-
 module.exports = router

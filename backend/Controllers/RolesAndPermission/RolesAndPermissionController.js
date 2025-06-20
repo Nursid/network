@@ -10,6 +10,7 @@ const BackofficeRoleModel=db.BackofficeRoleModel
 const ServiceProviderRolesModel = db.ServiceProviderRolesModel
 const SuperAdminRolesModel = db.SuperAdminRolesModel
 const SuperVisorRolesModel = db.SuperVisorRolesModel
+const EmployeeModel = db.EmployeeModel
 
 
 const { roles } = require("../../config");
@@ -38,16 +39,26 @@ const AddAdminRoles = async (req, res) => {
 // get the roles  
 const GetRoles = async (req, res) => {
     const reqRole = req.params.role;
+    const mobile = req.query.mobile;
 
     try {
         let result;
+        let emp_id;
+
+        if(mobile){
+            const employee = await EmployeeModel.findOne({ where: { mobile_no: mobile } });
+            if(employee){
+                emp_id = employee.id;
+            }
+        }
+
 
         switch (reqRole) {
             case "super":
                 result = await SuperAdminRolesModel.findOne({ where: { role: reqRole } });
                 break;
             case "admin":
-                result = await AdminRolesModel.findOne();
+                result = await AdminRolesModel.findOne({ where: { emp_id: emp_id } });
                 break;
             case "office":
                 result = await BackofficeRoleModel.findOne();
@@ -67,7 +78,7 @@ const GetRoles = async (req, res) => {
         
         res.status(200).json({ error: false, data: result });
     } catch (error) {
-        res.status(500).json(error);
+        res.status(402).json({error: true, message: "Internal Server Error"});
     }
 }
 

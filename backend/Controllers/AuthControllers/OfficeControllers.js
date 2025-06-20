@@ -100,51 +100,79 @@ const LoginEmployee = async (req, res) => {
 	const {number, otp, otpid} = req.query;
 	const {logger} = req.params;
 	try {
+		// Validate input parameters
+		if (!number || !otp || !otpid) {
+			return res.status(400).json({error: true, message: "Missing required parameters: number, otp, or otpid"});
+		}
+
+		if (!logger) {
+			return res.status(400).json({error: true, message: "Logger parameter is required"});
+		}
+
 		const isVerified = await isOptValid(otp, otpid);
-		if (! isVerified) {
-
-
+		if (!isVerified) {
 			return res.status(400).json({error: true, message: "Otp Expired or Invalid"});
 		}
-		// find the uer
+		
+		// Find the user with proper error handling
 		const isUser = await EmployeeModel.findOne({
 			include: [
 				{
-					model: DesignationModel
+					model: DesignationModel,
+					required: true // Ensure designation exists
 				},
+				{
+					model: DepartmentModel,
+					required: false
+				}
 			],
 			where: {
-				mobile_no: number
+				mobile_no: number,
+				is_block: false // Only allow non-blocked users
 			}
 		});
 
-
-		// const LoginEmp=await
-
-		if (! isUser) {
-			return res.status(204).json({error: true, message: "No user found"});
+		if (!isUser) {
+			return res.status(404).json({error: true, message: "No user found with this mobile number"});
 		}
 
-		// res.status(200).json(isUser.designation.name);
+		// Check if designation exists
+		if (!isUser.designation) {
+			return res.status(400).json({error: true, message: "User designation not found"});
+		}
+
+		// Validate user role
 		if (isUser.designation.name !== roles[logger]) {
-
-			return res.status(204).json({error: true, message: "Please Login In As per your Post "});
+			return res.status(403).json({error: true, message: `Please login as ${roles[logger]}. Your role is ${isUser.designation.name}`});
 		}
 
+		// Prepare user data without sensitive information
+		const userData = {
+			id: isUser.id,
+			emp_id: isUser.emp_id,
+			name: isUser.name,
+			mobile_no: isUser.mobile_no,
+			email: isUser.email,
+			image: isUser.image,
+			designation: isUser.designation,
+			department: isUser.department,
+			address: isUser.address,
+			doj: isUser.doj,
+			salary: isUser.salary,
+			week_off: isUser.week_off,
+			duty_hours: isUser.duty_hours,
+			gender: isUser.gender,
+			about: isUser.about
+		};
 
-		// compare the password
-
-		// Convert the Mongoose document to a plain JavaScript object
-		// const userWithoutPassword = isUser.toObject();
-		// delete userWithoutPassword.password;
-		// Remove the password from the object
-
-		// generate the jwt token
-		// const token = jwt.sign(process.env.SECRET_CODE);
-		// res.header("access-token", token);
-		res.status(200).json(isUser);
+		res.status(200).json(userData);
 	} catch (error) {
-		res.status(500).json({error});
+		console.error('LoginEmployee Error:', error);
+		res.status(500).json({
+			error: true,
+			message: "Internal server error",
+			details: error.message
+		});
 	}
 };
 

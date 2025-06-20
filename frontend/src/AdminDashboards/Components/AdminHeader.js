@@ -61,9 +61,9 @@ const AdminHeader = () => {
                                     src={ currentUser?.image ? IMG_URL+currentUser?.image : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'}
                                     alt="" />
                                     <div className=''>
-                                        <h6 className='d-none d-md-block'>{currentUser && currentUser.name ? currentUser.name : "yourName "}</h6>
+                                        <h6 className='d-none d-md-block'>{currentUser && currentUser?.name ? currentUser?.name : "yourName "}</h6>
                                         <small>
-                                            {currentUser && currentUser.role ? currentUser.role : currentUser && currentUser.designation.name ? currentUser.designation.name : ""}
+                                            {currentUser && currentUser.role ? currentUser?.role : currentUser && currentUser.designation?.name ? currentUser.designation?.name : ""}
                                         </small>
                                     </div>
                                     <FaChevronDown />

@@ -2,6 +2,10 @@ const { Sequelize, DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const AdminRolesModel = sequelize.define('admin_roles', {
+    emp_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     role: {
       type: DataTypes.STRING,
       allowNull: true,

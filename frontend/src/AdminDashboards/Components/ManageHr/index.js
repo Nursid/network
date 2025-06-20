@@ -51,11 +51,11 @@ const AdminManageHr = () => {
         <AnimatedBackground />
         <div className="BackgroundTopContents">
                   <div className="AttendenceTabs px-3 pt-2">
-            {userRole && userRole.ManageEmployee ? <span className={` ${attendanceActive === "employee" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("employee") }}>Manage Employee</span> : null}
+            {userRole && userRole.ManageEmployee ? <span className={` ${attendanceActive === "employee" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("employee") }}> Employee Management</span> : null}
 
             {/* {userRole && userRole.ManageMonthService ? <span className={` ${attendanceActive === "monthly-services" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("monthly-services") }}>Manage Monthly Service </span> : null} */}
 
-            {userRole && userRole.ManageServiceProvider ? <span className={` ${attendanceActive === "service-provider" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("service-provider") }}>Manage Service Provider</span> : null}
+            {userRole && userRole.ManageServiceProvider ? <span className={` ${attendanceActive === "service-provider" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("service-provider") }}> Local Service Provider</span> : null}
           </div>
 
 

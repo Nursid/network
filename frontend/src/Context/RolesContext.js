@@ -16,6 +16,9 @@ const RolesContext = createContext()
 const RolesProvider = ({ children }) => {
 
     const [activeUser, setActiveUser] = useState(null)
+    const [userMobile, setUserMobile] = useState(
+        sessionStorage.getItem("userMobile")
+    )
     const [userRole, setUserRole] = useState(
         JSON.parse(sessionStorage.getItem("roles"))
     )
@@ -27,9 +30,13 @@ const RolesProvider = ({ children }) => {
 
 
     // Role retrieval function
-    const getRolesByType = async (roleType) => {
+    const getRolesByType = async (roleType, mobileNo = null) => {
         try {
-            const response = await axios.get(`${API_URL}/roles/get/${roleType}`);
+            let url = `${API_URL}/roles/get/${roleType}`;
+            if (mobileNo && roleType !== 'super') {
+                url += `?mobile=${mobileNo}`;
+            }
+            const response = await axios.get(url);
             if (response.status === 200) {
                 return response.data.data;
             }
@@ -38,13 +45,18 @@ const RolesProvider = ({ children }) => {
         }
     };
 
-    const UserRoleCalled = async (Role) => {
+    const UserRoleCalled = async (Role, mobileNo = null) => {
         const role = Role ? Role : sessionStorage.getItem("role");
         if (role) {
-            const rolesData = await getRolesByType(role);
+            const rolesData = await getRolesByType(role, mobileNo);
             if (rolesData) {
                 sessionStorage.setItem("roles", JSON.stringify(rolesData));
                 setUserRole(rolesData);
+                // Store mobile number if provided for non-super roles
+                if (mobileNo && role !== 'super') {
+                    sessionStorage.setItem("userMobile", mobileNo);
+                    setUserMobile(mobileNo);
+                }
                 // console.log(rolesData);
             }
         }
@@ -92,13 +104,24 @@ const RolesProvider = ({ children }) => {
         }
     };
 
+    // Function to get current user's mobile number
+    const getUserMobile = () => {
+        return sessionStorage.getItem("userMobile");
+    };
 
+    // Function to clear user mobile when logging out
+    const clearUserMobile = () => {
+        sessionStorage.removeItem("userMobile");
+        setUserMobile(null);
+    };
 
     return <RolesContext.Provider value={{
         UserRoleCalled,
         userRole,
         activeUser,
+        userMobile,
         setUserRole,
+        setUserMobile,
         supervisorRoles,
         backOfficeRoles,
         serviceProviderRoles,
@@ -108,6 +131,8 @@ const RolesProvider = ({ children }) => {
         getSupervisorRole,
         GetBackofficeRoles,
         GetServiceProvider,
+        getUserMobile,
+        clearUserMobile,
     }}>
         {children}
     </RolesContext.Provider>
