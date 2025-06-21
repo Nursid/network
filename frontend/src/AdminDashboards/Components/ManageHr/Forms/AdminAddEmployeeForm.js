@@ -64,21 +64,13 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
 			errors.mobile_no = "Mobile number should be 10 digits";
 		}
 
-    //     if (!department) {
-    //         errors.department = "Department is required";
-    //     }
-        
+		if (!formData.gender) {
+			errors.gender = "Gender is required";
+		}
 
-    //    if (parseInt(department?.value) === 1) {
-    //         if (!slectedDesignation) {
-    //             errors.designation = "Designation is required";
-    //         }
-    //     } 
-    //     if(parseInt(department?.value) === 2 || parseInt(department?.value) === 3 ) {
-    //         if (!selectedOptions || !Array.isArray(selectedOptions) || selectedOptions.length === 0) {
-    //             errors.designation = "Service is required";
-    //         }
-    //     }
+		if (!formData.createdAt) {
+			errors.createdAt = "Join date is required";
+		}
 
 
 		if (errors && Object.keys(errors).length === 0) {
@@ -100,6 +92,8 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
             pan_image: pan_image,
             adhar_image: adhar_image, 
             image: image, 
+            department_id: 1,
+            designation_id: 9
             // multiServices: JSON.stringify(serviceValues)
           };
 
@@ -254,6 +248,18 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
 	};
       
     const formattedDate = formData.createdAt ? new Date(formData.createdAt).toISOString().slice(0, 10) : "";
+    
+    // Function to format date as dd-mmm-yyyy
+    const formatDateDisplay = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
 
     return (
         <Fragment>
@@ -377,15 +383,21 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
                                         </Col>
                                         <Col md={6}>
                                             <FormGroup>
-                                                <Label for="emai">Gender</Label>
-                                                <Input
-                                                    type="text"
-                                                    name="gender"
-                                                    onChange={(e) => handleChange(e, 50)}
-                                                    value={formData.gender}
-                                                    id="gender"
-                                                    placeholder='Enter gender'
+                                                <Label for="gender">Gender <span style={{color: "red"}}>*</span></Label>
+                                                <SelectBox 
+                                                    options={[
+                                                        { label: 'Male', value: 'Male' },
+                                                        { label: 'Female', value: 'Female' },
+                                                        { label: 'Other', value: 'Other' }
+                                                    ]} 
+                                                    setSelcted={(selected) => setFormData(prev => ({ ...prev, gender: selected?.value || '' }))} 
+                                                    initialValue={formData.gender ? { label: formData.gender, value: formData.gender } : ''}
                                                 />
+                                                {errors?.gender && (
+                                                    <span className='validationError'>
+                                                        {errors?.gender}
+                                                    </span>
+                                                )}
                                             </FormGroup>
                                         </Col>
                                         <Col md={6}>
@@ -415,13 +427,24 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
                                         </Col>
                                         <Col md={6}>
                                             <FormGroup>
-                                                <Label for="pannumber">Join Date</Label>
+                                                <Label for="createdAt">Join Date <span style={{color: "red"}}>*</span></Label>
                                                 <Input
                                                     type="date"
                                                     name="createdAt"
                                                     onChange={(e) => handleChange(e, 50)}
                                                     value={formattedDate}
+                                                    max={new Date().toISOString().split('T')[0]}
                                                 />
+                                                {formData.createdAt && (
+                                                    <small className="text-muted">
+                                                        Formatted: {formatDateDisplay(formData.createdAt)}
+                                                    </small>
+                                                )}
+                                                {errors?.createdAt && (
+                                                    <span className='validationError'>
+                                                        {errors?.createdAt}
+                                                    </span>
+                                                )}
                                             </FormGroup>
                                         </Col>
                                         <Col md={6}>
@@ -444,6 +467,7 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
                                                     type="file"
                                                     name="adhar_image"
                                                     onChange={(e) => handleFileChange(e, 'adhar_image')}
+                                                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
                                                 />
                                             </FormGroup>
                                         </Col>
@@ -454,6 +478,7 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
                                                     type="file"
                                                     name="image"
                                                     onChange={(e) => handleFileChange(e, 'image')}
+                                                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
                                                 />
                                             </FormGroup>
                                         </Col>
@@ -465,6 +490,7 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
                                                     type="file"
                                                     name="pan_image"
                                                     onChange={(e) => handleFileChange(e, 'pan_image')}
+                                                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
                                                 />
                                             </FormGroup>
                                         </Col>
@@ -577,37 +603,7 @@ const AdminAddEmployeeForm = ({ toggleModal,data }) => {
                                                 />
                                             </FormGroup>
                                         </Col>
-
                                     </Row>
-                                    <Row>
-
-                                        <h2 className='text-center'>Verification</h2>
-                                        <Col md={6}>
-                                            <FormGroup>
-                                                <Label for="about">Name</Label>
-                                                <Input
-                                                    type="text"
-                                                    name="v_name"
-                                                    onChange={(e) => handleChange(e, 50)}
-                                                    placeholder=' Name'
-                                                    value={formData.v_name}
-                                                />
-                                            </FormGroup>
-                                        </Col>
-                                        <Col md={6}>
-                                            <FormGroup>
-                                                <Label for="about">Date</Label>
-                                                <Input
-                                                    type="date"
-                                                    name="v_date"
-                                                    onChange={(e) => handleChange(e, 10)}
-                                                    placeholder='Week Off'
-                                                    value={formData?.v_date}
-                                                />
-                                            </FormGroup>
-                                        </Col>
-                                    </Row>
-
 
                                     <Button
                                         color="primary"

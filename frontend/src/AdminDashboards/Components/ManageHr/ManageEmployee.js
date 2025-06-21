@@ -17,6 +17,7 @@ import { Button } from '@mui/material'
 import Swal from 'sweetalert2'
 import { API_URL } from '../../../config'
 import axios from 'axios'
+import EmployeeRolesAndPermission from './Forms/EmployeeRolesAndPermission'
 
 const ManageEmployee = () => {
 
@@ -27,6 +28,7 @@ const ManageEmployee = () => {
 
     const [blockStatus, setBlockStatus] = useState({});
     const [viewModal, setViewModel] = useState(false)
+    const [employeeRolesId, setEmployeeRolesId] = useState(null)
     // Set initial block status when data changes
     useEffect(() => {
         if (data && data.length > 0) {
@@ -95,9 +97,9 @@ const ManageEmployee = () => {
         const NewData = []
         if (data !== undefined) {
             for (let item of data) {
-                NewData.push({ ...item,design_name:item.designation?.name, dept_name:item.department?.name , _id: data.indexOf(item), date: moment(item.createdAt).format("DD-MM-YYYY") })
+                NewData.push({ ...item,design_name:item.designation?.name, dept_name:item.department?.name , _id: data.indexOf(item)+1, date: moment(item.createdAt).format("DD-MM-YYYY") })
             }
-        } else {
+        } else {    
             NewData.push({ id: 0 })
         }
         return NewData
@@ -139,7 +141,7 @@ const ManageEmployee = () => {
 
     const [showModal, setShowModal] = useState(false);
     const [editMode, setEditMode] = useState(false);
-   
+    
 
 
     const [editData,setEditData]=useState([])
@@ -166,22 +168,22 @@ const ManageEmployee = () => {
         { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: false },
         { field: "emp_id", headerName: "Emp Id", minWidth: 120, editable: false },
         { field: "name", headerName: "Name", minWidth: 120, editable: false },
-        { field: "design_name", headerName: "Designation", minWidth: 120, editable: false },
-        { field: "dept_name", headerName: "Department", minWidth: 120, editable: false },
+        // { field: "design_name", headerName: "Designation", minWidth: 120, editable: false },
+        // { field: "dept_name", headerName: "Department", minWidth: 120, editable: false },
         { field: "mobile_no", headerName: "Mobile No.", minWidth: 120, editable: false },
         { field: "alterno", headerName: "Alternate No.", minWidth: 120, editable: false },
         { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 150, editable: false },
         { field: "pan_no", headerName: "Pan No", minWidth: 120, editable: false },
         { field: "address", headerName: "Address", minWidth: 250, editable: false },
         { field: "date", headerName: "Date Of Join", minWidth: 120, editable: false },
-        {
-            field: "status",
-            minWidth: 150,
-            headerName: "Status",
-            renderCell: (params) => (
-                <Button className="text-white bg-green">Approved</Button>
-            ),
-        },
+        // {
+        //     field: "status",
+        //     minWidth: 150,
+        //     headerName: "Status",
+        //     renderCell: (params) => (
+        //         <Button className="text-white bg-green">Approved</Button>
+        //     ),
+        // },
         {
             field: "action",
             headerName: "Action",
@@ -200,24 +202,32 @@ const ManageEmployee = () => {
                 </div>
             ),
         },
-        {
-            field: "block",
-            headerName: "Block",
-            minWidth: 150,
-            renderCell: (params) => (
-                <div className="d-flex gap-2">
-                    {blockStatus[params.row.id] ?
-                       <Button variant="contained" color="error" onClick={() => handleToggleBlock(params.row.id)}
-                       style={{minWidth: "40px", maxWidth: "40px"}}
-                       ><BlockIcon /
-                       
-                       ></Button>
-                        :
-                        <Button className="text-white bg-warning border-warning" onClick={() => handleToggleBlock(params.row.id)}> Un-Block </Button>
-                    }
-                </div>
-            ),
-        },
+            {
+                field: "block",
+                headerName: "Block",
+                minWidth: 150,
+                renderCell: (params) => (
+                    <div className="d-flex gap-2">
+                        {blockStatus[params.row.id] ?
+                        <Button variant="contained" color="error" onClick={() => handleToggleBlock(params.row.id)}
+                        style={{minWidth: "40px", maxWidth: "40px"}}
+                        ><BlockIcon /
+                        
+                        ></Button>
+                            :
+                            <Button className="text-white bg-warning border-warning" onClick={() => handleToggleBlock(params.row.id)}> Un-Block </Button>
+                        }
+                    </div>
+                ),
+            },
+            {
+                field: "roles",
+                headerName: "Roles",
+                minWidth: 150,
+                renderCell: (params) => (
+                    <Button variant="contained" color="primary" onClick={() => toggleEmployeeRoles(params.row.id)}>Roles</Button>
+                ),
+            },
     ];
 
     const CustomToolbar = () => {
@@ -235,6 +245,13 @@ const ManageEmployee = () => {
     // Add Employee form Handler 
     const [addEmployee, setAddEmployee] = useState(false)
     const ToggleAddEmployee = () => setAddEmployee(!addEmployee)
+
+    const [employeeRoles, setEmployeeRoles] = useState(false)
+    const toggleEmployeeRoles = (id) => {
+        setEmployeeRoles(!employeeRoles)
+        setEmployeeRolesId(id)
+    }
+
     return (
         <Fragment>
             {/* employee add form Modal  */}
@@ -247,6 +264,15 @@ const ManageEmployee = () => {
                 toggle={toggleModal}
                 size={"xl"} scrollable={true}
             />
+
+        <ModalComponent
+          modalTitle={"Employee Roles & Permission"}
+          modal={employeeRoles}
+          toggle={toggleEmployeeRoles}
+          data={<EmployeeRolesAndPermission employeeRolesId={employeeRolesId} 
+          size={"xl"} scrollable={true}
+          />}
+        />
 
             <div className='flex'>
 

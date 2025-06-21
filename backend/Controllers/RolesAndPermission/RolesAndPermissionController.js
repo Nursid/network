@@ -81,6 +81,47 @@ const GetRoles = async (req, res) => {
         res.status(402).json({error: true, message: "Internal Server Error"});
     }
 }
+const GetAllAdminRoles = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const result = await AdminRolesModel.findOne({ where: { emp_id: id } });
+
+        if (!result) return res.status(404).json({ error: true, message: "Not Found data" });
+        
+        res.status(200).json({ error: false, data: result });
+    } catch (error) {
+        console.log(error);
+        res.status(402).json({error: true, message: "Internal Server Error"});
+    }
+}
+
+const UpdateAdminRoles = async (req, res) => {
+    try {
+        const empId = req.params.empId;
+        const field = req.params.field;
+        const value = req.params.value === 'true'; // Convert string to boolean
+
+        // Find the admin role by employee ID
+        const adminRole = await AdminRolesModel.findOne({ where: { emp_id: empId } });
+
+        if (!adminRole) {
+            return res.status(404).json({ error: true, message: "Admin role not found for this employee" });
+        }
+
+        // Update the specific field
+        adminRole[field] = value;
+        await adminRole.save();
+
+        res.status(200).json({ 
+            error: false, 
+            message: "Role updated successfully",
+            data: adminRole 
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: true, message: "Internal Server Error" });
+    }
+}
 
 
 const UpdateRoles = async (req, res) => {
@@ -116,4 +157,4 @@ const UpdateRoles = async (req, res) => {
 }
 
 
-module.exports = { AddAdminRoles, GetRoles, UpdateRoles }
+module.exports = { AddAdminRoles, GetRoles, UpdateRoles, GetAllAdminRoles, UpdateAdminRoles }
