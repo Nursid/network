@@ -68,6 +68,7 @@ db.ServiceProviderAttendance = require("./AttendanceModels/ServiceProviderAttend
 db.SupervisorAvailability = require("./SupervisorAvailability")(sequelize, DataTypes)
 db.PlanModel = require("./ServiceModal/PlanModel")(sequelize, DataTypes)
 db.TicketHead = require("./ServiceModal/TicketHead")(sequelize, DataTypes)
+db.SalaryModel = require("./SalaryModel/SalaryModel")(sequelize, DataTypes)
 
 
 db.OrderModel.belongsTo(db.NewCustomerModel, {foreignKey: 'cust_id'})
@@ -94,6 +95,10 @@ db.EmployeeModel.belongsTo(db.SupervisorAvailability, { foreignKey: 'emp_id', ta
 db.TicketModel.belongsTo(db.CustomerModel, { foreignKey: 'mobileNo', targetKey: 'mobile' });
 
 db.TicketModel.belongsTo(db.ServiceProviderModel, { foreignKey: 'technician', targetKey: 'id' });
+
+// Salary model associations
+db.SalaryModel.belongsTo(db.EmployeeModel, { foreignKey: 'employee_id', as: 'employee' });
+db.EmployeeModel.hasMany(db.SalaryModel, { foreignKey: 'employee_id', as: 'salaries' });
 
 db.sequelize.sync({ force: false }).then(() => {
   console.log("re-sync done!");

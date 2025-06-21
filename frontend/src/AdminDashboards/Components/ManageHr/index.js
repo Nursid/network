@@ -7,6 +7,7 @@ import ManageEmployee from './ManageEmployee'
 import ManageServiceProvider from './ManageServiceProvider'
 import { useUserRoleContext } from '../../../Context/RolesContext'
 // import ManageMonthService from './ManageMonthService'
+import ManageSalary from './ManageSalary'
 
 const AdminManageHr = () => {
   const [attendanceActive, setActiveAttendance] = useState("employee")
@@ -56,6 +57,8 @@ const AdminManageHr = () => {
             {/* {userRole && userRole.ManageMonthService ? <span className={` ${attendanceActive === "monthly-services" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("monthly-services") }}>Manage Monthly Service </span> : null} */}
 
             {userRole && userRole.ManageServiceProvider ? <span className={` ${attendanceActive === "service-provider" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("service-provider") }}> Local Service Provider</span> : null}
+
+            {<span className={` ${attendanceActive === "salary" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("salary") }}> Salary Management</span>}
           </div>
 
 
@@ -67,9 +70,9 @@ const AdminManageHr = () => {
               <ManageServiceProvider setActiveAttendance={setActiveAttendance} />
             </TabPane>
 
-            {/* <TabPane tabId="monthly-services">
-              <ManageMonthService setActiveAttendance={setActiveAttendance} />
-            </TabPane> */}
+            <TabPane tabId="salary">
+              <ManageSalary setActiveAttendance={setActiveAttendance} />
+            </TabPane>
 
 
           </TabContent>

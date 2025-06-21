@@ -1,0 +1,354 @@
+/* Salary Management Component Styles */
+.salary-management {
+    background-color: #f8f9fc;
+    min-height: 100vh;
+}
+
+/* Header Card Styles */
+.salary-header-card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.salary-header-card .card-title {
+    color: #5a5c69;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.salary-header-card .card-text {
+    color: #858796;
+    font-size: 0.95rem;
+}
+
+/* Statistics Cards */
+.stats-card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    transition: all 0.3s;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 2rem 0 rgba(58, 59, 69, 0.2);
+}
+
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.text-primary {
+    color: #4e73df !important;
+}
+
+.text-success {
+    color: #1cc88a !important;
+}
+
+.text-warning {
+    color: #f6c23e !important;
+}
+
+.text-info {
+    color: #36b9cc !important;
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.text-xs {
+    font-size: 0.7rem;
+}
+
+.font-weight-bold {
+    font-weight: 700 !important;
+}
+
+.text-uppercase {
+    text-transform: uppercase !important;
+}
+
+/* Filter Card */
+.filter-card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.filter-card .card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+    border-radius: 0.35rem 0.35rem 0 0;
+}
+
+.filter-card .form-label {
+    color: #5a5c69;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.filter-card .form-select {
+    border: 1px solid #d1d3e2;
+    border-radius: 0.35rem;
+    font-size: 0.875rem;
+    color: #6e707e;
+    transition: all 0.15s ease-in-out;
+}
+
+.filter-card .form-select:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Data Table Card */
+.data-table-card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.data-table-card .card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+    border-radius: 0.35rem 0.35rem 0 0;
+}
+
+/* Status Badges */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.35rem;
+}
+
+.bg-success {
+    background-color: #1cc88a !important;
+}
+
+.bg-warning {
+    background-color: #f6c23e !important;
+    color: #fff !important;
+}
+
+/* Action Buttons */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.2rem;
+}
+
+.btn-success {
+    background-color: #1cc88a;
+    border-color: #1cc88a;
+}
+
+.btn-success:hover {
+    background-color: #17a673;
+    border-color: #169b6b;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2653d4;
+}
+
+.btn-danger {
+    background-color: #e74a3b;
+    border-color: #e74a3b;
+}
+
+.btn-danger:hover {
+    background-color: #e02d1b;
+    border-color: #d52a1a;
+}
+
+.btn-secondary {
+    background-color: #858796;
+    border-color: #858796;
+}
+
+.btn-secondary:hover {
+    background-color: #717384;
+    border-color: #6b6d7d;
+}
+
+/* Modal Styles */
+.modal-content {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.modal-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+    border-radius: 0.35rem 0.35rem 0 0;
+}
+
+.modal-title {
+    color: #5a5c69;
+    font-weight: 700;
+}
+
+.modal-body .form-label {
+    color: #5a5c69;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.modal-body .form-control,
+.modal-body .form-select {
+    border: 1px solid #d1d3e2;
+    border-radius: 0.35rem;
+    font-size: 0.875rem;
+    color: #6e707e;
+}
+
+.modal-body .form-control:focus,
+.modal-body .form-select:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.modal-footer {
+    background-color: #f8f9fc;
+    border-top: 1px solid #e3e6f0;
+    border-radius: 0 0 0.35rem 0.35rem;
+}
+
+/* Icons */
+.fas {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+    
+    .filter-card .row > div {
+        margin-bottom: 1rem;
+    }
+    
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .salary-header-card .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .salary-header-card .btn {
+        margin-top: 1rem;
+        width: 100%;
+    }
+    
+    .stats-card .row {
+        text-align: center;
+    }
+}
+
+/* Animation for loading states */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Custom scrollbar for modal */
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Enhanced focus states */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Hover effects for cards */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+}
+
+/* Data Grid customization */
+.MuiDataGrid-root {
+    border: none;
+    font-family: inherit;
+}
+
+.MuiDataGrid-columnHeaders {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.MuiDataGrid-cell {
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.MuiDataGrid-row:hover {
+    background-color: #f8f9fc;
+} 

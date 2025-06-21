@@ -27,6 +27,7 @@ const InventoryRouter=require("./Routers/InventryRouter")
 const complain = require("./Routers/ComplainRouter")
 const Attendance = require("./Routers/AttendanceRouters")
 const Plan = require("./Routers/Services/PlansRouters")
+const SalaryRoutes = require("./Routers/SalaryRouters/SalaryRoutes")
 const app = express();
 const route= require("./Routers/index")
 app.use(cors());
@@ -82,11 +83,12 @@ app.use("/inventry",InventoryRouter)
 app.use("/complain",complain)
 app.use("/attendance",Attendance)
 app.use("/plan",Plan)
+app.use("/salary",SalaryRoutes)
 
 
 
 
 // Start the server
-app.listen(5000, () => {
-  console.log(`Server started at port 5000`);
+app.listen(6000, () => {
+  console.log(`Server started at port 6000`);
 });
