@@ -25,9 +25,9 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.AdminModel = require("./AuthModels/AdminModel")(sequelize, DataTypes);
 db.CustomerModel=require("./AuthModels/CustomerModel")(sequelize, DataTypes);
+db.NewCustomerModel = db.CustomerModel; // Alias for backward compatibility
 db.EmployeeModel=require("./AuthModels/EmployeeModel")(sequelize,DataTypes);
 db.ServiceProviderModel=require("./AuthModels/ServiceProviderModel")(sequelize,DataTypes);
-db.NewCustomerModel=require("./CustomerModels/NewCustomerModal")(sequelize,DataTypes);
 db.AddCollectionModel=require("./ExpenseModels/AddCollection")(sequelize,DataTypes)
 db.AddExpenseModel=require("./ExpenseModels/AddExpenseModel")(sequelize,DataTypes)
 db.HeadExpModel = require("./ExpenseModels/AddHeadExpenseModel")(sequelize,DataTypes)
@@ -71,15 +71,11 @@ db.TicketHead = require("./ServiceModal/TicketHead")(sequelize, DataTypes)
 db.SalaryModel = require("./SalaryModel/SalaryModel")(sequelize, DataTypes)
 
 
-db.OrderModel.belongsTo(db.NewCustomerModel, {foreignKey: 'cust_id'})
-db.NewCustomerModel.hasOne(db.CustomerModel, { foreignKey: 'user_id' });
 db.SupervisorAttendance.belongsTo(db.EmployeeModel, { foreignKey: 'emp_id', targetKey: 'emp_id' });
 db.ServiceProviderAttendance.belongsTo(db.ServiceProviderModel, { foreignKey: 'servp_id', targetKey: 'id'});
 
 
 
-db.CustomerModel.belongsTo(db.NewCustomerModel, { foreignKey: 'user_id' });
-db.ComplainModel.belongsTo(db.NewCustomerModel, { foreignKey: 'cust_id' });
 db.EmployeeModel.belongsTo(db.DepartmentsModel,{foreignKey: 'department_id'});
 db.EmployeeModel.belongsTo(db.DesignationModel,{foreignKey: 'designation_id'});
 db.EmployeeModel.hasMany(db.Empservices, { foreignKey: 'mobile_no', sourceKey: 'mobile_no' });

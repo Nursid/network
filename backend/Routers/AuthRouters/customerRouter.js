@@ -33,7 +33,15 @@ router.get('/delete/:id', customerRouter.GetDeleteCustomerById);
 router.get("/getall", customerRouter.AllCustomer);
 router.get("/getbyid/:id", customerRouter.GetCustomer);
 router.post("/get", customerRouter.AllCustomer);
-router.put('/getupdate/:user_id', upload.single('image'), customerRouter.GetUpdateTheCustomer);
+
+router.put('/getupdate/:user_id', upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'frontAadharImage', maxCount: 1 },
+  { name: 'backAadharImage', maxCount: 1 },
+  { name: 'panImage', maxCount: 1 },
+  { name: 'otherIdImage', maxCount: 1 },
+  { name: 'signature', maxCount: 1 }
+]), customerRouter.GetUpdateTheCustomer);
 router.post('/block/:id', customerRouter.UpdateStatus);
 
 module.exports = router;

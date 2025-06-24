@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 const db = require("../../model/index");
 const CustomerModel = db.CustomerModel;
-const NewCustomerModel = db.NewCustomerModel
 const ServiceProviderModel = db.ServiceProviderModel
 const EmployeeModel = db.EmployeeModel
 require("dotenv").config;
@@ -10,7 +9,9 @@ const {isEmail, isMobileNumber, isOptValid} = require("../utils");
 
 const SignupUser = async (req, res) => {
 	const data = req.body;
+	console.log('Received customer data:', data);
 
+	// Handle file uploads
 	if(req.files){
 		const files = req.files;
 		data.image = files.image ? files.image[0].path : '';
@@ -21,21 +22,84 @@ const SignupUser = async (req, res) => {
 		data.signature = files.signature ? files.signature[0].path : '';
 	}
 
-	const newCustomer_data = {
-		"name": data.name,
-		"email": data.email,
-		"password": data.name,
-		"mobileno": data.mobile,
-		"username": data.username
+	// Validate required fields
+	if (!data.name || !data.username || !data.mobile || !data.address) {
+		return res.status(400).json({
+			status: false, 
+			message: 'Required fields missing: name, username, mobile, and address are required'
+		});
 	}
-	const {
-		email,
-		name,
-		...customer_data
-	} = data;
+
+	// Validate mobile number format
+	if (!/^\d{10}$/.test(data.mobile)) {
+		return res.status(400).json({
+			status: false, 
+			message: 'Mobile number must be exactly 10 digits'
+		});
+	}
+
+
+	// Prepare data for CustomerModel (detailed customer info)
+	const customer_data = {
+		// Basic Information
+		name: data.name,
+		username: data.username,
+		email: data.email || null,
+		gender: data.gender || null,
+		
+		// Address Information
+		address: data.address,
+		t_address: data.t_address || null,
+		area: data.area || null,
+		block: data.block || null,
+		apartment: data.apartment || null,
+		
+		// Contact Information
+		mobile: data.mobile,
+		whatsapp_no: data.whatsapp_no || null,
+		alternate_no: data.alternate_no || null,
+		
+		// Personal Information
+		dob: data.dob || null,
+		doa: data.doa || null,
+		
+		// KYC Information
+		aadhar_no: data.aadhar_no || null,
+		other_id: data.other_id || null,
+		pan_no: data.pan_no ? data.pan_no.toUpperCase() : null,
+		
+		// Package Information
+		selectedPackage: data.selectedPackage ? parseInt(data.selectedPackage) : null,
+		packageDetails: data.packageDetails || null,
+		
+		// Inventory Items (will be stored as JSON string)
+		selectedItems: data.selectedItems || null,
+		
+		// Billing Information
+		bill_date: data.bill_date || null,
+		billing_amount: data.billing_amount ? parseFloat(data.billing_amount) : null,
+		payment_method: data.payment_method || null,
+		
+		// Legacy billing fields (for backward compatibility)
+		cash: data.cash ? parseFloat(data.cash) : null,
+		online: data.online ? parseFloat(data.online) : null,
+		
+		// Image/Document Fields
+		image: data.image || null,
+		frontAadharImage: data.frontAadharImage || null,
+		backAadharImage: data.backAadharImage || null,
+		panImage: data.panImage || null,
+		otherIdImage: data.otherIdImage || null,
+		signature: data.signature || null,
+		
+		// Status fields
+		status: 'active',
+		customerType: 'individual',
+		registrationDate: new Date()
+	};
 
 	try {
-
+		// Check if user already exists as Service Provider
 		const isServiceProvider = await ServiceProviderModel.findOne({
 			where: {
 				mobile_no: data.mobile
@@ -43,9 +107,13 @@ const SignupUser = async (req, res) => {
 		});
 
 		if (isServiceProvider) {
-			return res.status(200).json({status: false, message: 'User Already Exists!'});
+			return res.status(200).json({
+				status: false, 
+				message: 'Mobile number already registered as Service Provider!'
+			});
 		}
 
+		// Check if user already exists as Employee/Supervisor
 		const isSupervisor = await EmployeeModel.findOne({
 			where: {
 				mobile_no: data.mobile
@@ -53,36 +121,89 @@ const SignupUser = async (req, res) => {
 		});
 
 		if (isSupervisor) {
-			return res.status(200).json({status: false, message: 'User Already Exists!'});
+			return res.status(200).json({
+				status: false, 
+				message: 'Mobile number already registered as Employee!'
+			});
 		}
 
-		const isCustomer = await NewCustomerModel.findOne({
+		// Check if customer already exists
+		const isCustomer = await CustomerModel.findOne({
 			where: {
-				mobileno: data.mobile
+				mobile: data.mobile
 			}
 		});
 
 		if (isCustomer) {
-			return res.status(200).json({status: false, message: 'User Already Exists!'});
+			return res.status(200).json({
+				status: false, 
+				message: 'Mobile number already registered as Customer!'
+			});
 		}
 
-		const newCustomer = await NewCustomerModel.create(newCustomer_data);
+		// Create detailed customer record
+		const customerRecord = await CustomerModel.create(customer_data);
 
-		if (!newCustomer) {
-			return res.status(200).json({status: false, message: 'Your Customer Not Added!'});
+		if (!customerRecord) {
+			return res.status(200).json({
+				status: false, 
+				message: 'Failed to create customer details!'
+			});
 		}
 
-		const user_id = newCustomer.id;
-
-		customer_data.user_id = user_id;
-
-		const formdata = await CustomerModel.create(customer_data);
-
-		return res.status(200).json({status: true, data: formdata, message: "Customer Added Successfully!"});
+		// Return success response with customer details
+		return res.status(200).json({
+			status: true, 
+			data: {
+				id: customerRecord.id,
+				name: data.name,
+				username: data.username,
+				mobile: data.mobile,
+				email: data.email,
+				gender: data.gender,
+				address: data.address,
+				t_address: data.t_address,
+				area: data.area,
+				block: data.block,
+				apartment: data.apartment,
+				whatsapp_no: data.whatsapp_no,
+				alternate_no: data.alternate_no,
+				dob: data.dob,
+				doa: data.doa,
+				aadhar_no: data.aadhar_no,
+				other_id: data.other_id,
+				pan_no: data.pan_no,
+				selectedPackage: data.selectedPackage,
+				packageDetails: data.packageDetails,
+			}, 
+			message: "Customer Added Successfully!"
+		});
 
 	} catch (error) {
-		console.log(error);
-		return res.status(500).json({status: false, error: 'Internal Server Error', error});
+		console.error('Error creating customer:', error);
+		
+		// Handle specific database errors
+		if (error.name === 'SequelizeValidationError') {
+			const validationErrors = error.errors.map(err => err.message);
+			return res.status(400).json({
+				status: false, 
+				message: 'Validation Error', 
+				errors: validationErrors
+			});
+		}
+
+		if (error.name === 'SequelizeUniqueConstraintError') {
+			return res.status(400).json({
+				status: false, 
+				message: 'Username or mobile number already exists!'
+			});
+		}
+
+		return res.status(500).json({
+			status: false, 
+			message: 'Internal Server Error',
+			error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+		});
 	}
 };
 
@@ -99,11 +220,11 @@ const LoginUser = async (req, res) => {
 			return res.status(404).json({error: true, message: "Otp Invalid or expired"});
 		}
 
-		const User = await NewCustomerModel.findOne({
-			where: {
-				mobileno: number
-			}
-		});
+			const User = await CustomerModel.findOne({
+		where: {
+			mobile: number
+		}
+	});
 
 		if (!User) {
 			return res.status(404).json({error: true, message: "No user found"});
@@ -128,11 +249,6 @@ const DeleteUsers = (req, res) => {
 const AllCustomer = async (req, res) => {
 	try {
 		const customers = await CustomerModel.findAll({
-			include: [
-				{
-					model: NewCustomerModel,
-				}
-			],
 			order: [
 				['id', 'DESC']
 			]
@@ -150,16 +266,11 @@ const AllCustomer = async (req, res) => {
 const GetCustomer = async (req, res) => {
 	try {
 		const id = req.params.id;
-		const isUser = await CustomerModel.findOne({
-			include: [
-				{
-					model: NewCustomerModel,
-				}
-			],
-			where:{
-				user_id:id
-			}
-		});
+			const isUser = await CustomerModel.findOne({
+		where:{
+			id:id
+		}
+	});
 		if (!isUser){ 
 			return res.status(404).json({error: true, message: "No user found"});
 		}
@@ -172,18 +283,13 @@ const GetCustomer = async (req, res) => {
 const GetDeleteCustomerById = async (req, res) => {
 	const user_id = req.params.id;
 	try {
-		const rowsDeleted = await CustomerModel.destroy({
-			where: {
-				user_id: user_id
-			}
-		});
-		const isdeleted = await NewCustomerModel.destroy({
-			where: {
-				id: user_id
-			}
+			const rowsDeleted = await CustomerModel.destroy({
+		where: {
+			id: user_id
+		}
 		});
 
-		if (rowsDeleted === 0 && isdeleted === 0) {
+		if (rowsDeleted === 0) {
 			return res.status(400).json({error: true, message: "No data found with this id"});
 		}
 		
@@ -201,6 +307,7 @@ const GetUpdateTheCustomer = async (req, res) => {
 		const data = req.body;
 
 		// Handle multiple file uploads
+		// Accept either a new uploaded file or a string (existing image URL/filename) for each field
 		const fileFields = {
 			image: null,
 			frontAadharImage: null,
@@ -210,14 +317,17 @@ const GetUpdateTheCustomer = async (req, res) => {
 			signature: null
 		};
 
-		// Process uploaded files
-		if (req.files) {
-			Object.keys(fileFields).forEach(fieldName => {
-				if (req.files[fieldName] && req.files[fieldName][0]) {
-					fileFields[fieldName] = req.files[fieldName][0].filename;
-				}
-			});
-		}
+		Object.keys(fileFields).forEach(fieldName => {
+			// If a new file is uploaded, use its filename
+			if (req.files && req.files[fieldName] && req.files[fieldName][0]) {
+				fileFields[fieldName] = req.files[fieldName][0].filename;
+			}
+			// If not, but a string is provided in the body (existing image url/filename), use it
+			else if (typeof req.body[fieldName] === 'string' && req.body[fieldName].trim() !== '') {
+				fileFields[fieldName] = req.body[fieldName].trim();
+			}
+			// Otherwise, leave as null (will not update)
+		});
 
 		// Validate required fields
 		if (!data.name || data.name.trim() === '') {
@@ -282,7 +392,7 @@ const GetUpdateTheCustomer = async (req, res) => {
 		}
 
 		// Check for duplicate username (excluding current user)
-		const existingCustomer = await NewCustomerModel.findOne({
+		const existingCustomer = await CustomerModel.findOne({
 			where: {
 				username: data.username,
 				id: { [Op.ne]: user_id } // Exclude current user
@@ -293,16 +403,12 @@ const GetUpdateTheCustomer = async (req, res) => {
 			return res.status(400).json({status: false, message: 'Username already exists!'});
 		}
 
-		// Prepare data for NewCustomerModel (main user table)
-		const newCustomer_data = {
+		// Prepare data for CustomerModel (all customer details in one model)
+		const customer_data = {
 			name: data.name?.trim() || '',
 			username: data.username?.trim() || '',
 			email: data.email?.trim() || '',
-			mobileno: data.mobile?.trim() || ''
-		};
-
-		// Prepare data for CustomerModel (extended customer details)
-		const customer_data = {
+			mobile: data.mobile?.trim() || '',
 			address: data.address?.trim() || '',
 			t_address: data.t_address?.trim() || '',
 			whatsapp_no: data.whatsapp_no?.trim() || '',
@@ -313,6 +419,7 @@ const GetUpdateTheCustomer = async (req, res) => {
 			dob: data.dob || null,
 			doa: data.doa || null,
 			bill_date: data.bill_date || null,
+			billing_amount: data.billing_amount || null,
 			gender: data.gender || null,
 			block: data.block || null,
 			area: data.area || null,
@@ -320,6 +427,10 @@ const GetUpdateTheCustomer = async (req, res) => {
 			payment_method: data.payment_method || null,
 			online: data.online || null,
 			cash: data.cash || null,
+			// Package and inventory fields
+			selectedPackage: data.selectedPackage || null,
+			packageDetails: data.packageDetails?.trim() || '',
+			selectedItems: data.selectedItems || null,
 			...fileFields // Add file fields
 		};
 
@@ -330,32 +441,18 @@ const GetUpdateTheCustomer = async (req, res) => {
 			}
 		});
 
-		console.log('NewCustomer data to update:', newCustomer_data);
 		console.log('Customer data to update:', customer_data);
 
-		// Update main customer record
-		const updatedCustomerRows = await NewCustomerModel.update(newCustomer_data, {
+		// Update customer record
+		const updatedRows = await CustomerModel.update(customer_data, {
 			where: {
 				id: user_id
 			}
 		});
 
-		console.log('Updated Customer Rows:--------', updatedCustomerRows);
-
-		if (!updatedCustomerRows) {
-			return res.status(404).json({status: false, message: "Customer not updated!"});
-		}
-
-		// Update extended customer details
-		const updatedRows= await CustomerModel.update(customer_data, {
-			where: {
-				user_id: user_id
-			}
-		});
-
 		console.log('Updated Rows:', updatedRows);
 
-		if (!updatedRows) {
+		if (!updatedRows || updatedRows[0] === 0) {
 			return res.status(404).json({status: false, message: "Customer not updated!"});
 		}
 
@@ -364,7 +461,7 @@ const GetUpdateTheCustomer = async (req, res) => {
 			message: "Customer updated successfully",
 			data: {
 				user_id,
-				updatedFields: Object.keys({...newCustomer_data, ...customer_data})
+				updatedFields: Object.keys(customer_data)
 			}
 		});
 
@@ -383,11 +480,11 @@ const GetUpdateTheCustomer = async (req, res) => {
 	const {is_block} = req.body;
 
 	try {
-		const record = await CustomerModel.findOne({
-			where: {
-				user_id: user_id
-			}
-		});
+			const record = await CustomerModel.findOne({
+		where: {
+			id: id
+		}
+	});
 
 		if (! record) {
 			return res.status(404).json({error: 'Record not found'});
@@ -405,11 +502,11 @@ const UpdateStatus = async (req, res) => {
 	const user_id = req.params.id
 	try {
 		const is_block = req.body;
-		const data = await CustomerModel.update(is_block, {
-			where: {
-				user_id: user_id
-			}
-		});
+			const data = await CustomerModel.update(is_block, {
+		where: {
+			id: user_id
+		}
+	});
 		if (data) {
 			res.status(200).json({error: false, message: data})
 		}

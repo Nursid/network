@@ -46,7 +46,7 @@ function App() {
             <Route path='monthly-service' element={<MonthService />} />
             <Route path='task-management' element={<Tickets />} />
             <Route path='flow' element={<NetworkFlow />} />
-            <Route path='inventory-mananagement' element={<AdminInventory />} />
+            <Route path='inventory-management' element={<AdminInventory />} />
           </Route>
         </Routes>
       </BrowserRouter>

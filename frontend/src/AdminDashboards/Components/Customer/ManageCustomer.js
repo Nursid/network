@@ -66,18 +66,11 @@ const ManageCustomer = () => {
         const NewData = []
         if (data !== undefined) {
             for (let item of data) {
-                let newCustomer = item.NewCustomer;
-                let mergedItem = {...item, ...newCustomer};
-                const paddedId = String(item.id).padStart(6, '0');
                 NewData.push({
-                    ...mergedItem,
-                    id: data.indexOf(item),
+                    ...item,
+                    _id: data.indexOf(item)+1,
                     date: moment(item.createdAt).format("DD-MM-YYYY"),
-                    member_id: (!item.member_id) 
-                    ? 'NM' + paddedId 
-                    : item.member_id
                 });
-
             }
         } else {
             NewData.push({ id: 0 })
@@ -164,14 +157,29 @@ const ManageCustomer = () => {
     }
 
     const column = [
-        { field: "id", headerName: "Sr No", minWidth: 50, editable: false },
+        { field: "_id", headerName: "Sr No", minWidth: 50, editable: false },
+        { field: "id", headerName: "Customer ID", minWidth: 120, editable: false },
         { field: "name", headerName: "Name", minWidth: 120, editable: false },
-        { field: "mobileno", headerName: "Mobile No.", minWidth: 120, editable: false },
-        { field: "date", headerName: "Date", minWidth: 120, editable: false },
-        { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 120, editable: false },
-        { field: "username", headerName: "Username", minWidth: 250, editable: false },
-        { field: "area", headerName: "Area", minWidth: 250, editable: false },
-        { field: "apartment", headerName: "Apartment", minWidth: 250, editable: false },
+        { field: "username", headerName: "Username", minWidth: 120, editable: false },
+        { 
+            field: "address", 
+            headerName: "Address", 
+            minWidth: 350,
+            minHeight: 200,
+            renderCell: (params) => (
+                <div style={{ whiteSpace: "pre-line" }}>
+                    {params.row.address && <div>{params.row.address}</div>}
+                    {params.row.area && <div>{params.row.area}</div>}
+                    {params.row.apartment && <div>{params.row.apartment}</div>}
+                    {params.row.block && <div>{params.row.block}</div>}
+                    {params.row.t_address && <div>{params.row.t_address}</div>}
+                </div>
+            ),
+            editable: false 
+        },
+        { field: "mobile", headerName: "Mobile No.", minWidth: 120, editable: false },
+        { field: "status", headerName: "Status", minWidth: 120, editable: false },
+        { field: "billing_amount", headerName: "Billing Amount", minWidth: 120, editable: false },
         {
             field: "action",
             headerName: "Action",
@@ -200,23 +208,6 @@ const ManageCustomer = () => {
             </div>
             ),
         },
-        // {
-        //     field: "block",
-        //     headerName: "Block",
-        //     minWidth: 150,
-        //     renderCell: (params) => (
-        //         <div className="d-flex gap-2">
-        //             {blockStatus[params.row.user_id] ?
-        //                <Button variant="contained" color="error" onClick={() => handleToggleBlock(params.row.user_id)} 
-        //                style={{minWidth: "40px", maxWidth: "40px"}}
-        //                ><BlockIcon /></Button>
-        //                 :
-        //                 <Button className="text-white bg-warning border-warning" onClick={() => handleToggleBlock(params.row.user_id)}>Un-Block</Button>
-        //             }
-               
-        //         </div>
-        //     ),
-        // },
     ];
 
     const CustomToolbar = () => {
