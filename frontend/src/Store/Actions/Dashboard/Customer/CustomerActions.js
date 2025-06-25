@@ -97,6 +97,20 @@ export const GetAllMembers = () => {
     }
 }
 
+export const FilterCustomers = (filterData) => {
+    return async (dispatch) => {
+        dispatch({ type: constant.FILTER_CUSTOMERS_LOADING })
+        try {
+            const response = await axios.post(API_URL + '/customer/filter', filterData)
+            if (response.status === 200) {
+                dispatch({ type: constant.FILTER_CUSTOMERS_SUCCESS, payload: response.data })
+            }
+        } catch (error) {
+            dispatch({ type: constant.FILTER_CUSTOMERS_ERROR })
+        }
+    }
+}
+
 
 
 

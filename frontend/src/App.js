@@ -2,7 +2,6 @@ import './App.css';
 import { BrowserRouter, Route, Routes , Navigate} from 'react-router-dom';
 import AdminSignIn from './AdminDashboards/Components/LoginSignup/AdminSignIn';
 import AdminAttendance from './AdminDashboards/Components/Attendence';
-import AdminExpenses from './AdminDashboards/Components/Expenses';
 import AdminManageHr from './AdminDashboards/Components/ManageHr';
 import AdminAddEmployeeForm from './AdminDashboards/Components/ManageHr/Forms/AdminAddEmployeeForm';
 import AdminManageMaster from './AdminDashboards/Components/ManageMaster';
@@ -20,6 +19,7 @@ import Network from './AdminDashboards/Components/Network';
 import Tickets from './AdminDashboards/Components/Tickets';
 import NetworkFlow from './AdminDashboards/Components/Network/components/NetworkFlow';
 import AdminInventory from './AdminDashboards/Components/Inventory';
+import AccountTransaction from './AdminDashboards/Components/AccountTransaction';
 
 function App() {
 
@@ -31,7 +31,7 @@ function App() {
           <Route path='/admin/*'  element={<AdminSignIn />}>
             <Route path='dashboard' element={<AdminPannel />} />
             <Route path='attendance' element={<AdminAttendance />} />
-            <Route path='account-transactions' element={<AdminExpenses />} />
+            <Route path='account-transactions' element={<AccountTransaction />} />
             <Route path='team-management' element={<AdminManageHr />} />
             <Route path='manage-hr/employee-form' element={<AdminAddEmployeeForm />} />
             <Route path='settings' element={<AdminManageMaster />} />

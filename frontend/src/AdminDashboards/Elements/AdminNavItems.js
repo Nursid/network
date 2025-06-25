@@ -23,7 +23,7 @@ const AdminNavItems = () => {
 
   const NavItems = [
     { field: "Dashboard", title: "Dashboard", icon: <CiViewList size={30} /> },
-    { field: "Expenses", title: "Account Transactions", icon: <GiPayMoney size={30} /> },
+    { field: "AccountTransaction", title: "Account Transactions", icon: <GiPayMoney size={30} /> },
     { field: "Attendence", title: "Attendance", icon: <TbReport size={30} /> },
     { field: "ManageHR", title: "Team Management", icon: <MdPeopleOutline size={30} /> },
     

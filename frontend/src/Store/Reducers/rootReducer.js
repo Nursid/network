@@ -12,6 +12,7 @@ import GetAllCustomerReducer from "./CustomersReducers.js/GetAllCustomerReducers
 import GetAllEnquiryReducer from "./CustomersReducers.js/GetAllEnquiryReducers";
 import GetAllMembersReducer from "./CustomersReducers.js/GetAllMembersReducer";
 import GetCustomerUpdateReducer from "./CustomersReducers.js/GetCustomerUpdateReducer";
+import FilterCustomersReducer from "./CustomersReducers.js/FilterCustomersReducer";
 import { GetAddHeadExpReducers, GetAllHeadExpReducer, GetAddExpenseReducer, GetAddCollectionReducer, GetAllExpenseReducers, GetAllCollectionReducers } from "./Dashboard/ExpensesReducers/headExpReducers";
 import GetAllOrderReducer from "./Dashboard/OrderReducers/GetAllOrderReducer";
 import GetAllMonthlyServiceDataReducer from "./Dashboard/EmployeeReducers/GetAllMonthlyServiceReducer";
@@ -43,6 +44,7 @@ const rootReducer = combineReducers({
     GetAllEnquiryReducer:GetAllEnquiryReducer,
     GetAllMembersReducer:GetAllMembersReducer,
     GetCustomerUpdateReducer: GetCustomerUpdateReducer,
+    FilterCustomersReducer: FilterCustomersReducer,
     GetAddHeadExpReducers: GetAddHeadExpReducers,
     GetAllHeadExpReducer: GetAllHeadExpReducer,
     GetAddExpenseReducer: GetAddExpenseReducer,

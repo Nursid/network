@@ -515,6 +515,82 @@ const UpdateStatus = async (req, res) => {
 	}
 }
 
+const FilterCustomers = async (req, res) => {
+	try {
+		const { status, locality, company, broadband, endDate, startDate } = req.body;
+		
+		// Build dynamic where clause
+		let whereClause = {};
+		
+		// Status filter
+		if (status && status !== 'all') {
+			whereClause.status = status;
+		}
+		
+		// Locality filter (searching in area, block, apartment, address fields)
+		if (locality && locality.trim() !== '') {
+			whereClause[Op.or] = [
+				{ area: { [Op.like]: `%${locality}%` } },
+				{ block: { [Op.like]: `%${locality}%` } },
+				{ apartment: { [Op.like]: `%${locality}%` } },
+				{ address: { [Op.like]: `%${locality}%` } },
+				{ t_address: { [Op.like]: `%${locality}%` } }
+			];
+		}
+		
+		// Company filter (if you have a company field)
+		if (company && company.trim() !== '') {
+			whereClause.company = { [Op.like]: `%${company}%` };
+		}
+		
+		// Broadband filter (assuming this is package related)
+		if (broadband && broadband !== 'all') {
+			whereClause.selectedPackage = broadband;
+		}
+		
+		// Date range filter
+		if (startDate && endDate) {
+			whereClause.createdAt = {
+				[Op.between]: [new Date(startDate), new Date(endDate)]
+			};
+		} else if (endDate) {
+			whereClause.createdAt = {
+				[Op.lte]: new Date(endDate)
+			};
+		} else if (startDate) {
+			whereClause.createdAt = {
+				[Op.gte]: new Date(startDate)
+			};
+		}
+		
+		const customers = await CustomerModel.findAll({
+			where: whereClause,
+			order: [['id', 'DESC']]
+		});
+		
+		if (customers.length === 0) {
+			return res.status(200).json({
+				status: 200, 
+				data: [],
+				message: "No customers found matching the filter criteria"
+			});
+		}
+		
+		res.status(200).json({
+			status: 200, 
+			data: customers,
+			count: customers.length
+		});
+		
+	} catch (error) {
+		console.error('Filter customers error:', error);
+		res.status(500).json({
+			error: true, 
+			message: "Internal Server Error: " + error.message
+		});
+	}
+}
+
 module.exports = {
 	SignupUser,
 	LoginUser,
@@ -523,5 +599,6 @@ module.exports = {
 	GetCustomer,
 	GetDeleteCustomerById,
 	GetUpdateTheCustomer,
-	UpdateStatus
+	UpdateStatus,
+	FilterCustomers
 };

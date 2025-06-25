@@ -41,28 +41,20 @@ module.exports = (sequelize) => {
     AttendenceModify: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
-    },
-    Expenses: {
+    },  
+    AccountTransaction: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
-    AddHeadExpence: {
+    PaymentPending: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
-    AddExpense: {
+    CollectionTally: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
-    AddCollections: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-    },
-    TodaysReport: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-    },
-    AllTransactionReport: {
+    AllTransaction: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },

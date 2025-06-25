@@ -202,7 +202,7 @@ const RouterNode = ({ data }) => {
         {customers?.data?.length > 0 ? (
           customers.data.map((customer) => (
             <option key={customer.id} value={customer.id}>
-              {customer.NewCustomer.name} ({customer.id})
+              {customer.name} ({customer.id})
             </option>
           ))
         ) : !isLoading && (
