@@ -5,7 +5,7 @@ import AdminDashboard from './AdminDashboard';
 const AdminPannel = () => {
     return (
         <Fragment>
-            <AdminHeader />
+            {/* <AdminHeader /> */}
             <AdminDashboard />
         </Fragment>
     )

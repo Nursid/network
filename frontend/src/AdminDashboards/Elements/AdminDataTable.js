@@ -1,37 +1,20 @@
 import { Box } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import React from 'react';
-import { darken, lighten, styled } from '@mui/material/styles';
 import "./AnimatedBackground.css"
 const AdminDataTable = ({ rows, columns, CustomToolbar, ...args }) => {
 
-
     const getRowClassName = (params) => {
-        const status = params.row.pending;
-        if (status === "Completed") {
-        return "complete-cell";
-        } else if (status === "Running") {
-        return "running-cell";
-        } else if (status === "Cancel") {
-        return "cancel-cell";
-        } else if (status === "Hold") {
-        return "hold-cell";
-        } else if (status === "Due") {
-        return "due-cell";
-        } else if (status === "Pending") {
-        return "pending-cell";
-        }
         return "";
     };
 
     return (
         <Box
             m="0px 0 0 0"
-            height="75vh"
+            height="100%"
             sx={{
                 "& .MuiDataGrid-root": {
                     border: "none",
-                    
                 },
                 "& .MuiDataGrid-cell": {
                     borderBottom: "none",
@@ -60,10 +43,10 @@ const AdminDataTable = ({ rows, columns, CustomToolbar, ...args }) => {
                     color: `#1e5245 !important`,
                 },
                 "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                    color: `#ffffff !important`,
+                    color: `#000000 !important`,
                 },
-                "& .MuiSvgIcon-root": {
-                    fill: "#ffffff",
+                "& .MuiDataGrid-toolbarContainer .MuiSvgIcon-root": {
+                    fill: "#000000",
                 },
                 "& .MuiTablePagination-root": {
                     color: "#ffffff",
