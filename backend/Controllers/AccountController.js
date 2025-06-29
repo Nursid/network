@@ -5,63 +5,18 @@ const AccountModel = db.Account
 const moment = require('moment')
 
 const ListingAccount = async (req, res) => {
-	const { from, to } = req.query;
-  
 	try {
-	  let dateCondition = {};
-  
-	  // Check if both from and to exist
-	  if (from && to) {
-		// Convert and validate provided dates
-		const startDate = new Date(from);
-		const endDate = new Date(to);
-		
-		if (isNaN(startDate) || isNaN(endDate)) {
-		  return res.status(400).json({ message: "Invalid date format" });
-		}
-  
-		dateCondition = {
-		  date: {
-			[Op.between]: [startDate, endDate]
-		  }
-		};
-	  } else if (from) {
-		// If only 'from' exists, filter by date greater than or equal to 'from'
-		const startDate = new Date(from);
-		if (isNaN(startDate)) {
-		  return res.status(400).json({ message: "Invalid 'from' date format" });
-		}
-  
-		dateCondition = {
-		  date: {
-			[Op.gte]: startDate
-		  }
-		};
-	  } else if (to) {
-		// If only 'to' exists, filter by date less than or equal to 'to'
-		const endDate = new Date(to);
-		if (isNaN(endDate)) {
-		  return res.status(400).json({ message: "Invalid 'to' date format" });
-		}
-  
-		dateCondition = {
-		  date: {
-			[Op.lte]: endDate
-		  }
-		};
-	  }
   
 	  // Query the database with the date condition
 	  const data = await AccountModel.findAll({
-		where: dateCondition,
 		order: [['date', 'DESC']]
 	  });
   
 	  if (data.length === 0) {
-		return res.status(204).json({ error: true, message: "No data found" });
+		return res.status(200).json({ status: true, data: [] });
 	  }
   
-	  res.status(200).json({ status: true, data });
+	  res.status(200).json({ status: true, data: data });
   
 	} catch (error) {
 	  console.error(error);
