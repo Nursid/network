@@ -1,36 +1,19 @@
 const router = require('express').Router()
 /*  Account API */
 const AccountController = require('../Controllers/AccountController');
-const AvailabilityController = require("../Controllers/AvailabilityController")
 const LocationModel = require("../Controllers/misc/LocationController")
-const supervisorAvailabilityController = require("../Controllers/SupervisorAvailabilityController")
+
 const ticketRouter = require('./TicketRouter')
 const ticketHeadRouter = require('./Services/TicketHeadRouter')
 const flowRouter = require('./FlowRouter')
 
 router.get('/account-listing',AccountController.ListingAccount);
 router.post('/add-balance',AccountController.AddBalance);
-router.post('/add-fund',AccountController.AddFund);
-router.post('/add-expense',AccountController.AddExpense);
-router.get('/total-amount',AccountController.TotalAmount);
-router.post("/edit-balance/:id",AccountController.EditBalnace);
+router.post("/edit-balance/:id",AccountController.EditBalance);
+router.post("/filter-amount",AccountController.FilterAmount);
+router.get("/account-detail/:id",AccountController.GetAccountById);
+router.delete("/delete-account/:id",AccountController.DeleteAccount);
 
-
-/* Service Provider  Availability API */
-router.post("/listing-availability",AvailabilityController.GetAllAvailability )
-router.post("/add-leave",AvailabilityController.AddLeave );
-router.post("/availability/attendance/:empId", AvailabilityController.AddAttendance);
-router.post("/assign-availability/:mobile_no/:date",AvailabilityController.AssignAvailability);
-router.post("/transfer-availability",AvailabilityController.TransferAvailability);
-
-
-
-/* Supervisor  Availability API */
-router.post("/supervisor-availability-list",supervisorAvailabilityController.GetAllSupervisorAvailability )
-router.post("/supervisor-add-leave",supervisorAvailabilityController.AddLeave);
-router.post("/supervisor-assign-availability/:mobile_no/:date",supervisorAvailabilityController.AssignAvailability);
-router.post("/supervisor-transfer-availability",supervisorAvailabilityController.TransferAvailability);
-router.post("/supervisor-availability/attendance/:empId", supervisorAvailabilityController.AddAttendance);
 
 
 //  Location API

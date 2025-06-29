@@ -1,9 +1,8 @@
 const db = require("../model/index")
-const {Sequelize, Model, DataTypes} = require('sequelize');
+const {Sequelize} = require('sequelize');
 const Op = Sequelize.Op;
 const AccountModel = db.Account
 const moment = require('moment')
-const sequelize = require('../config/sequalize');
 
 const ListingAccount = async (req, res) => {
 	const { from, to } = req.query;
@@ -54,7 +53,8 @@ const ListingAccount = async (req, res) => {
   
 	  // Query the database with the date condition
 	  const data = await AccountModel.findAll({
-		where: dateCondition
+		where: dateCondition,
+		order: [['date', 'DESC']]
 	  });
   
 	  if (data.length === 0) {
@@ -67,32 +67,34 @@ const ListingAccount = async (req, res) => {
 	  console.error(error);
 	  res.status(400).json({ message: "Invalid request" });
 	}
-  };
-  
+};
 
 const AddBalance = async (req, res) => {
 	try {
 		const data = req.body;
 		data.date = moment(new Date()).format('YYYY-MM-DD');
 
-		// Check if the order_no exists
+		// Check if the trans_id exists (using transaction ID as unique identifier)
 		const existingAccount = await AccountModel.findOne({
-			where: { order_no: data?.order_no 
+			where: { 
+				trans_id: data?.trans_id,
+				cust_id: data?.cust_id
 			}
-			});
+		});
 
 		if (existingAccount) {
 			// If exists, update the existing record
 			await AccountModel.update(data, {
 				where: {
-					order_no: data?.order_no
+					trans_id: data?.trans_id,
+					cust_id: data?.cust_id
 				}
 			});
-			return res.status(200).json({ status: true, message: "Amount Updated Successfully!" });
+			return res.status(200).json({ status: true, message: "Payment record updated successfully!" });
 		} else {
 			// If not exists, create a new record
 			const newAccount = await AccountModel.create(data);
-			return res.status(200).json({ status: true, message: "Amount Added Successfully!" });
+			return res.status(200).json({ status: true, message: "Payment record added successfully!" });
 		}
 	} catch (error) {
 		console.error('Error:', error); // Log the error for debugging
@@ -100,169 +102,147 @@ const AddBalance = async (req, res) => {
 	}
 }
 
-
-const EditBalnace = async (req, res) => {
-
+const EditBalance = async (req, res) => {
 	try {
-
-		const amount_id = req.params.id;
+		const account_id = req.params.id;
 		const data = req.body;
 
-		const IsAmount = await AccountModel.findOne({
+		const IsAccount = await AccountModel.findOne({
 			where: {
-				id: amount_id
+				id: account_id
 			}
 		});
-		if (!IsAmount) {
-			res.status(204).json({error: true, message: "Not Found Data"});
+		
+		if (!IsAccount) {
+			return res.status(204).json({error: true, message: "Payment record not found"});
 		}
+		
 		await AccountModel.update(data, {
 			where: {
-				id: amount_id
+				id: account_id
 			}
 		});
-		res.status(200).json({status: true, message: "Amount Updated Successfully!"});
+		
+		res.status(200).json({status: true, message: "Payment record updated successfully!"});
 	} catch (error) {
 		res.status(400).json({message: "Invalid url"});
 	}
 }
 
-
-const TotalAmount = async (req, res) => {
+const FilterAmount = async (req, res) => {
 	try {
+        const { date, payment_mode, recharge_status, cust_id } = req.body;
+        
+        let startDate = "", endDate = "";
+        let whereCondition = {};
 
-        let startDate="", endDate="";
+        // Date filtering
+        if (date) {
+            switch (parseInt(date)) {
+                case 1: // Today
+                    startDate = moment().startOf('day').toDate();
+                    endDate = moment().endOf('day').toDate();
+                    break;
+                case 3: // Last month
+                    startDate = moment().subtract(1, 'month').startOf('month').toDate();
+                    endDate = moment().subtract(1, 'month').endOf('month').toDate();
+                    break;
+                case 6: // Last 6 months
+                    startDate = moment().subtract(6, 'months').startOf('month').toDate();
+                    endDate = moment().endOf('day').toDate();
+                    break;
+                default:
+                    return res.status(400).json({ error: 'Invalid date parameter' });
+            }
 
-        switch (parseInt(req.query.date)) {
-            case 1: // Today
-                startDate = moment().startOf('day').toDate();
-                endDate = new Date();
-                break;
-            case 3: 
-            var today = moment();
-               // Get the start date of the previous month
-            startDate = today.clone().startOf('month').toDate();
+            whereCondition.date = {
+                [Op.between]: [startDate, endDate]
+            };
+        }
 
-            // Get the end date of the previous month
-            endDate = new Date();
-                break;
-            case 6: 
-			var today = moment();
-                // Get the start date of 6 months ago
-            startDate = today.clone().subtract(6, 'months').startOf('month').toDate();
-            // Get the end date of the current month
-            endDate = new Date();
-                break;
-            default:
-                startDate = new Date(); // Earliest date possible
-                endDate = new Date(); // Current date
-                break;
+        // Additional filters
+        if (payment_mode) {
+            whereCondition.payment_mode = payment_mode;
+        }
+
+        if (recharge_status) {
+            whereCondition.recharge_status = recharge_status;
+        }
+
+        if (cust_id) {
+            whereCondition.cust_id = {
+                [Op.like]: `%${cust_id}%`
+            };
         }
 
 		const data = await AccountModel.findAll({
-			attributes: [
-				[sequelize.fn('SUM', sequelize.col('amount')), 'total_amount'],
-				[sequelize.fn('SUM', sequelize.literal("CASE WHEN payment_mode = 'Cash' THEN amount ELSE 0 END")), 'total_cash'],
-				[sequelize.fn('SUM', sequelize.literal("CASE WHEN payment_mode = 'Online' THEN amount ELSE 0 END")), 'total_online']
-			],
-			where: {
-				type_payment: 0,
-				createdAt: {
-					[Op.between]: [startDate, endDate]
-				}
-			}
-			
+			where: whereCondition,
+			order: [['date', 'DESC']]
 		});
 		
-		if (! data) {
-			res.status(200).json({status: false, message: "Not Found Data"});
+		if (data.length === 0) {
+			return res.status(200).json({status: false, message: "No data found"});
 		}
-		res.status(200).json({status: true, data: data})
+		
+		res.status(200).json({status: true, data: data});
 	} catch (error) {
 		res.status(400).json({
-			message: "Inter Server Error" + error
-		})
-	}
-}
-
-const FilterAmount = async (req, res) => {
-	try {
-        const data=req.body;
-        
-        let startDate="", endDate="";
-
-        switch (parseInt(date)) {
-            case 1: // Today
-                startDate = moment().startOf('day').toDate();
-                endDate = moment().endOf('day').toDate();
-                break;
-            case 3: 
-                startDate = moment().subtract(1, 'month').startOf('month').toDate();
-                endDate = moment().subtract(1, 'month').endOf('month').toDate();
-                break;
-            case 6: 
-                startDate = moment().subtract(6, 'months').startOf('month').toDate();
-                endDate = moment().endOf('day').toDate();
-                break;
-            default:
-                return res.status(400).json({ error: 'Invalid date parameter' });
-        }
-
-		const Isdata = await AccountModel.findAll({
-			where: {
-                createdAt: {
-                    [Op.between]: [startDate, endDate]
-                }
-            }
+			message: "Internal Server Error: " + error
 		});
-		if (! data) {
-			res.status(200).json({status: false, message: "Not Found Data"});
+	}
+}
+
+const GetAccountById = async (req, res) => {
+	try {
+		const account_id = req.params.id;
+		
+		const account = await AccountModel.findOne({
+			where: {
+				id: account_id
+			}
+		});
+		
+		if (!account) {
+			return res.status(404).json({error: true, message: "Payment record not found"});
 		}
-		res.status(200).json({status: true, data: Isdata})
+		
+		res.status(200).json({status: true, data: account});
 	} catch (error) {
-		res.status(400).json({
-			message: "Inter Server Error" + error
-		})
+		res.status(400).json({message: "Invalid request"});
 	}
 }
 
-
-const AddExpense = async (req, res) => {
+const DeleteAccount = async (req, res) => {
 	try {
-		const data = req.body;
-		data.date = moment(new Date()).format('YYYY-MM-DD');
-
-		// Check if the order_no exists
-			// If not exists, create a new record
-			const newAccount = await AccountModel.create(data);
-			return res.status(200).json({ status: true, message: "Expense Added Successfully!" });
+		const account_id = req.params.id;
+		
+		const account = await AccountModel.findOne({
+			where: {
+				id: account_id
+			}
+		});
+		
+		if (!account) {
+			return res.status(404).json({error: true, message: "Payment record not found"});
+		}
+		
+		await AccountModel.destroy({
+			where: {
+				id: account_id
+			}
+		});
+		
+		res.status(200).json({status: true, message: "Payment record deleted successfully!"});
 	} catch (error) {
-		console.error('Error:', error); // Log the error for debugging
-		res.status(400).json({ message: "Invalid URL or data" });
+		res.status(400).json({message: "Invalid request"});
 	}
 }
-
-
-const AddFund = async (req, res) => {
-	try {
-		const data = req.body;
-
-		const newAccount = await AccountModel.create(data);
-		return res.status(200).json({ status: true, message: "Amount Added Successfully!" });
-
-	} catch (error) {
-		console.error('Error:', error); // Log the error for debugging
-		res.status(400).json({ message: "Invalid URL or data" });
-	}
-}
-
 
 module.exports = {
 	ListingAccount,
 	AddBalance,
-	TotalAmount,
-	EditBalnace,
+	EditBalance,
     FilterAmount,
-	AddExpense,
-	AddFund
+	GetAccountById,
+	DeleteAccount
 }

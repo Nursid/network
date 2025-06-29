@@ -26,10 +26,8 @@ const AdminNavItems = () => {
     { field: "AccountTransaction", title: "Account Transactions", icon: <GiPayMoney size={30} /> },
     { field: "Attendence", title: "Attendance", icon: <TbReport size={30} /> },
     { field: "ManageHR", title: "Team Management", icon: <MdPeopleOutline size={30} /> },
-    
     { field: "ManagePage", title: "Manage Website", icon: <CgWebsite size={30} /> },
     { field: "Customer", title: "Customer", icon: <FaPeopleCarry size={30} /> },
-    { field: "RolesAndPermission", title: "Roles & Permission", icon: <MdOutlinePeople size={30} /> },
     { field: "Tickets", title: "Task Management", icon: <MdAirplaneTicket size={30} /> },
     { field: "Network", title: "Network", icon: <IoIosGitNetwork size={30} /> },
     { field: "Inventory", title: "Inventory Management", icon: <MdInventory size={30} /> },

@@ -2,63 +2,55 @@ const { Sequelize, DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
     const Account = sequelize.define('accounts', {
-        person_name: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        about_payment: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        type_payment: {
-            type: DataTypes.BOOLEAN,
-            allowNull: true,
-        },
-        total_amount: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        online: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        cash: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
         date: {
             type: DataTypes.DATE,
+            allowNull: true,
+        },
+        cust_id: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        cust_name: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        vc_no: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        address: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+        amount: {
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: true,
         },
         payment_mode: {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        transection_id: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        order_no: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
         balance: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: true,
         },
-        approve: {
+        trans_id: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        partner_emp_id: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        auto_renew: {
             type: DataTypes.BOOLEAN,
             allowNull: true,
+            defaultValue: false,
         },
-        remark: {
+        recharge_status: {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        expense_remark: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-
     }, {
         timestamps: true,
         tableName: 'accounts',
