@@ -10,6 +10,7 @@ import moment from 'moment';
 import axios from 'axios';
 import { API_URL } from '../../../config';
 import { Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import AdminNavItems from '../../Elements/AdminNavItems';
 
 const ManageFlow = () => {
 
@@ -376,14 +377,89 @@ const ManageFlow = () => {
 
     return (
         <Fragment>
-            <div style={{ height: "calc(100vh - 20px)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                <div className='flex'>  
+            <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+        {/* Left Sidebar - 1/4 width */}
+        <div
+          className="sidebar"
+          style={{
+            width: '25%',
+            height: '100vh',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            overflowY: 'auto',
+            zIndex: 999,
+          }}
+        >
+          <AdminNavItems />
+        </div>
+
+        {/* Main Content - 3/4 width */}
+        <div
+          className="main-content"
+          style={{
+            width: '75%',
+            height: '100vh',
+            marginLeft: '25%',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: '#f8f9fa'
+          }}
+        >
+          {/* Header Section with Gradient Background */}
+          <div 
+            className="flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: '0 0 20px 20px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              margin: '10px',
+              marginBottom: '20px'
+            }}
+          >
+            <div className='d-flex align-items-center justify-content-between p-4'>
+              <div>
+                <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
+                  📊 Network Flow
+                </h4>
+                <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
+                  Manage and track all network flows
+                </p>
+              </div>
+
+              <div className="d-flex gap-3">
+                <div
+                  className="btn btn-light d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
+                  style={{ 
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    border: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                  }}
+                  onClick={handleAddFlow}
+                >
+                  <span>📈</span>
+                  Add New Flow
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* <div className='flex'>  
                     <h4 className='p-2 px-4 mt-2 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}>
                         {isSearching ? `Search Results (${searchResults.length})` : 'Flow List'}
                     </h4>
 
                     <div className='AttendenceNavBtn w-100 py-1 px-4 gap-3 justify-content-end'>
-                        {/* Search Input Section */}
                         <div className='d-flex align-items-center gap-2' style={{ minWidth: "25rem" }}>
                             <div className='d-flex align-items-center border rounded-2 bg-white' style={{ flex: 1 }}>
                                 <input
@@ -414,7 +490,6 @@ const ManageFlow = () => {
                                 </Button>
                             </div>
                             
-                            {/* Clear Search Button */}
                             {isSearching && (
                                 <Button
                                     variant="outlined"
@@ -440,17 +515,70 @@ const ManageFlow = () => {
                             Add Flow
                         </div>
                     </div>
-                </div>
+                </div> */}
 
-                <div style={{ flex: 1, overflow: "auto", padding: "0 16px 0 16px", marginBottom: 0 }}>
-                    <AdminDataTable 
-                        rows={DataWithID(isSearching ? searchResults : data)} 
-                        columns={column} 
-                        CustomToolbar={CustomToolbar} 
-                        loading={loading}
-                    />
-                </div>
+
+<div className='AttendenceNavBtn w-100 py-1 px-4 gap-3 justify-content-end'>
+                        <div className='d-flex align-items-center gap-2' style={{ minWidth: "25rem" }}>
+                            <div className='d-flex align-items-center border rounded-2 bg-white' style={{ flex: 1 }}>
+                                <input
+                                    type="text"
+                                    placeholder="Search by MAC address or User ID..."
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    onKeyPress={handleSearchKeyPress}
+                                    className="form-control border-0"
+                                    style={{ 
+                                        boxShadow: 'none',
+                                        fontSize: '14px'
+                                    }}
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    size="small"
+                                    onClick={handleSearchClick}
+                                    disabled={loading}
+                                    style={{ 
+                                        minWidth: '40px',
+                                        margin: '2px',
+                                        borderRadius: '4px'
+                                    }}
+                                >
+                                    <SearchIcon fontSize="small" />
+                                </Button>
+                            </div>
+                            
+                            {isSearching && (
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={clearSearch}
+                                    startIcon={<ClearIcon />}
+                                    style={{ 
+                                        minWidth: '100px',
+                                        color: 'white',
+                                        borderColor: 'white'
+                                    }}
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </div>
+                        </div>
+          
+          {/* Data Table Section */}
+          <div className="flex-grow-1 px-4 pb-4 " style={{ overflow: 'hidden' }}>
+              <AdminDataTable
+                rows={DataWithID(isSearching ? searchResults : data)} 
+                columns={column} 
+                CustomToolbar={CustomToolbar} 
+                loading={loading}
+              />
             </div>
+        </div>
+      </div>
+
 
             {/* Add Flow Modal */}
             <Modal isOpen={modalOpen} toggle={toggleModal} size="lg">

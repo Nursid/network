@@ -12,80 +12,125 @@ const AccountTransaction = () => {
 
     const [attendanceActive, setActiveAttendance] = useState("all-transaction")
 
-    const { userRole, setUserRole, UserRoleCalled } = useUserRoleContext();
-    
-    // to set the active page 
-    const ActiveTabFunction = () => {
-        if (userRole.AllTransaction) {
-            setActiveAttendance('all-transaction')
-        } else if (userRole.PaymentPending) {
-            setActiveAttendance("payment-pending")
-        } else if (userRole.CollectionTally) {
-            setActiveAttendance("collection-tally")
-        }
-    }
+    const { userRole } = useUserRoleContext();
 
-    // useEffect(() => {
-    //     ActiveTabFunction()
-    // }, [userRole])
 
     return (
-        <Fragment>
-      <AdminHeader />
-      <div className="d-flex">
-        <div
-          className="sidebar bg-light"
-          style={{
-            width: "300px",
-            position: "sticky",
-            top: 0,
-            height: "100vh",
-          }}
-        >
-          <AdminNavItems  />
-        </div>
-        <div
-          className="main-content flex-grow-1 position-relative"
-          style={{
-            width: "calc(100% - 300px)",
-            overflowY: "auto",
-          }}
-        >
-          <AnimatedBackground />
-          <div className="BackgroundTopContents">
-                    <div className="AttendenceTabs px-3 pt-2">
+        // <Fragment>
+        //     <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+        //         {/* Left Sidebar - 1/4 width */}
+        //         <div
+        //             className="sidebar"
+        //             style={{
+        //                 width: '25%',
+        //                 height: '100vh',
+        //                 position: 'fixed',
+        //                 top: 0,
+        //                 left: 0,
+        //                 overflowY: 'auto',
+        //                 zIndex: 999,
+        //             }}
+        //         >
+        //             <AdminNavItems />
+        //         </div>
 
-                        {userRole && userRole.AllTransaction ? <span className={` ${attendanceActive === "all-transaction" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("all-transaction") }}>All Transaction</span> : null}
+        //         {/* Main Content - 3/4 width */}
+        //         <div
+        //             className="main-content"
+        //             style={{
+        //                 width: '75%',
+        //                 height: '100vh',
+        //                 marginLeft: '25%',
+        //                 overflow: 'hidden',
+        //                 display: 'flex',
+        //                 flexDirection: 'column',
+        //                 backgroundColor: '#f8f9fa'
+        //             }}
+        //         >
+        //             {/* Header Section with Gradient Background */}
+        //             <div 
+        //                 className="flex-shrink-0"
+        //                 style={{
+        //                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        //                     borderRadius: '0 0 20px 20px',
+        //                     boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        //                     margin: '10px',
+        //                     marginBottom: '20px'
+        //                 }}
+        //             >
+        //                 <div className='p-4'>
+        //                     <div className="mb-3">
+        //                         <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
+        //                             💰 Account Transactions
+        //                         </h4>
+        //                         <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
+        //                             Manage payments, collections and transaction records
+        //                         </p>
+        //                     </div>
 
-                        {userRole && userRole.PaymentPending ? <span className={` ${attendanceActive === "payment-pending" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("payment-pending") }}>Payment Pending</span> : null}
+        //                     {/* Tabs */}
+        //                     <div className="d-flex gap-3 flex-wrap">
+        //                         {userRole && userRole.AllTransaction ? 
+        //                             <span 
+        //                                 className={`btn ${attendanceActive === "all-transaction" ? "btn-light" : "btn-outline-light"} px-4 py-2 rounded-pill`}
+        //                                 style={{ cursor: 'pointer', fontWeight: '500', transition: 'all 0.3s ease' }}
+        //                                 onClick={() => { setActiveAttendance("all-transaction") }}
+        //                             >
+        //                                 All Transactions
+        //                             </span> 
+        //                         : null}
 
-                        {userRole && userRole.CollectionTally ? <span className={` ${attendanceActive === "collection-tally" ? "AttendenceTabs_Active" : ""}`} onClick={() => { setActiveAttendance("collection-tally") }}>Collection Tally</span> : null}
-                        
-                    </div>
-                    <TabContent activeTab={attendanceActive} >
+        //                         {userRole && userRole.PaymentPending ? 
+        //                             <span 
+        //                                 className={`btn ${attendanceActive === "payment-pending" ? "btn-light" : "btn-outline-light"} px-4 py-2 rounded-pill`}
+        //                                 style={{ cursor: 'pointer', fontWeight: '500', transition: 'all 0.3s ease' }}
+        //                                 onClick={() => { setActiveAttendance("payment-pending") }}
+        //                             >
+        //                                 Payment Pending
+        //                             </span> 
+        //                         : null}
 
-                        {userRole && userRole.AllTransaction ?
-                            <TabPane tabId="all-transaction">
-                                <AllTransaction setActiveAttendance={setActiveAttendance} />
-                            </TabPane>
-                            : null}
+        //                         {userRole && userRole.CollectionTally ? 
+        //                             <span 
+        //                                 className={`btn ${attendanceActive === "collection-tally" ? "btn-light" : "btn-outline-light"} px-4 py-2 rounded-pill`}
+        //                                 style={{ cursor: 'pointer', fontWeight: '500', transition: 'all 0.3s ease' }}
+        //                                 onClick={() => { setActiveAttendance("collection-tally") }}
+        //                             >
+        //                                 Collection Tally
+        //                             </span> 
+        //                         : null}
+        //                     </div>
+        //                 </div>
+        //             </div>
+                    
+        //             {/* Content Section */}
+        //                 <div className="flex-grow-1">
+        //                     <TabContent activeTab={attendanceActive}>
+        //                         {userRole && userRole.AllTransaction ?
+        //                             <TabPane tabId="all-transaction" >
+        //                                 <AllTransaction setActiveAttendance={setActiveAttendance} />
+        //                             </TabPane>
+        //                             : null}
 
-                        {userRole && userRole.PaymentPending ?
-                            <TabPane tabId="payment-pending">
-                                <PaymentPending setActiveAttendance={setActiveAttendance} />
-                            </TabPane> 
-                            : null}
+        //                         {userRole && userRole.PaymentPending ?
+        //                             <TabPane tabId="payment-pending" >
+        //                                 <PaymentPending setActiveAttendance={setActiveAttendance} />
+        //                             </TabPane> 
+        //                             : null}
 
-                        {userRole && userRole.CollectionTally ?
-                            <TabPane tabId="collection-tally">
-                                <CollectionTally setActiveAttendance={setActiveAttendance} />
-                            </TabPane>
-                            : null}
-                    </TabContent>
-                    </div>
-				</div>
-			</div>
-			</Fragment>
+        //                         {userRole && userRole.CollectionTally ?
+        //                             <TabPane tabId="collection-tally" >
+        //                                 <CollectionTally setActiveAttendance={setActiveAttendance} />
+        //                             </TabPane>
+        //                             : null}
+        //                     </TabContent>
+        //                 </div>
+        //         </div>
+        //     </div>
+        // </Fragment>
+        <>
+        <AllTransaction />
+        </>
     )
 }
 

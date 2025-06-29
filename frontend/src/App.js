@@ -9,13 +9,16 @@ import AdminCustomerManage from './AdminDashboards/Components/Customer';
 import AdminPannel from './AdminDashboards/AdminPannel';
 import AdminProfile from './AdminDashboards/Components/profile/AdminProfile';
 import { ServiceProvider } from './Store/context/serviceProvider';
-import Reports from './AdminDashboards/Components/Reports';
-import MonthService from './AdminDashboards/Components/MonthlyService';
 import Network from './AdminDashboards/Components/Network';
 import Tickets from './AdminDashboards/Components/Tickets';
 import NetworkFlow from './AdminDashboards/Components/Network/components/NetworkFlow';
 import AdminInventory from './AdminDashboards/Components/Inventory';
 import AccountTransaction from './AdminDashboards/Components/AccountTransaction';
+import AllTransaction from './AdminDashboards/Components/AccountTransaction/AllTransaction';
+import CollectionTally from './AdminDashboards/Components/AccountTransaction/CollectionTally';
+import PaymentPending from './AdminDashboards/Components/AccountTransaction/PaymentPending';
+import ManageCustomer from './AdminDashboards/Components/Customer/ManageCustomer';
+import ManageFlow from './AdminDashboards/Components/Network/ManageFlow';
 
 function App() {
 
@@ -31,13 +34,15 @@ function App() {
             <Route path='team-management' element={<AdminManageHr />} />
             <Route path='settings' element={<AdminManageMaster />} />
             <Route path='manage-website' element={<AdminManageWebsite />} />
-            <Route path='customer' element={<AdminCustomerManage />} />
+            <Route path='customer' element={<ManageCustomer />} />
             <Route path='profile' element={<AdminProfile />} />
             <Route path='network' element={<Network />} />
-            <Route path='monthly-service' element={<MonthService />} />
             <Route path='task-management' element={<Tickets />} />
-            <Route path='flow' element={<NetworkFlow />} />
+            <Route path='flow' element={<ManageFlow />} />
             <Route path='inventory-management' element={<AdminInventory />} />
+            <Route path='all-transaction' element={<AllTransaction />} />
+            <Route path='collection-tally' element={<CollectionTally />} />
+            <Route path='payment-pending' element={<PaymentPending />} />
           </Route>
         </Routes>
       </BrowserRouter>

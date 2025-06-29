@@ -25,7 +25,7 @@ import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { Button, Tooltip, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import UpdateCustomerForm from './Froms/UpdateCustomerForm';
 import CustomerView from './View/CustomerView';
-
+import AdminNavItems from '../../Elements/AdminNavItems';
 
 
 const ManageCustomer = () => {
@@ -495,7 +495,7 @@ const ManageCustomer = () => {
    
             <ModalComponent modal={updateCustomer} toggle={ToggleUpdateCustomer} data={<UpdateCustomerForm  prop={ToggleUpdateCustomer } updateData={update} />} modalTitle={"Update Customer"} size={"xl"} scrollable={true} />
 
-            <div className='flex'>
+            {/* <div className='flex'>
             <h4 className='p-3 px-4 mt-3 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "15rem", minWidth: "15rem" }}> Customer List </h4>
 
             <div className='AttendenceNavBtn w-100 py-2 px-4 gap-3 justify-content-end'>
@@ -504,10 +504,87 @@ const ManageCustomer = () => {
                 </div>
 
                 </div>
+              </div> */}
+           
+           
+<div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+        {/* Left Sidebar - 1/4 width */}
+        <div
+          className="sidebar"
+          style={{
+            width: '25%',
+            height: '100vh',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            overflowY: 'auto',
+            zIndex: 999,
+          }}
+        >
+          <AdminNavItems />
+        </div>
+
+        {/* Main Content - 3/4 width */}
+        <div
+          className="main-content"
+          style={{
+            width: '75%',
+            height: '100vh',
+            marginLeft: '25%',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: '#f8f9fa'
+          }}
+        >
+          {/* Header Section with Gradient Background */}
+          <div 
+            className="flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: '0 0 20px 20px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              margin: '10px',
+              marginBottom: '20px'
+            }}
+          >
+            <div className='d-flex align-items-center justify-content-between p-4'>
+              <div>
+                <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
+                  📱 Customer List
+                </h4>
+                <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
+                  Manage and track all customers
+                </p>
               </div>
 
-            {/* Filter Section */}
-            <div className='p-4 border-bottom' >
+              <div className="d-flex gap-3">
+                <div
+                  className="btn btn-light d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
+                  style={{ 
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    border: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                  }}
+                  onClick={ToggleAddCustomer}
+                >
+                  <span>💳</span>
+                  Add New Customer
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className='p-4 border-bottom' >
                 <div className='row align-items-end p-2 rounded-2' style={{ background: "#fff" }}>
                     <div className='col-md-2'>
                         <FormControl fullWidth size="small" sx={{ background: "#fff" }}>
@@ -542,27 +619,8 @@ const ManageCustomer = () => {
                                 ))}
                             </Select>
                         </FormControl>
-                    </div>
-                    
-                    {/* <div className='col-md-2'>
-                        <FormControl fullWidth size="small" sx={{ background: "#fff" }}>
-                            <InputLabel>Company</InputLabel>
-                            <Select
-                                value={filters.company}
-                                label="Company"
-                                onChange={(e) => handleFilterChange('company', e.target.value)}
-                                sx={{ background: "#fff" }}
-                            >
-                                <MenuItem value="">All</MenuItem>
-                                {companyOptions.map((company, index) => (
-                                    <MenuItem key={index} value={company}>
-                                        {company}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </div> */}
-                    
+                    </div> 
+                   
                     <div className='col-md-2'>
                         <FormControl fullWidth size="small" sx={{ background: "#fff" }}>
                             <InputLabel>Broadband</InputLabel>
@@ -582,7 +640,7 @@ const ManageCustomer = () => {
                         </FormControl>
                     </div>
                                 
-                    <div className='col-md-1'>
+                    <div className='col-md-2'>
                         <TextField
                             fullWidth
                             size="small"
@@ -596,7 +654,7 @@ const ManageCustomer = () => {
                         />
                     </div>
 
-                    <div className='col-md-1'>
+                    <div className='col-md-2'>
                         <TextField
                             fullWidth
                             size="small"
@@ -641,16 +699,19 @@ const ManageCustomer = () => {
                         </span>
                     </div>
                 )}
+            </div> 
+          
+          {/* Data Table Section */}
+          <div className="flex-grow-1 px-4 pb-4 " style={{ overflow: 'hidden' }}>
+              <AdminDataTable
+               rows={DataWithID(isFiltered ? filteredData.data : data.data)} 
+               columns={column} 
+               CustomToolbar={CustomToolbar} 
+               loading={isFiltered ? filterLoading : isLoading} 
+              />
             </div>
-
-            <div className='p-4'>
-                <AdminDataTable 
-                    rows={DataWithID(isFiltered ? filteredData.data : data.data)} 
-                    columns={column} 
-                    CustomToolbar={CustomToolbar} 
-                    loading={isFiltered ? filterLoading : isLoading} 
-                />
-            </div>
+        </div>
+      </div>
         </Fragment>
         </>
     )
