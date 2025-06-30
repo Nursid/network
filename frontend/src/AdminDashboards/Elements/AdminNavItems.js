@@ -2,28 +2,24 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUserRoleContext } from '../../Context/RolesContext'
 import { CiGrid41, CiViewList } from 'react-icons/ci';
-import { TbCalendarCheck } from "react-icons/tb";
 import { GiPayMoney } from 'react-icons/gi';
-import { TbReport } from 'react-icons/tb';
-import { MdOutlinePeople, MdPeopleOutline, MdInventory } from 'react-icons/md';
-import { CgWebsite } from 'react-icons/cg';
+import { MdPeopleOutline, MdInventory } from 'react-icons/md';
 import { FaPeopleCarry } from 'react-icons/fa';
-import { FaRegClock } from "react-icons/fa";
-import { MdReportProblem } from "react-icons/md";
 import { MdAirplaneTicket } from "react-icons/md";
-import { FcSupport } from "react-icons/fc";
-import { GoReport } from "react-icons/go";
 import { useLocation } from 'react-router-dom';
 import { IoIosGitNetwork } from "react-icons/io";
 import { FaChevronDown, FaChevronRight, FaBars } from "react-icons/fa";
 import { BiTransfer, BiMoney, BiReceipt } from "react-icons/bi";
-import { FiUsers, FiUserCheck, FiUserPlus } from "react-icons/fi";
+import { FiUsers, FiUserCheck, FiUserPlus, FiLogOut } from "react-icons/fi";
 import { AiOutlineFileText, AiOutlineGift } from "react-icons/ai";
 import { BsTicketPerforated, BsListTask } from "react-icons/bs";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
+import Swal from 'sweetalert2';
+import { useAuth } from '../../Context/userAuthContext';
 
 const AdminNavItems = ({ onSidebarToggle }) => {
   const { userRole } = useUserRoleContext();
+  const { setCurrentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState({});
@@ -59,18 +55,16 @@ const AdminNavItems = ({ onSidebarToggle }) => {
       title: "Team Management", 
       icon: <MdPeopleOutline size={30} />,
       children: [
-        { title: "Manage Employees", icon: <FiUsers size={20} />, path: "/admin/manage-employees" },
-        { title: "Add Employee", icon: <FiUserPlus size={20} />, path: "/admin/add-employee" },
-        { title: "Manage Salary", icon: <BiMoney size={20} />, path: "/admin/manage-salary" }
+        { title: "Employees Management", icon: <FiUsers size={20} />, path: "/admin/manage-employees" },
+        { title: "Local Staff Management", icon: <FiUserPlus size={20} />, path: "/admin/local-staff-management" },
+        { title: "Salary Management", icon: <BiMoney size={20} />, path: "/admin/manage-salary" }
       ]
     },
     { 
       field: "Customer", 
       title: "Customer", 
       icon: <FaPeopleCarry size={30} />,
-      children: [
-        { title: "All Customers", icon: <FiUsers size={20} />, path: "/admin/customer" },
-      ]
+      path: "/admin/customer",
     },
     { 
       field: "Tickets", 
@@ -78,7 +72,9 @@ const AdminNavItems = ({ onSidebarToggle }) => {
       icon: <MdAirplaneTicket size={30} />,
       children: [
         { title: "All Tickets", icon: <BsTicketPerforated size={20} />, path: "/admin/all-tickets" },
-        { title: "Assign Tickets", icon: <BsListTask size={20} />, path: "/admin/assign-tickets" }
+        { title: "Assign Tickets", icon: <BsListTask size={20} />, path: "/admin/assign-tickets" },
+
+        
       ]
     },
     { 
@@ -92,8 +88,8 @@ const AdminNavItems = ({ onSidebarToggle }) => {
       title: "Inventory Management", 
       icon: <MdInventory size={30} />,
       children: [
-        { title: "All Items", icon: <MdInventory size={20} />, path: "/admin/inventory-management" },
-        { title: "Alloted Items", icon: <FiUserCheck size={20} />, path: "/admin/alloted-items" }
+        { title: "Stock Management", icon: <MdInventory size={20} />, path: "/admin/stock-management" },
+        { title: "Warehouse Management", icon: <FiUserCheck size={20} />, path: "/admin/warehouse-management" }
       ]
     },
     { 
@@ -101,10 +97,11 @@ const AdminNavItems = ({ onSidebarToggle }) => {
       title: "Settings", 
       icon: <CiGrid41 size={30} />,
       children: [
-        { title: "Manage Services", icon: <CiGrid41 size={20} />, path: "/admin/manage-service" },
-        { title: "Manage Plans", icon: <AiOutlineFileText size={20} />, path: "/admin/manage-plans" }
+        { title: "Manage Services", icon: <CiGrid41 size={20} />, path: "/admin/manage-services" },
+        { title: "Manage Plans", icon: <AiOutlineFileText size={20} />, path: "/admin/manage-plans" },
+        { title: "Manage Tickets Head", icon: <AiOutlineFileText size={20} />, path: "/admin/manage-tickets-head" }
       ]
-    }
+    },
   ];
 
   const toggleExpanded = (index) => {
@@ -159,6 +156,31 @@ const AdminNavItems = ({ onSidebarToggle }) => {
     if (onSidebarToggle) {
       onSidebarToggle(newCollapsedState);
     }
+  };
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You will be logged out of your session!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, logout!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        sessionStorage.clear();
+        Swal.fire({
+          position: 'top-end',
+          icon: 'success',
+          title: 'Logout Successfully',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        setCurrentUser(null);
+        navigate('/admin');
+      }
+    });
   };
 
   return (
@@ -216,20 +238,39 @@ const AdminNavItems = ({ onSidebarToggle }) => {
           </div>
         )}
         
-        <button
-          onClick={toggleSidebar}
-          className="btn btn-sm btn-outline-primary border-0 p-2 rounded-circle"
-          style={{
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginLeft: isCollapsed ? '0' : 'auto'
-          }}
-        >
-          <HiOutlineMenuAlt2 size={16} />
-        </button>
+        <div className="d-flex align-items-center gap-2">
+          {!isCollapsed && (
+            <button
+              onClick={handleLogout}
+              className="btn btn-sm btn-outline-danger border-0 p-2 rounded-circle"
+              style={{
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              title="Logout"
+            >
+              <FiLogOut size={16} />
+            </button>
+          )}
+          
+          <button
+            onClick={toggleSidebar}
+            className="btn btn-sm btn-outline-primary border-0 p-2 rounded-circle"
+            style={{
+              width: '32px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <HiOutlineMenuAlt2 size={16} />
+          </button>
+        </div>
       </div>
 
       <div className="d-flex flex-column gap-2">
@@ -298,6 +339,23 @@ const AdminNavItems = ({ onSidebarToggle }) => {
           );
         })}
       </div>
+
+      {/* Logout button for collapsed sidebar */}
+      {isCollapsed && (
+        <div className="mt-auto pt-3 border-top">
+          <button
+            onClick={handleLogout}
+            className="btn btn-sm btn-outline-danger border-0 p-2 rounded-circle mx-auto d-flex align-items-center justify-content-center"
+            style={{
+              width: '40px',
+              height: '40px'
+            }}
+            title="Logout"
+          >
+            <FiLogOut size={18} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

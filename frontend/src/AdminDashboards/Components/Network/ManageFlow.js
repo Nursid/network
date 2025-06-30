@@ -23,6 +23,7 @@ const ManageFlow = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [searchTimeout, setSearchTimeout] = useState(null);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         olt_name: '',
@@ -375,36 +376,28 @@ const ManageFlow = () => {
         setSuccessMessage('');
     }
 
+    const handleSidebarToggle = (collapsed) => {
+        setSidebarCollapsed(collapsed)
+    }
+
     return (
         <Fragment>
             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
-        {/* Left Sidebar - 1/4 width */}
-        <div
-          className="sidebar"
-          style={{
-            width: '25%',
-            height: '100vh',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            overflowY: 'auto',
-            zIndex: 999,
-          }}
-        >
-          <AdminNavItems />
-        </div>
+        {/* Left Sidebar - Dynamic width */}
+        <AdminNavItems onSidebarToggle={handleSidebarToggle} />
 
-        {/* Main Content - 3/4 width */}
+        {/* Main Content - Dynamic width based on sidebar state */}
         <div
           className="main-content"
           style={{
-            width: '75%',
+            width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
+            marginLeft: sidebarCollapsed ? '80px' : '280px',
             height: '100vh',
-            marginLeft: '25%',
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: '#f8f9fa'
+            backgroundColor: '#f8f9fa',
+            transition: 'width 0.3s ease, margin-left 0.3s ease'
           }}
         >
           {/* Header Section with Gradient Background */}
@@ -453,69 +446,6 @@ const ManageFlow = () => {
               </div>
             </div>
           </div>
-
-          {/* <div className='flex'>  
-                    <h4 className='p-2 px-4 mt-2 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}>
-                        {isSearching ? `Search Results (${searchResults.length})` : 'Flow List'}
-                    </h4>
-
-                    <div className='AttendenceNavBtn w-100 py-1 px-4 gap-3 justify-content-end'>
-                        <div className='d-flex align-items-center gap-2' style={{ minWidth: "25rem" }}>
-                            <div className='d-flex align-items-center border rounded-2 bg-white' style={{ flex: 1 }}>
-                                <input
-                                    type="text"
-                                    placeholder="Search by MAC address or User ID..."
-                                    value={searchQuery}
-                                    onChange={handleSearchChange}
-                                    onKeyPress={handleSearchKeyPress}
-                                    className="form-control border-0"
-                                    style={{ 
-                                        boxShadow: 'none',
-                                        fontSize: '14px'
-                                    }}
-                                />
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    size="small"
-                                    onClick={handleSearchClick}
-                                    disabled={loading}
-                                    style={{ 
-                                        minWidth: '40px',
-                                        margin: '2px',
-                                        borderRadius: '4px'
-                                    }}
-                                >
-                                    <SearchIcon fontSize="small" />
-                                </Button>
-                            </div>
-                            
-                            {isSearching && (
-                                <Button
-                                    variant="outlined"
-                                    size="small"
-                                    onClick={clearSearch}
-                                    startIcon={<ClearIcon />}
-                                    style={{ 
-                                        minWidth: '100px',
-                                        color: 'white',
-                                        borderColor: 'white'
-                                    }}
-                                >
-                                    Clear
-                                </Button>
-                            )}
-                        </div>
-
-                        <div 
-                            className={`py-1 px-4 border shadow rounded-2 cursor-p hoverThis text-white Fw_500 d-flex align-items-center justify-content-center`} 
-                            style={{ minWidth: "15rem", maxWidth: "15rem" }} 
-                            onClick={handleAddFlow}
-                        >
-                            Add Flow
-                        </div>
-                    </div>
-                </div> */}
 
 
 <div className='AttendenceNavBtn w-100 py-1 px-4 gap-3 justify-content-end'>

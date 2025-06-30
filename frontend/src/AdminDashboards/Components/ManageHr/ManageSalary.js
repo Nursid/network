@@ -4,11 +4,13 @@ import { GridToolbarContainer, GridToolbarQuickFilter, GridToolbarColumnsButton,
 import AdminDataTable from '../../Elements/AdminDataTable'
 import { API_URL } from '../../../config';
 import './ManageSalary.css';
+import AdminNavItems from '../../Elements/AdminNavItems';
 
 const ManageSalary = () => {
     const [salaries, setSalaries] = useState([]);
     const [employees, setEmployees] = useState([]);
-    const [loading, setLoading] = useState(false);  
+    const [loading, setLoading] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);  
     
 
     // Fetch salaries with filters
@@ -103,6 +105,10 @@ const ManageSalary = () => {
         fetchSalaries();
         fetchEmployees();
     }, []);
+
+    const handleSidebarToggle = (collapsed) => {
+        setSidebarCollapsed(collapsed)
+    }
 
     const DataWithID = (data) => {
         const NewData = []
@@ -231,92 +237,133 @@ const ManageSalary = () => {
 
     return (
         <Fragment>
-            <div className="container-fluid p-4">
+            <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+                {/* Left Sidebar - Dynamic width */}
+                <AdminNavItems onSidebarToggle={handleSidebarToggle} />
 
-                {/* Filters Card */}
-                <div className="card mb-4 shadow-sm border-0">
-                    <div className="card-header bg-light border-bottom">
-                        <h6 className="m-0 fw-bold text-primary">
-                            <i className="fas fa-filter me-2"></i>
-                            Filters
-                        </h6>
-                    </div>
-                    <div className="card-body bg-white">
-                        <div className="row">
-                            <div className="col-md-3 mb-3">
-                                <label className="form-label fw-semibold text-dark">Employee:</label>
-                                <select 
-                                    className="form-select border-1 shadow-sm"
-                                    name="employee_id" 
-                                    // value={filters.employee_id} 
-                                    // onChange={handleFilterChange}
-                                >
-                                    <option value="">All Employees</option>
-                                    {employees.map(emp => (
-                                        <option key={emp.id} value={emp.id}>
-                                            {emp.name} ({emp.emp_id})
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            
-                            <div className="col-md-3 mb-3">
-                                <label className="form-label fw-semibold text-dark">Month:</label>
-                                <select 
-                                    className="form-select border-1 shadow-sm"
-                                    name="month" 
-                                    // value={filters.month} 
-                                    // onChange={handleFilterChange}
-                                >
-                                    {monthOptions.map(option => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            
-                            <div className="col-md-3 mb-3">
-                                <label className="form-label fw-semibold text-dark">Year:</label>
-                                <select 
-                                    className="form-select border-1 shadow-sm"
-                                    name="year" 
-                                    // value={filters.year} 
-                                    // onChange={handleFilterChange}
-                                >
-                                    {yearOptions.map(option => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            
-                            <div className="col-md-3 mb-3">
-                                <label className="form-label fw-semibold text-dark">Status:</label>
-                                <select 
-                                    className="form-select border-1 shadow-sm"
-                                    name="is_approved" 
-                                    // value={filters.is_approved} 
-                                    // onChange={handleFilterChange}
-                                >
-                                    <option value="">All Status</option>
-                                    <option value="true">Approved</option>
-                                    <option value="false">Pending</option>
-                                </select>
+                {/* Main Content - Dynamic width based on sidebar state */}
+                <div
+                    className="main-content"
+                    style={{
+                        width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
+                        marginLeft: sidebarCollapsed ? '80px' : '280px',
+                        height: '100vh',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        backgroundColor: '#f8f9fa',
+                        transition: 'width 0.3s ease, margin-left 0.3s ease'
+                    }}
+                >
+                    {/* Header Section with Gradient Background */}
+                    <div 
+                        className="flex-shrink-0"
+                        style={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            borderRadius: '0 0 20px 20px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                            margin: '10px',
+                            marginBottom: '20px'
+                        }}
+                    >
+                        <div className='d-flex align-items-center justify-content-between p-4'>
+                            <div>
+                                <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
+                                    💰 Salary Management
+                                </h4>
+                                <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
+                                    Manage and track employee salaries
+                                </p>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Data Table Card */}
-                 
-                        <div className="p-3">
-                            <AdminDataTable 
-                                rows={DataWithID(salaries.length > 0 ? salaries : data)} 
-                                columns={column} 
-                                CustomToolbar={CustomToolbar} 
-                            />
+                    {/* Filters Section */}
+                    <div className="px-4 mb-3">
+                        <div className="card shadow-sm border-0" style={{ borderRadius: '15px' }}>
+                            <div className="card-header bg-light border-bottom-0" style={{ borderRadius: '15px 15px 0 0' }}>
+                                <h6 className="m-0 fw-bold text-primary">
+                                    <i className="fas fa-filter me-2"></i>
+                                    Filters
+                                </h6>
+                            </div>
+                            <div className="card-body bg-white" style={{ borderRadius: '0 0 15px 15px' }}>
+                                <div className="row">
+                                    <div className="col-md-3 mb-3">
+                                        <label className="form-label fw-semibold text-dark">Employee:</label>
+                                        <select 
+                                            className="form-select border-1 shadow-sm"
+                                            name="employee_id" 
+                                            // value={filters.employee_id} 
+                                            // onChange={handleFilterChange}
+                                        >
+                                            <option value="">All Employees</option>
+                                            {employees.map(emp => (
+                                                <option key={emp.id} value={emp.id}>
+                                                    {emp.name} ({emp.emp_id})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="col-md-3 mb-3">
+                                        <label className="form-label fw-semibold text-dark">Month:</label>
+                                        <select 
+                                            className="form-select border-1 shadow-sm"
+                                            name="month" 
+                                            // value={filters.month} 
+                                            // onChange={handleFilterChange}
+                                        >
+                                            {monthOptions.map(option => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="col-md-3 mb-3">
+                                        <label className="form-label fw-semibold text-dark">Year:</label>
+                                        <select 
+                                            className="form-select border-1 shadow-sm"
+                                            name="year" 
+                                            // value={filters.year} 
+                                            // onChange={handleFilterChange}
+                                        >
+                                            {yearOptions.map(option => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="col-md-3 mb-3">
+                                        <label className="form-label fw-semibold text-dark">Status:</label>
+                                        <select 
+                                            className="form-select border-1 shadow-sm"
+                                            name="is_approved" 
+                                            // value={filters.is_approved} 
+                                            // onChange={handleFilterChange}
+                                        >
+                                            <option value="">All Status</option>
+                                            <option value="true">Approved</option>
+                                            <option value="false">Pending</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Data Table Section */}
+                    <div className="flex-grow-1 px-4 pb-4" style={{ overflow: 'hidden' }}>
+                        <AdminDataTable 
+                            rows={DataWithID(salaries.length > 0 ? salaries : data)} 
+                            columns={column} 
+                            CustomToolbar={CustomToolbar} 
+                        />
+                    </div>
                 </div>
             </div>
         </Fragment>

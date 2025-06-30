@@ -30,6 +30,7 @@ import AdminNavItems from '../../Elements/AdminNavItems';
 
 const ManageCustomer = () => {
     const navigate = useNavigate()
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
     // Area options for locality filter
     const areaOptions = [
@@ -477,6 +478,10 @@ const ManageCustomer = () => {
     const ToggleAddCustomer = () => setAddCustomer(!addCustomer)
     const ToggleUpdateCustomer = () => setUpdateCustomer(!updateCustomer)
 
+    const handleSidebarToggle = (collapsed) => {
+        setSidebarCollapsed(collapsed)
+    }
+
     return (
     <>
 
@@ -508,33 +513,21 @@ const ManageCustomer = () => {
            
            
 <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
-        {/* Left Sidebar - 1/4 width */}
-        <div
-          className="sidebar"
-          style={{
-            width: '25%',
-            height: '100vh',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            overflowY: 'auto',
-            zIndex: 999,
-          }}
-        >
-          <AdminNavItems />
-        </div>
+        {/* Left Sidebar - Dynamic width */}
+        <AdminNavItems onSidebarToggle={handleSidebarToggle} />
 
-        {/* Main Content - 3/4 width */}
+        {/* Main Content - Dynamic width based on sidebar state */}
         <div
           className="main-content"
           style={{
-            width: '75%',
+            width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
+            marginLeft: sidebarCollapsed ? '80px' : '280px',
             height: '100vh',
-            marginLeft: '25%',
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: '#f8f9fa'
+            backgroundColor: '#f8f9fa',
+            transition: 'width 0.3s ease, margin-left 0.3s ease'
           }}
         >
           {/* Header Section with Gradient Background */}

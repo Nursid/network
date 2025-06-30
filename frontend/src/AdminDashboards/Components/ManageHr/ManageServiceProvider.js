@@ -16,6 +16,7 @@ import moment from 'moment';
 import { API_URL } from '../../../config';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import AdminNavItems from '../../Elements/AdminNavItems';
 
 const ManageServiceProvider = () => {
 
@@ -25,9 +26,8 @@ const ManageServiceProvider = () => {
     const dispatch = useDispatch();
     const { data } = useSelector(pre => pre.GetAllServiceProviderReducer);
 
-
-
     const [blockStatus, setBlockStatus] = useState({});
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // Set initial block status when data changes
     useEffect(() => {
@@ -239,12 +239,16 @@ const ManageServiceProvider = () => {
     useEffect(() => {
         dispatch(GetAllServiceProvider())
     }, [])
+
+    const handleSidebarToggle = (collapsed) => {
+        setSidebarCollapsed(collapsed)
+    }
+    
     // Add service provider controller 
     const [AddService, setAddServicer] = useState(false)
     const ToggleAddServiceMan = () => setAddServicer(!AddService)
     return (
         <Fragment>
-
             <ModalComponent data={<AdminAddServiceProvider toggleModal={toggleModal} data2={editData}  />} 
             modalTitle={editMode ? "Edit Service Provider" : "Add Service Provider"}
             modal={showModal}
@@ -252,19 +256,76 @@ const ManageServiceProvider = () => {
             size={"xl"} scrollable={true}
             />
 
+            <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+                {/* Left Sidebar - Dynamic width */}
+                <AdminNavItems onSidebarToggle={handleSidebarToggle} />
 
-            <div className='flex'>
-                <h4 className='p-3 px-4 mt-3 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}>Service Provider List</h4>
+                {/* Main Content - Dynamic width based on sidebar state */}
+                <div
+                    className="main-content"
+                    style={{
+                        width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
+                        marginLeft: sidebarCollapsed ? '80px' : '280px',
+                        height: '100vh',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        backgroundColor: '#f8f9fa',
+                        transition: 'width 0.3s ease, margin-left 0.3s ease'
+                    }}
+                >
+                    {/* Header Section with Gradient Background */}
+                    <div 
+                        className="flex-shrink-0"
+                        style={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            borderRadius: '0 0 20px 20px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                            margin: '10px',
+                            marginBottom: '20px'
+                        }}
+                    >
+                        <div className='d-flex align-items-center justify-content-between p-4'>
+                            <div>
+                                <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
+                                    🔧 Service Provider List
+                                </h4>
+                                <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
+                                    Manage and track all service providers
+                                </p>
+                            </div>
 
-                <div className='AttendenceNavBtn w-100 py-2 px-4 gap-3 justify-content-end'>
-                    <div className={`py-2 px-4 border shadow rounded-2 cursor-p hoverThis text-white Fw_500 d-flex align-items-center justify-content-center `} style={{ minWidth: "15rem", maxWidth: "15rem" }} onClick={toggleModal} >
-                    Add Service Provider
+                            <div className="d-flex gap-3">
+                                <div
+                                    className="btn btn-light d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
+                                    style={{ 
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        border: 'none'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.transform = 'translateY(-2px)';
+                                        e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                                    }}
+                                    onClick={toggleModal} 
+                                >
+                                    <span>➕</span>
+                                    Add Service Provider
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Data Table Section */}
+                    <div className="flex-grow-1 px-4 pb-4" style={{ overflow: 'hidden' }}>
+                        <AdminDataTable rows={DataWithID(data)} columns={column} CustomToolbar={CustomToolbar} />
                     </div>
                 </div>
-            </div>
-
-            <div className='p-4'>
-                <AdminDataTable rows={DataWithID(data)} columns={column} CustomToolbar={CustomToolbar} />
             </div>
         </Fragment>
     )

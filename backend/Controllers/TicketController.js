@@ -1,6 +1,5 @@
 const db = require("../model/index")
 const Ticket = db.TicketModel;
-const NewCustomerModel = db.NewCustomerModel;
 const CustomerModel = db.CustomerModel;
 const ServiceProviderModel = db.ServiceProviderModel
 
@@ -9,9 +8,9 @@ const createTicket = async (req, res) => {
 	try {
 		const data = req.body;
 
-		const isCustomer = await NewCustomerModel.findOne({
+		const isCustomer = await CustomerModel.findOne({
 			where: {
-				mobileno: data.mobileNo
+				mobile: data.mobileNo
 			}
 		})
 		// Validate required fields
@@ -37,14 +36,9 @@ const getAllTicket = async (req, res) => {
 				{
 					model: CustomerModel,
 					attributes: [
-						'address', 'apartment', 't_address', 'block'
+						'address', 'apartment', 't_address', 'block','name', 'email','mobile'
 					],
-					include: [
-						{
-							model: NewCustomerModel,
-							attributes: ['name', 'email']
-						}
-					]
+					
 				},
 				{
 					model: ServiceProviderModel,

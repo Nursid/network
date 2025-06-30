@@ -1,8 +1,8 @@
-export const API_URL = "http://localhost:5000";
-export const IMG_URL = "http://localhost:5000/uploads/";
+// export const API_URL = "http://localhost:5000";
+// export const IMG_URL = "http://localhost:5000/uploads/";
 
-// export const API_URL = "https://api.medicinehub.in";
-// export const IMG_URL = "https://api.medicinehub.in/";
+export const API_URL = "https://api.medicinehub.in";
+export const IMG_URL = "https://api.medicinehub.in/";
 
 
 export const employeeList = ["backoffice", "admin", "supervisor"];

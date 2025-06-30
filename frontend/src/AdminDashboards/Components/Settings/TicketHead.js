@@ -3,120 +3,69 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from "react-redux";
 import AdminDataTable from '../../Elements/AdminDataTable';
 import moment from 'moment/moment';
+import { GetAllTicketHead } from '../../../Store/Actions/Dashboard/TicketHeadAction';
 import ModalComponent from '../../Elements/ModalComponent';
-import CreateTickets from './form/CreateTickets';
-import { GetAllTicket } from '../../../Store/Actions/Dashboard/TicketAction';
-import VisibilityIcon from '@mui/icons-material/Visibility'
+import AddTicketHead from './Form/AddTicketHead';
 import { Button } from '@mui/material';
-import AssignTechnician from './form/AssignTechnician';
-import TicketView from './view/TicketVIew';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import Swal from 'sweetalert2';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import axios from 'axios';
+import { API_URL } from '../../../config';
 import AdminNavItems from '../../Elements/AdminNavItems';
 
-const AllTickets = () => {
-    const { data } = useSelector(pre => pre.GetAllTicketReducers)
+const TicketsHead = () => {
+    const { data } = useSelector(pre => pre.GetAllTicketHeadReducers)
+    const [createTicket, setCreateTicket] = useState(false)
+    const [editData, setEditData] = useState([])
     const dispatch = useDispatch()
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
     const DataWithID = (data) => {
-        const NewData = [];
-        if (Array.isArray(data) && data.length > 0) {
+        const NewData = []
+        if (data !== undefined) {
             for (let item of data) {
-                const mergedCustomer = {
-                    ...item.customer, 
-                    ...item.customer?.NewCustomer // Merge customer and NewCustomer
-                };
-    
-                delete mergedCustomer.NewCustomer; // Remove nested NewCustomer if needed
-    
-                NewData.push({
-                    ...item,
-                    _id: item.id, // Use item's ID for _id
-                    formattedDate: moment(item.date).format("DD MMM YYYY, hh:mm a"), // Format the `date` field
-                    createdAt: moment(item.createdAt).format("DD MMM YYYY, hh:mm a"), // Format the `date` field
-                    customer: mergedCustomer // Replace customer with the merged object
-                });
+                NewData.push({ ...item, _id: data.indexOf(item), date: moment(item.createdAt).format("D / M / Y") })
             }
         } else {
-            NewData.push({ id: 0 });
+            NewData.push({ id: 0 })
         }
-        return NewData;
-    };
-    const [serviceProviderModalOpen, setServiceProviderModalOpen] = useState(false);
-    const [ticketId, setTicketId] = useState('');
-    const [viewData, setViewData] = useState('');
-    const [createTicket, setCreateTicket] = useState(false)
-    const [viewTicket, setViewTicket] = useState(false)
+        return NewData
+    }
+
     const column = [
         { field: "_id", headerName: "Sr No", minWidth: 50 },
+        { field: "shortCode", headerName: "Short Code", flex: 1 },
         {
-            field: "ticket_code",
-            headerName: "Ticket Code/Id",
-            flex: 1,
-            renderCell: (params) => {
-                return (
-                    <div
-                        className="d-flex flex-column justify-content-center align-items-start p-2"
-                        style={{ width: "200px", height: "100px" }} // Inline style for width and height
-                    >
-                        <div>{params.row.customer?.name}</div>
-                        {/* <div>CustomerId: {params.row.customer?.id}</div>
-                        <div>Box Unique No: {params.row.customer?.other_id}</div> */}
-                    </div>
-                );
-            }
-        },        
+            field: "name", headerName: "Name", flex: 1 },
         {
-            field: "details", headerName: "Details", flex: 1 },
-        {
-            field: "createdAt", headerName: "Created Date & Time", flex: 1
+            field: "Type", headerName: "Type", flex: 1
         },
         {
-            field: "formattedDate", headerName: 'Visit Date & Time', flex: 1
+            field: "TAT", headerName: 'TAT', flex: 1
         },
-        { field: "technician", headerName: "Assign Technician",
-            renderCell: (params) => ( 
-                <>
-                {
-                !params.row.technician   ? (
-                  <Button variant='contained' color='primary' onClick={() => AssignServiceProvider(params.row.id)} >
-                    Technician
-                  </Button>
-        
-                ) : (
-                  params.row.service_provider?.name
-                )
-            }
-            </> ),
-
-            minWidth: 200,  editable: false },
         {
             field: "action",
             headerName: "Action",
-            minWidth: 150,
+            minWidth: 160,
             renderCell: (params) => (
-
                 <div className="d-flex gap-2">
-                
-
-                <Button variant="contained" color="success" 
-                onClick={(e)=>{toggleView(params.row)}}
-                style={{minWidth: "40px", maxWidth: "40px"}}
-                >
-                    <VisibilityIcon />
-                </Button>
-            </div>
+                    <Button variant='contained' color='primary'
+                    style={{minWidth: "40px", maxWidth: "40px"}}
+                    onClick={() => handleEdit(params.row)}
+                    ><BorderColorIcon /></Button>
+                    <Button onClick={() => handleDeleteServices(params.row.id)} variant="contained" color="error"
+                        style={{minWidth: "40px", maxWidth: "40px"}}
+                        >
+                        <DeleteForeverIcon />
+                    </Button>
+                </div>
             ),
         },
     ];
 
-    const toggleView = (data) =>{
-        setViewData(data)
-        ToggleVIewTickets();
-    }
-
-    const AssignServiceProvider = (id) => { 
-        setTicketId(id)
-        setServiceProviderModalOpen(!serviceProviderModalOpen)
-      }
+    useEffect(()=>{
+        dispatch((GetAllTicketHead()))
+    }, [])
 
     const CustomToolbar = () => {
         return (
@@ -132,19 +81,46 @@ const AllTickets = () => {
 
     const ToggleAddTickets = () => {
         setCreateTicket(!createTicket)
+        if (createTicket) {
+            setEditData(null); // Reset editData when closing masterAddService
+        }
     };
+    const handleEdit = (data) =>{
+        setEditData(data)
+        ToggleAddTickets()
+    }
 
-    const ToggleVIewTickets = () => {
-        setViewTicket(!viewTicket)
-    };
 
-    const ToggleAssingTickets = () => {
-        setServiceProviderModalOpen(!serviceProviderModalOpen)
-    };
-
-    useEffect(() => {
-        dispatch(GetAllTicket())
-    }, [])
+    const handleDeleteServices = (itemID)=>{
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+      }).then(async (result) => {
+          if (result.isConfirmed) {
+              const response = await axios.delete(API_URL + '/api/ticket-head/delete/' + itemID)
+              if (response.status === 200) {
+                  Swal.fire(
+                      'Deleted!',
+                      response.data.message,
+                      'success'
+                  )
+                  dispatch(GetAllTicketHead())
+              } else {
+                  Swal.fire({
+                      title: 'failed to delete try again',
+                      icon: "error",
+                  })
+              }
+          }
+      })
+    
+    
+      }
 
     const handleSidebarToggle = (collapsed) => {
         setSidebarCollapsed(collapsed)
@@ -152,11 +128,7 @@ const AllTickets = () => {
 
     return (
         <Fragment>
-            <ModalComponent modal={createTicket} toggle={ToggleAddTickets} data={<CreateTickets ToggleMasterAddService={ToggleAddTickets} GetAllTicket={GetAllTicket}  />} modalTitle={'Add Tickets'} size={'lg'} />
-
-            <ModalComponent modal={viewTicket} toggle={ToggleVIewTickets} data={<TicketView  data={viewData}  />} modalTitle={'View Tickets'} size={'xl'} />
-
-            <ModalComponent modal={serviceProviderModalOpen} toggle={ToggleAssingTickets} data={<AssignTechnician ToggleAssingTickets={ToggleAssingTickets}  ticketId={ticketId} GetAllTicket={GetAllTicket}/>} modalTitle={'Assign Technician'} size={'md'} />
+            <ModalComponent modal={createTicket} toggle={ToggleAddTickets} data={<AddTicketHead ToggleMasterAddService={ToggleAddTickets} GetAllTicketHead={GetAllTicketHead} editData={editData}  />} modalTitle={ editData?.id ? 'Update Ticket Head' : 'Add Ticket Head'} size={'lg'} />
 
             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
                 {/* Left Sidebar - Dynamic width */}
@@ -190,10 +162,10 @@ const AllTickets = () => {
                         <div className='d-flex align-items-center justify-content-between p-4'>
                             <div>
                                 <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
-                                    🎫 All Tickets
+                                    🎟️ Ticket Head Management
                                 </h4>
                                 <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
-                                    Manage and track all support tickets
+                                    Configure ticket categories and types
                                 </p>
                             </div>
 
@@ -217,7 +189,7 @@ const AllTickets = () => {
                                     onClick={ToggleAddTickets}
                                 >
                                     <span>➕</span>
-                                    Create Ticket
+                                    Create New Ticket Head
                                 </div>
                             </div>
                         </div>
@@ -233,4 +205,4 @@ const AllTickets = () => {
     )
 }
 
-export default AllTickets
+export default TicketsHead

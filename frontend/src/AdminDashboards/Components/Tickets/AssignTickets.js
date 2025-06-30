@@ -5,10 +5,12 @@ import { useSelector, useDispatch } from "react-redux";
 import AdminDataTable from '../../Elements/AdminDataTable';
 import moment from 'moment/moment';
 import { GetAllTicket } from '../../../Store/Actions/Dashboard/TicketAction';
+import AdminNavItems from '../../Elements/AdminNavItems';
 
 const AssignTickets = () => {
     const { data } = useSelector(pre => pre.GetAllTicketReducers)
     const dispatch = useDispatch()
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
     const DataWithID = (data) => {
         const NewData = [];
         if (Array.isArray(data) && data.length > 0) {
@@ -92,14 +94,58 @@ const AssignTickets = () => {
         dispatch(GetAllTicket())
     }, [])
 
+    const handleSidebarToggle = (collapsed) => {
+        setSidebarCollapsed(collapsed)
+    }
+
     return (
         <Fragment>
-            <div className='flex'>
-            <h4 className='p-3 px-4 mt-3 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "18rem", minWidth: "18rem" }}> Assign Tickets</h4>
-            </div>
+            <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+                {/* Left Sidebar - Dynamic width */}
+                <AdminNavItems onSidebarToggle={handleSidebarToggle} />
 
-            <div className='p-4'>
-                <AdminDataTable rows={DataWithID(data.data)} columns={column} CustomToolbar={CustomToolbar} />
+                {/* Main Content - Dynamic width based on sidebar state */}
+                <div
+                    className="main-content"
+                    style={{
+                        width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
+                        marginLeft: sidebarCollapsed ? '80px' : '280px',
+                        height: '100vh',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        backgroundColor: '#f8f9fa',
+                        transition: 'width 0.3s ease, margin-left 0.3s ease'
+                    }}
+                >
+                    {/* Header Section with Gradient Background */}
+                    <div 
+                        className="flex-shrink-0"
+                        style={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            borderRadius: '0 0 20px 20px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                            margin: '10px',
+                            marginBottom: '20px'
+                        }}
+                    >
+                        <div className='d-flex align-items-center justify-content-between p-4'>
+                            <div>
+                                <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
+                                    🔧 Assigned Tickets
+                                </h4>
+                                <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
+                                    Track tickets assigned to technicians
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Data Table Section */}
+                    <div className="flex-grow-1 px-4 pb-4" style={{ overflow: 'hidden' }}>
+                        <AdminDataTable rows={DataWithID(data.data)} columns={column} CustomToolbar={CustomToolbar} />
+                    </div>
+                </div>
             </div>
         </Fragment>
     )
