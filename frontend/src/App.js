@@ -1,7 +1,6 @@
 import './App.css';
 import { BrowserRouter, Route, Routes , Navigate} from 'react-router-dom';
 import AdminSignIn from './AdminDashboards/Components/LoginSignup/AdminSignIn';
-import AdminAttendance from './AdminDashboards/Components/Attendence';
 import AdminManageHr from './AdminDashboards/Components/ManageHr';
 import AdminPannel from './AdminDashboards/AdminPannel';
 import AdminProfile from './AdminDashboards/Components/profile/AdminProfile';
@@ -36,7 +35,6 @@ function App() {
         <Route path="/" element={<LandingPage />}/>
           <Route path='/admin/*'  element={<AdminSignIn />}>
             <Route path='dashboard' element={<AdminPannel />} />
-            <Route path='attendance' element={<AdminAttendance />} />
             <Route path='account-transactions' element={<AccountTransaction />} />
             <Route path='team-management' element={<AdminManageHr />} />
             <Route path='customer' element={<ManageCustomer />} />

@@ -71,8 +71,8 @@ const RolesProvider = ({ children }) => {
     useEffect(() => {
         getAdminRoles();
         getSupervisorRole();
-        GetBackofficeRoles();
-        GetServiceProvider();
+        // GetBackofficeRoles();
+        // GetServiceProvider();
     }, []);
 
     // Other role retrieval functions

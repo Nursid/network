@@ -14,8 +14,6 @@ import { useAuth } from '../../../Context/userAuthContext';
 import { ServiceProviderAttendancaAction } from '../../../Store/Actions/Dashboard/AttendanceAction/ServiceProviderAttendance';
 import { Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { ServiceProviderLeaveRemarkModal } from '../../../Components/Modal';
-
 
 const ServiceProviderAttendance = () => {
     const { UserRoleCalled } = useUserRoleContext();
@@ -120,32 +118,12 @@ const ServiceProviderAttendance = () => {
         { field: "check_out", headerName: "Check Out", flex: 1, minWidth: 120, editable: false },
         { field: "createdby", headerName: "Created By", flex: 1, minWidth: 120, editable: false },
         { field: "message", headerName: "Remark", flex: 1, minWidth: 120, editable: false },
-        { field: "action", headerName: "Action", flex: 1, minWidth: 120, editable: false,
-
-          renderCell: (params) => {
-                return (
-                  <div className="d-flex gap-2">
-                  <Button variant='contained' color='primary' 
-                  onClick={() => addLeave(params.row.servp_id)}
-                      style={{minWidth: "40px", maxWidth: "40px"}}
-                      ><LogoutIcon /></Button>
-                   </div>   
-                )
-            }
-         },
     ];
 
 
 
     return (
         <Fragment>
-           <ServiceProviderLeaveRemarkModal 
-            modalOpen={modalOpen}
-            toggleModal={toggleModal} 
-            role={role}
-            empId={empId}
-            ServiceProviderAttendancaAction={ServiceProviderAttendancaAction}
-            />
 
             {/* <DashHeader /> */}
             <div className='p-3'>

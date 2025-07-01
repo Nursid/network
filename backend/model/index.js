@@ -53,7 +53,6 @@ db.SupervisorAttendance.belongsTo(db.EmployeeModel, { foreignKey: 'emp_id', targ
 db.ServiceProviderAttendance.belongsTo(db.ServiceProviderModel, { foreignKey: 'servp_id', targetKey: 'id'});
 
 
-
 db.EmployeeModel.belongsTo(db.DepartmentsModel,{foreignKey: 'department_id'});
 db.EmployeeModel.belongsTo(db.DesignationModel,{foreignKey: 'designation_id'});
 
@@ -63,8 +62,8 @@ db.TicketModel.belongsTo(db.CustomerModel, { foreignKey: 'mobileNo', targetKey: 
 db.TicketModel.belongsTo(db.ServiceProviderModel, { foreignKey: 'technician', targetKey: 'id' });
 
 // Salary model associations
-db.SalaryModel.belongsTo(db.EmployeeModel, { foreignKey: 'employee_id', as: 'employee' });
-db.EmployeeModel.hasMany(db.SalaryModel, { foreignKey: 'employee_id', as: 'salaries' });
+// db.SalaryModel.belongsTo(db.EmployeeModel, { foreignKey: 'employee_id', as: 'employee' });
+
 
 db.sequelize.sync({ force: false }).then(() => {
   console.log("re-sync done!");

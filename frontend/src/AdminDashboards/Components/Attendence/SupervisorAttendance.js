@@ -11,7 +11,6 @@ import { useAuth } from '../../../Context/userAuthContext';
 import Swal from 'sweetalert2';
 import { Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { SupervisorLeaveRemarkModal } from '../../../Components/Modal';
 
 const SupervisorAttendance = () => {
     const { UserRoleCalled } = useUserRoleContext();
@@ -116,32 +115,10 @@ const SupervisorAttendance = () => {
         { field: "check_out", headerName: "Check Out", flex: 1, minWidth: 120, editable: false },
         { field: "createdby", headerName: "Created By", flex: 1, minWidth: 120, editable: false },
         { field: "message", headerName: "Remark", flex: 1, minWidth: 120, editable: false },
-        { field: "action", headerName: "Action", flex: 1, minWidth: 120, editable: false,
-
-          renderCell: (params) => {
-                return (
-                  <div className="d-flex gap-2">
-                  <Button variant='contained' color='primary' 
-                  onClick={() => addLeave(params.row.emp_id)}
-                      style={{minWidth: "40px", maxWidth: "40px"}}
-                      ><LogoutIcon /></Button>
-                   </div>   
-                )
-            }
-         },
     ];
 
     return (
         <Fragment>
-
-            <SupervisorLeaveRemarkModal 
-            modalOpen={modalOpen}
-            toggleModal={toggleModal} 
-            role={role}
-            empId={empId}
-            AttendanceAction={AttendanceAction}
-            />
-
             <div className='p-3'>
                 <h3 className='headingBelowBorder py-3 text-white' style={{ maxWidth: "fit-content" }}>Supervisor Attendance Listing</h3>
                 <AdminDataTable rows={attendanceData} columns={columns} CustomToolbar={GridToolbar} />

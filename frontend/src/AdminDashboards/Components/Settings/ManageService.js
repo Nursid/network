@@ -28,6 +28,7 @@ const ManageService = () => {
 
 
     const { data } = useSelector(pre => pre.GetAllServicesReducer)
+
     // service reducere
     // const DeletResult = useSelector(pre => pre.DeleterTheServiceReducer)
 

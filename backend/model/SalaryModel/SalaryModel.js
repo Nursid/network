@@ -10,18 +10,10 @@ module.exports = (sequelize) => {
         employee_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: {
-                model: 'employees',
-                key: 'id'
-            }
         },
         month: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            validate: {
-                min: 1,
-                max: 12
-            }
         },
         year: {
             type: DataTypes.INTEGER,
@@ -34,9 +26,6 @@ module.exports = (sequelize) => {
         amount: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
-            validate: {
-                min: 0
-            }
         },
         remarks: {
             type: DataTypes.TEXT,

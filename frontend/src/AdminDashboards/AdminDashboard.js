@@ -1,29 +1,21 @@
-import React, { Fragment, useState, useRef } from "react";
+import React, { Fragment, useState } from "react";
 import "./AdminDashboard.css";
 import { GridToolbarDensitySelector, GridToolbarFilterButton, GridToolbarQuickFilter,GridToolbarColumnsButton } from "@mui/x-data-grid";
 import { GridToolbarContainer } from "@mui/x-data-grid";
 import { GridToolbarExport } from "@mui/x-data-grid";
-import AnimatedBackground from "./Elements/AnimatedBacground";
 import AdminNavItems from "./Elements/AdminNavItems";
 import AdminDataTable from "./Elements/AdminDataTable";
 import { useUserRoleContext } from "../Context/RolesContext";
-import { useDispatch, useSelector } from 'react-redux';
-import GetAllOrders from "../Store/Actions/Dashboard/Orders/OrderAction"
-import { useEffect } from "react";
-import { useAuth } from "../Context/userAuthContext";
 
-import Switch from '@mui/material/Switch';
-import Tooltip from '@mui/material/Tooltip';
+
+
 
 const AdminDashboard = () => {
 
   const { userRole } = useUserRoleContext();
-  const { currentUser, setCurrentUser } = useAuth();
-  const [role, setRole] = useState(userRole?.role || '');
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const dispatch = useDispatch();
-  
-  // const {  data: orders, isLoading: isOrderLoading} = useSelector(state => state.GetAllOrderReducer);
+
  
   const orders = [
     {
@@ -42,17 +34,6 @@ const AdminDashboard = () => {
     },
   ];
 
-
-
-
-  useEffect(() => {
-    if (role === "service" || role === "supervisor") {
-      const status = undefined;
-      dispatch(GetAllOrders(status, currentUser.id, role));
-    } else {
-      dispatch(GetAllOrders());
-    }
-  }, [role, currentUser.id, dispatch]);
 
 
   const DataWithID = (data) => {
