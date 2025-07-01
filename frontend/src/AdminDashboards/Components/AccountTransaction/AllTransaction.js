@@ -153,7 +153,7 @@ const AllTransaction = () => {
                 </p>
               </div>
 
-              <div className="d-flex gap-3">
+              {/* <div className="d-flex gap-3">
                 <div
                   className="btn btn-light d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
                   style={{ 
@@ -170,12 +170,11 @@ const AllTransaction = () => {
                     e.target.style.transform = 'translateY(0)';
                     e.target.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
                   }}
-                  // onClick={() => customerTypeOpenFunction(!customerTypeOpen)}
                 >
                   <span>➕</span>
                   Add New Transaction
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
           

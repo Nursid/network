@@ -3,8 +3,7 @@ import { Label, FormGroup, Input, Button, Row, Col } from 'reactstrap';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useDispatch } from 'react-redux';
-import { BounceLoader } from 'react-spinners';
-import { GetAllServices } from '../../../../Store/Actions/Dashboard/servicesAction';
+import { GetAllPlan } from '../../../../Store/Actions/Dashboard/PlanAction';
 import { API_URL } from '../../../../config';
 
 const AddPlans = ({ ToggleMasterAddService, data }) => {
@@ -29,17 +28,20 @@ const AddPlans = ({ ToggleMasterAddService, data }) => {
     };
 
     // Submit the form
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setLoading(true)
 
-        const apiUrl = `${API_URL}/plan/add`;
-        axios
+        let apiUrl = `${API_URL}/plan/add`;
+        if(data?.id){
+            apiUrl = `${API_URL}/plan/update/${data?.id}`;
+        }
+        await axios
             .post(apiUrl, formData)
             .then((response) => {
                 setLoading(false);
                 ToggleMasterAddService();
                 Swal.fire('Success', response.data.message, 'success');
-                dispatch(GetAllServices());
+                dispatch(GetAllPlan());
             })
             .catch((error) => {
                 setLoading(false);

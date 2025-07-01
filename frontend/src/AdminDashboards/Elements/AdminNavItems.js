@@ -81,7 +81,7 @@ const AdminNavItems = ({ onSidebarToggle }) => {
       field: "Network", 
       title: "Network", 
       icon: <IoIosGitNetwork size={30} />,
-      path: "/admin/flow"
+      path: "/admin/manage-flow"
     },
     { 
       field: "Inventory", 

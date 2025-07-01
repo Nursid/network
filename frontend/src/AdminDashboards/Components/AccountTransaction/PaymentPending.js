@@ -163,7 +163,7 @@ const PaymentPending = () => {
                 </p>
               </div>
 
-              <div className="d-flex gap-3">
+              {/* <div className="d-flex gap-3">
                 <div
                   className="btn btn-light d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
                   style={{ 
@@ -185,7 +185,7 @@ const PaymentPending = () => {
                   <span>💳</span>
                   Collect Payment
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
           

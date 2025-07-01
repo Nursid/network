@@ -50,6 +50,34 @@ const GetAllServices = async (req, res) => {
     }
 }
 
+const UpdatePlan = async (req, res) => {    
+    const id = req.params.id;
+    const data = req.body;
+    
+    try {
+        const UpdatePlan = await PlanModel.update(data, {
+            where: {
+                id: id
+            }
+        });
+        
+        if (!UpdatePlan) {
+            return res.status(400).json("Plan Not Updated");
+        }
+        
+        res.status(200).json({
+            error: false,
+            data: UpdatePlan,
+            message: "Plan Updated Successfully!"
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: true,
+            message: "Failed to update service",
+            details: error.message // Optionally include more details about the error
+        });
+    }
+};
 
 const DeletePlan = async (req, res) => {
     const id = req.params.id;
@@ -81,4 +109,4 @@ const DeletePlan = async (req, res) => {
 
 
 
-module.exports ={AddPlans, GetAllServices, DeletePlan} 
+module.exports ={AddPlans, GetAllServices, DeletePlan, UpdatePlan} 

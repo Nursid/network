@@ -11,20 +11,11 @@ const utilRouter = require("./Routers/utils");
 const RolesRoutes = require("./Routers/RolesManageRoutes/RolesRoutes");
 const EmployeeRoutes = require("./Routers/AuthRouters/OfficeRouter");
 const ServiceRoutes = require("./Routers/AuthRouters/ServiceProviderRoutes");
-const OrderRouters = require("./Routers/OrdersRoutes/BookingRoutes");
-const EnquiryRouters = require("./Routers/enquiryRoutes");
-const ExpenseRouters = require("./Routers/ExpensesRouters/ExpenseRouters");
 const SuperAdminRoutes = require("./Routers/AuthRouters/SuperAdminRoutes");
 const VerifyRoutes = require("./Routers/Verify");
-const NewCustomerRoutes = require("./Routers/NewCustomerRouters/NewCustomerRoute")
 const DepartmentsRouter=require("./Routers/DepartmentsRouter");
 const DesignationRouter=require("./Routers/DesignationRouter")
-const MemberRoutes=require("./Routers/NewCustomerRouters/MemberRouter");
-const MonthlyService=require("./Routers/AuthRouters/MonthlyServiceRouter");
-const ManageWebsite = require("./Routers/ManageWebsiteRouters/")
-const CustomerPost= require("./Routers/NewCustomerRouters/CustomerPostRouter")
 const InventoryRouter=require("./Routers/InventryRouter")
-const complain = require("./Routers/ComplainRouter")
 const Attendance = require("./Routers/AttendanceRouters")
 const Plan = require("./Routers/Services/PlansRouters")
 const SalaryRoutes = require("./Routers/SalaryRouters/SalaryRoutes")
@@ -63,32 +54,20 @@ app.get("/", (req, res) => {
 app.use("/api",route)
 app.use("/customer", CustomerRouter);
 app.use("/service", ServiceRouter);
-app.use("/expense", ExpenseRouters);
 app.use("/employee", EmployeeRoutes);
 app.use("/service-provider", ServiceRoutes);
 app.use("/roles", RolesRoutes);
 app.use("/admin", SuperAdminRoutes);
 app.use("/util", utilRouter);
-app.use("/order", OrderRouters);
-app.use("/enquiry", EnquiryRouters);
 app.use("/verify", VerifyRoutes);
-app.use('/', NewCustomerRoutes)
-app.use("/members",MemberRoutes);
 app.use("/department",DepartmentsRouter);
 app.use("/designation",DesignationRouter);
-app.use("/monthly-service",MonthlyService);
-app.use("/manage-website",ManageWebsite);
-app.use("/post",CustomerPost);
 app.use("/inventry",InventoryRouter)
-app.use("/complain",complain)
 app.use("/attendance",Attendance)
 app.use("/plan",Plan)
 app.use("/salary",SalaryRoutes)
 
-
-
-
 // Start the server
-app.listen(6000, () => {
-  console.log(`Server started at port 6000`);
+app.listen(5000, () => {
+  console.log(`Server started at port 5000`);
 });

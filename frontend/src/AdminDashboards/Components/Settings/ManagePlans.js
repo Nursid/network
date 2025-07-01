@@ -5,7 +5,7 @@ import MasterAddService from './Form/MasterAddService';
 import ModalComponent from '../../Elements/ModalComponent';
 import AdminDataTable from '../../Elements/AdminDataTable';
 import { GetAllPlan } from '../../../Store/Actions/Dashboard/PlanAction';
-import { DeleteService } from '../../../Store/Actions/Dashboard/servicesAction';
+import { DeletePlan } from '../../../Store/Actions/Dashboard/PlanAction';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import Swal from 'sweetalert2';
 import moment from 'moment/moment';
@@ -58,64 +58,6 @@ const ManagePlans = () => {
     }, [data]);
 
 
-
-
-    const handleToggleBlock = (userId) => {
-        const newBlockStatus = !blockStatus[userId]; // Toggle the block status
-        // Make API call to update block status on the server
-
-        const actionText = newBlockStatus ? 'Un-Block' : 'Block';
-        Swal.fire({
-            title: 'Are you sure?',
-            text: `You won't be able to ${actionText}!`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: `Yes, ${actionText} it!`
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                // Toggle the block status
-        // Make API call to update block status on the server
-        axios.put(`${API_URL}/service/block/${userId}`, { block: newBlockStatus })
-            .then(response => {
-                if (response.status === 200) {
-                    Swal.fire(
-                        `${actionText} Successful`,
-                        `User has been ${actionText}ed.`,
-                        'success'
-                    );
-                    // Update local state if API call is successful
-                   setBlockStatus(prevBlockStatus => ({
-                        ...prevBlockStatus,
-                        [userId]: newBlockStatus,
-                    }));
-                } else {
-                    // Handle error if API call fails
-                    Swal.fire({
-                        title: 'failed to delete try again',
-                        icon: "error",
-                    })
-                    console.error('Failed to update block status');
-                }
-            })
-            .catch(error => {
-                console.error('Error updating block status:', error);
-            });
-
-               
-            }
-        })
-    };
-
-
-
-    // const IconWrapper = ({ icon }) => {
-    //     const IconComponent = ALlIcon[icon];
-    //     return IconComponent ? <IconComponent /> : null;
-    // };
-
-
     const handleDeleteServices = (id) => {
         Swal.fire({
             title: `Are you sure? `,
@@ -127,7 +69,7 @@ const ManagePlans = () => {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                dispatch(DeleteService(id))
+                dispatch(DeletePlan(id))
                     .then(() => {
                         setDeleteSuccess(true);
                         Swal.fire("Deleted!", "Your Data Deleted", "success");

@@ -96,7 +96,7 @@ const DeleteByID = async (req, res) => {
             }
         });
 
-        if (result === 0) {
+        if (!result) {
             return res.status(400).json("Service Not Deleted");
         }
 

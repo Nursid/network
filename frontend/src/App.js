@@ -24,6 +24,7 @@ import AssignTickets from './AdminDashboards/Components/Tickets/AssignTickets';
 import TicketsHead from './AdminDashboards/Components/Settings/TicketHead';
 import ManagePlans from './AdminDashboards/Components/Settings/ManagePlans';
 import LandingPage from './LandingPage/LandingPage';
+import NetworkFlow from './AdminDashboards/Components/Network/components/NetworkFlow';
 
 
 function App() {
@@ -41,7 +42,8 @@ function App() {
             <Route path='customer' element={<ManageCustomer />} />
             <Route path='profile' element={<AdminProfile />} />
             <Route path='network' element={<Network />} />
-            <Route path='flow' element={<ManageFlow />} />
+            <Route path='flow' element={<NetworkFlow />} />
+            <Route path='manage-flow' element={<ManageFlow />} />
             <Route path='all-transaction' element={<AllTransaction />} />
             <Route path='collection-tally' element={<CollectionTally />} />
             <Route path='payment-pending' element={<PaymentPending />} />
