@@ -5,7 +5,6 @@ import AdminManageHr from './AdminDashboards/Components/ManageHr';
 import AdminPannel from './AdminDashboards/AdminPannel';
 import AdminProfile from './AdminDashboards/Components/profile/AdminProfile';
 import { ServiceProvider } from './Store/context/serviceProvider';
-import Network from './AdminDashboards/Components/Network';
 import AccountTransaction from './AdminDashboards/Components/AccountTransaction';
 import AllTransaction from './AdminDashboards/Components/AccountTransaction/AllTransaction';
 import CollectionTally from './AdminDashboards/Components/AccountTransaction/CollectionTally';
@@ -39,7 +38,6 @@ function App() {
             <Route path='team-management' element={<AdminManageHr />} />
             <Route path='customer' element={<ManageCustomer />} />
             <Route path='profile' element={<AdminProfile />} />
-            <Route path='network' element={<Network />} />
             <Route path='flow' element={<NetworkFlow />} />
             <Route path='manage-flow' element={<ManageFlow />} />
             <Route path='all-transaction' element={<AllTransaction />} />

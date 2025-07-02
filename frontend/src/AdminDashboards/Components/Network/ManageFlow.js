@@ -180,8 +180,8 @@ const ManageFlow = () => {
                 
                 try {
                     if (item.data) {
-                        const parsedData = JSON.parse(item.data);
-                        
+                        const parsedData = item.data;
+
                         if (parsedData.nodes && Array.isArray(parsedData.nodes)) {
                             parsedData.nodes.forEach(node => {
                                 // Count OLT devices (nodes with oltName or deviceType OLT)

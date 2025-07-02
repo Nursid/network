@@ -341,7 +341,7 @@ const ManageCustomer = () => {
     }
 
     const column = [
-        { field: "_id", headerName: "Sr No", minWidth: 50, editable: false },
+        // { field: "_id", headerName: "Sr No", minWidth: 50, editable: false },
         { field: "id", headerName: "Customer ID", minWidth: 120, editable: false },
         { field: "name", headerName: "Name", minWidth: 120, editable: false },
         { field: "username", headerName: "Username", minWidth: 120, editable: false },

@@ -250,7 +250,7 @@ const AllCustomer = async (req, res) => {
 	try {
 		const customers = await CustomerModel.findAll({
 			order: [
-				['id', 'DESC']
+				['id', 'ASC']
 			]
 		});
 

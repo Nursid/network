@@ -763,13 +763,11 @@ const FlowContent = ({ flowData }) => {
     const restoreFlow = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/flow/get/${flowData.id}`);
-        
-        const flow = JSON.parse(response.data.data.data);
-        console.log("Flow restored:-----", flow);
-   
+
+        const flow = response?.data?.data?.data;
+
         if (flow) {
           const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-          
           // Clear NodeStore before restoration
           NodeStore.clear();
           

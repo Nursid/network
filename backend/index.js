@@ -1,5 +1,4 @@
 require("dotenv").config();
-require("./connection");
 const multer = require("multer");
 const express = require("express");
 const cors = require("cors");
@@ -68,6 +67,6 @@ app.use("/plan",Plan)
 app.use("/salary",SalaryRoutes)
 
 // Start the server
-app.listen(6000, () => {
-  console.log(`Server started at port 6000`);
+app.listen(5000, () => {
+  console.log(`Server started at port 5000`);
 });
