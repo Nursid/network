@@ -34,6 +34,7 @@ router.get("/getall", customerRouter.AllCustomer);
 router.get("/getbyid/:id", customerRouter.GetCustomer);
 router.post("/get", customerRouter.AllCustomer);
 router.post("/filter", customerRouter.FilterCustomers);
+router.get("/getallcustomerfilterbyflow", customerRouter.AllCustomerFilterByFlow);
 
 router.put('/getupdate/:user_id', upload.fields([
   { name: 'image', maxCount: 1 },

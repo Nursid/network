@@ -18,6 +18,20 @@ export const GetAllCustomers = () => {
     }
 }
 
+export const GetAllCustomersFilterByFlow = () => {
+    return async (dispatch) => {
+        dispatch({ type: constant.GET_ALL_CUSTOMER_FILTER_BY_FLOW_LOADING })
+        try {
+            const response = await axios.get(API_URL + '/customer/getallcustomerfilterbyflow')
+            if (response.status === 200) {
+                dispatch({ type: constant.GET_ALL_CUSTOMER_FILTER_BY_FLOW_SUCCESS, payload: response.data })
+            }
+        } catch (error) {
+            dispatch({ type: constant.GET_ALL_CUSTOMER_FILTER_BY_FLOW_ERROR })
+        }
+    }
+}
+
 
 
 // get update the customer 

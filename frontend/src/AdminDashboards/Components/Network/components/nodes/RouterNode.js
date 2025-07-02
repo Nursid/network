@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Handle } from '@xyflow/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { GetAllCustomers } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
+import { GetAllCustomersFilterByFlow } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
 import { API_URL } from '../../../../../config';
 
 const RouterNode = ({ data }) => {
   const dispatch = useDispatch();
-  const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerReducer)
+  const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerFilterByFlowReducer)
 
   console.log("customers---->",customers)
 
@@ -24,7 +24,7 @@ const RouterNode = ({ data }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
-    dispatch(GetAllCustomers());
+    dispatch(GetAllCustomersFilterByFlow());
   }, [dispatch]);
 
   useEffect(() => {

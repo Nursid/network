@@ -4,6 +4,7 @@ const db = require("../../model/index");
 const CustomerModel = db.CustomerModel;
 const ServiceProviderModel = db.ServiceProviderModel
 const EmployeeModel = db.EmployeeModel
+const FlowModel = db.FlowModel
 require("dotenv").config;
 const {isEmail, isMobileNumber, isOptValid} = require("../utils");
 
@@ -591,6 +592,78 @@ const FilterCustomers = async (req, res) => {
 	}
 }
 
+
+const AllCustomerFilterByFlow = async (req, res) => {
+	try {
+		// Get all flows
+		const flows = await FlowModel.findAll();
+		
+		// Extract all userIds from flow data
+		const userIdsInFlows = new Set();
+		
+		flows.forEach(flow => {
+			if (flow.data) {
+				let parsedData;
+				try {
+					// Handle both string and object data types
+					if (typeof flow.data === 'string') {
+						parsedData = JSON.parse(flow.data);
+						// Handle double-encoded JSON
+						while (typeof parsedData === 'string') {
+							parsedData = JSON.parse(parsedData);
+						}
+					} else {
+						parsedData = flow.data;
+					}
+					
+					// Extract userIds from nodes in the flow data
+					if (parsedData && parsedData.nodes && Array.isArray(parsedData.nodes)) {
+						parsedData.nodes.forEach(node => {
+							if (node.data && node.data.userId) {
+								userIdsInFlows.add(node.data.userId.toString());
+							}
+						});
+					}
+				} catch (error) {
+					console.error('Error parsing flow data:', error);
+				}
+			}
+		});
+
+		// Get all customers
+		const allCustomers = await CustomerModel.findAll({
+			order: [
+				['id', 'ASC']
+			]
+		});
+
+		// Filter customers that are NOT in any flow
+		const customersNotInFlow = allCustomers.filter(customer => {
+			return !userIdsInFlows.has(customer.id.toString());
+		});
+
+		if (customersNotInFlow.length === 0) {
+			return res.status(200).json({
+				status: 200, 
+				data: [], 
+				message: "No customers found that are not assigned to any flow"
+			});
+		}
+		
+		res.status(200).json({
+			status: 200, 
+			data: customersNotInFlow,
+			message: `Found ${customersNotInFlow.length} customers not assigned to any flow`
+		});
+	} catch (error) {
+		console.error('AllCustomerFilterByFlow error:', error);
+		res.status(500).json({
+			error: true, 
+			message: "Internal Server Error: " + error.message
+		});
+	}
+};
+
 module.exports = {
 	SignupUser,
 	LoginUser,
@@ -600,5 +673,6 @@ module.exports = {
 	GetDeleteCustomerById,
 	GetUpdateTheCustomer,
 	UpdateStatus,
-	FilterCustomers
+	FilterCustomers,
+	AllCustomerFilterByFlow
 };

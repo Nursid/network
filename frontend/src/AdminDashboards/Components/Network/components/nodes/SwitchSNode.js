@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Handle } from '@xyflow/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { GetAllCustomers } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
+import { GetAllCustomersFilterByFlow } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
 
 const SwitchSNode = ({ data }) => {
   const dispatch = useDispatch();
-  const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerReducer)
+  const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerFilterByFlowReducer)
 
   const [fields, setFields] = useState({
     ports: data.ports || '',
@@ -23,7 +23,7 @@ const SwitchSNode = ({ data }) => {
   });
 
   useEffect(() => {
-    dispatch(GetAllCustomers());
+    dispatch(GetAllCustomersFilterByFlow());
   }, [dispatch]);
 
   useEffect(() => {
@@ -286,15 +286,22 @@ const SwitchSNode = ({ data }) => {
         disabled={isLoading}
       >
         <option value="">{isLoading ? "Loading customers..." : "Select Customer"}</option>
-        {customers?.data?.length > 0 ? (
-          customers.data.map((customer) => (
-            <option key={customer._id} value={customer._id}>
-              {customer.name} ({customer._id})
+        {(() => {
+          // Get available customers (excluding already assigned ones)
+          const availableCustomers = data.getAvailableCustomers ? data.getAvailableCustomers(customers) : customers?.data || [];
+          
+          return availableCustomers.length > 0 ? (
+            availableCustomers.map((customer) => (
+              <option key={customer.id || customer._id} value={customer.id || customer._id}>
+                {customer.name} ({customer.id || customer._id})
+              </option>
+            ))
+          ) : !isLoading && (
+            <option value="" disabled>
+              {customers?.data?.length > 0 ? "All customers are already assigned" : "No customers found"}
             </option>
-          ))
-        ) : !isLoading && (
-          <option value="" disabled>No customers found</option>
-        )}
+          );
+        })()}
       </select>
 
       <div style={{fontSize: '12px', marginBottom: '3px', fontWeight: '500'}}>Google Location:</div>

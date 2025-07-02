@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Handle } from '@xyflow/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { GetAllCustomers } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
+import { GetAllCustomersFilterByFlow } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
 
 const SwitchPNode = ({ data }) => {
   const dispatch = useDispatch();
-  const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerReducer)
+  const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerFilterByFlowReducer)
 
   const [fields, setFields] = useState({
     ports: data.ports || '',
@@ -21,7 +21,7 @@ const SwitchPNode = ({ data }) => {
   });
 
   useEffect(() => {
-    dispatch(GetAllCustomers());
+    dispatch(GetAllCustomersFilterByFlow());
   }, [dispatch]);
 
   useEffect(() => {
