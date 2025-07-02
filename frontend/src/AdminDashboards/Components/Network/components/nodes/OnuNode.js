@@ -47,6 +47,9 @@ const OnuNode = ({ data }) => {
     });
   }, [data]);
 
+  
+  
+
     const handleFieldChange = (e) => {
     const { name, value } = e.target;
     
@@ -321,8 +324,8 @@ const OnuNode = ({ data }) => {
         <option value="">{isLoading ? "Loading customers..." : "Select Customer"}</option>
         {customers?.data?.length > 0 ? (
           customers.data.map((customer) => (
-            <option key={customer._id} value={customer._id}>
-              {customer.name} ({customer._id})
+            <option key={customer.id} value={customer.id}>
+              {customer.name} ({customer.id})
             </option>
           ))
         ) : !isLoading && (

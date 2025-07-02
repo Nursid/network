@@ -596,39 +596,39 @@ const FilterCustomers = async (req, res) => {
 const AllCustomerFilterByFlow = async (req, res) => {
 	try {
 		// Get all flows
-		const flows = await FlowModel.findAll();
+		// const flows = await FlowModel.findAll();
 		
-		// Extract all userIds from flow data
-		const userIdsInFlows = new Set();
+		// // Extract all userIds from flow data
+		// const userIdsInFlows = new Set();
 		
-		flows.forEach(flow => {
-			if (flow.data) {
-				let parsedData;
-				try {
-					// Handle both string and object data types
-					if (typeof flow.data === 'string') {
-						parsedData = JSON.parse(flow.data);
-						// Handle double-encoded JSON
-						while (typeof parsedData === 'string') {
-							parsedData = JSON.parse(parsedData);
-						}
-					} else {
-						parsedData = flow.data;
-					}
+		// flows.forEach(flow => {
+		// 	if (flow.data) {
+		// 		let parsedData;
+		// 		try {
+		// 			// Handle both string and object data types
+		// 			if (typeof flow.data === 'string') {
+		// 				parsedData = JSON.parse(flow.data);
+		// 				// Handle double-encoded JSON
+		// 				while (typeof parsedData === 'string') {
+		// 					parsedData = JSON.parse(parsedData);
+		// 				}
+		// 			} else {
+		// 				parsedData = flow.data;
+		// 			}
 					
-					// Extract userIds from nodes in the flow data
-					if (parsedData && parsedData.nodes && Array.isArray(parsedData.nodes)) {
-						parsedData.nodes.forEach(node => {
-							if (node.data && node.data.userId) {
-								userIdsInFlows.add(node.data.userId.toString());
-							}
-						});
-					}
-				} catch (error) {
-					console.error('Error parsing flow data:', error);
-				}
-			}
-		});
+		// 			// Extract userIds from nodes in the flow data
+		// 			if (parsedData && parsedData.nodes && Array.isArray(parsedData.nodes)) {
+		// 				parsedData.nodes.forEach(node => {
+		// 					if (node.data && node.data.userId) {
+		// 						userIdsInFlows.add(node.data.userId.toString());
+		// 					}
+		// 				});
+		// 			}
+		// 		} catch (error) {
+		// 			console.error('Error parsing flow data:', error);
+		// 		}
+		// 	}
+		// });
 
 		// Get all customers
 		const allCustomers = await CustomerModel.findAll({
@@ -637,12 +637,12 @@ const AllCustomerFilterByFlow = async (req, res) => {
 			]
 		});
 
-		// Filter customers that are NOT in any flow
-		const customersNotInFlow = allCustomers.filter(customer => {
-			return !userIdsInFlows.has(customer.id.toString());
-		});
+		// // Filter customers that are NOT in any flow
+		// const customersNotInFlow = allCustomers.filter(customer => {
+		// 	return !userIdsInFlows.has(customer.id.toString());
+		// });
 
-		if (customersNotInFlow.length === 0) {
+		if (allCustomers.length === 0) {
 			return res.status(200).json({
 				status: 200, 
 				data: [], 
@@ -652,8 +652,8 @@ const AllCustomerFilterByFlow = async (req, res) => {
 		
 		res.status(200).json({
 			status: 200, 
-			data: customersNotInFlow,
-			message: `Found ${customersNotInFlow.length} customers not assigned to any flow`
+			data: allCustomers,
+			message: `Found ${allCustomers.length} customers not assigned to any flow`
 		});
 	} catch (error) {
 		console.error('AllCustomerFilterByFlow error:', error);

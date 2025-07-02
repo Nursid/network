@@ -292,8 +292,8 @@ const SwitchSNode = ({ data }) => {
           
           return availableCustomers.length > 0 ? (
             availableCustomers.map((customer) => (
-              <option key={customer.id || customer._id} value={customer.id || customer._id}>
-                {customer.name} ({customer.id || customer._id})
+              <option key={customer.id || customer.id} value={customer.id || customer.id}>
+                {customer.name} ({customer.id || customer.id})
               </option>
             ))
           ) : !isLoading && (
