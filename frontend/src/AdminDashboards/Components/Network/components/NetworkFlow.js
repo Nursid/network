@@ -20,6 +20,7 @@ import Swal from 'sweetalert2';
 // Import components
 import DebugPanel from './DebugPanel';
 import NodeStore from './NodeStore';
+import EdgeStore from './EdgeStore';
 import { getLayoutedElements, } from './NetworkLayout';
 import { 
   createPonClickHandler, 
@@ -96,11 +97,13 @@ const FlowContent = ({ flowData }) => {
     console.log(`[${action}] Nodes:`, nodes);
     console.log(`[${action}] Edges:`, edges);
     console.log(`[${action}] Node store:`, NodeStore.getAllNodes());
+    console.log(`[${action}] Edge store:`, EdgeStore.getAllEdges());
     setDebugInfo({
       action,
       nodeCount: nodes.length,
       edgeCount: edges.length,
       storeCount: NodeStore.getAllNodes().length,
+      edgeStoreCount: EdgeStore.getAllEdges().length,
       timestamp: new Date().toISOString()
     });
   };
@@ -191,9 +194,10 @@ const FlowContent = ({ flowData }) => {
 
   // Setup initial nodes function wrapped in useCallback
   const setupInitialNodes = useCallback(() => {
-    // Reset counter and store
+    // Reset counter and stores
     idCounterRef.current = 1;
     NodeStore.clear();
+    EdgeStore.clear();
     
     // Use flowData if available, otherwise use default values
     const eponName = flowData?.name || 'EPON';
@@ -249,6 +253,8 @@ const FlowContent = ({ flowData }) => {
       };
 
       ponEdges.push(edge);
+      // Add to EdgeStore
+      EdgeStore.addEdge(edge);
     }
 
     const allNodes = [eponNode, ...ponNodes];
@@ -297,6 +303,21 @@ const FlowContent = ({ flowData }) => {
       }
     });
   }, [nodes, onNodesChange]);
+
+  // Custom edge change handler to update EdgeStore when edges change
+  const handleEdgesChange = useCallback((changes) => {
+    // Apply the changes to the edges state first
+    onEdgesChange(changes);
+    
+    // Update EdgeStore based on changes
+    changes.forEach(change => {
+      if (change.type === 'add' && change.item) {
+        EdgeStore.addEdge(change.item);
+      } else if (change.type === 'remove') {
+        EdgeStore.removeEdge(change.id);
+      }
+    });
+  }, [onEdgesChange]);
   
   // Suppress ResizeObserver loop warning
   useEffect(() => {
@@ -424,7 +445,13 @@ const FlowContent = ({ flowData }) => {
     setEdges(eds => {
       // Keep all edges that don't have this node as a target
       const filteredEdges = eds.filter(e => !incomingEdges.some(ie => ie.id === e.id));
-      return [...filteredEdges, newEdge];
+      const updatedEdges = [...filteredEdges, newEdge];
+      
+      // Update EdgeStore
+      incomingEdges.forEach(edge => EdgeStore.removeEdge(edge.id));
+      EdgeStore.addEdge(newEdge);
+      
+      return updatedEdges;
     });
     
     // Log state after update
@@ -487,6 +514,23 @@ const FlowContent = ({ flowData }) => {
     }
   }, [nodes]);
 
+  // Keep edgeStore in sync with edges state
+  useEffect(() => {
+    // Only sync if we're not in the middle of restoration
+    // This prevents interference during the restore process
+    if (isMounted.current) {
+      // Clear the store first
+      EdgeStore.clear();
+      
+      // Add all current edges to the store
+      edges.forEach(edge => {
+        EdgeStore.addEdge(edge);
+      });
+      
+      // console.log("Edge store updated:", EdgeStore.getAllEdges().length, "edges");
+    }
+  }, [edges]);
+
   // Apply layout and update the flow when nodes or edges change
   useEffect(() => {
     // Avoid layout calculations during initial render
@@ -517,13 +561,15 @@ const FlowContent = ({ flowData }) => {
   }, [nodes.length, edges.length]);
 
   const onConnect = useCallback(
-    (params) =>
-      setEdges((eds) =>
-        addEdge(
-          { ...params, type: ConnectionLineType.SmoothStep, animated: true },
-          eds,
-        ),
-      ),
+    (params) => {
+      const newEdge = { ...params, type: ConnectionLineType.SmoothStep, animated: true };
+      setEdges((eds) => {
+        const updatedEdges = addEdge(newEdge, eds);
+        // Add to EdgeStore
+        EdgeStore.addEdge(newEdge);
+        return updatedEdges;
+      });
+    },
     [],
   );
 
@@ -768,8 +814,9 @@ const FlowContent = ({ flowData }) => {
 
         if (flow) {
           const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-          // Clear NodeStore before restoration
+          // Clear both stores before restoration
           NodeStore.clear();
+          EdgeStore.clear();
           
           // Update idCounter to be higher than any existing node ID
           const maxId = Math.max(
@@ -831,6 +878,11 @@ const FlowContent = ({ flowData }) => {
           // Set nodes and edges
           setNodes(restoredNodes);
           setEdges(flow.edges || []);
+          
+          // Add edges to EdgeStore
+          (flow.edges || []).forEach(edge => {
+            EdgeStore.addEdge(edge);
+          });
           
           // Set viewport after a short delay to ensure nodes are rendered
           setTimeout(() => {
@@ -1165,7 +1217,7 @@ const FlowContent = ({ flowData }) => {
           nodes={nodes}
           edges={edges}
           onNodesChange={handleNodesChange}
-          onEdgesChange={onEdgesChange}
+          onEdgesChange={handleEdgesChange}
           onConnect={onConnect}
           onEdgeClick={onEdgeClick}
           onPaneClick={onPaneClick}
