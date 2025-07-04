@@ -1,7 +1,6 @@
 import './App.css';
 import { BrowserRouter, Route, Routes , Navigate} from 'react-router-dom';
 import AdminSignIn from './AdminDashboards/Components/LoginSignup/AdminSignIn';
-import AdminManageHr from './AdminDashboards/Components/ManageHr';
 import AdminPannel from './AdminDashboards/AdminPannel';
 import AdminProfile from './AdminDashboards/Components/profile/AdminProfile';
 import { ServiceProvider } from './Store/context/serviceProvider';
@@ -34,8 +33,7 @@ function App() {
         <Route path="/" element={<LandingPage />}/>
           <Route path='/admin/*'  element={<AdminSignIn />}>
             <Route path='dashboard' element={<AdminPannel />} />
-            <Route path='account-transactions' element={<AccountTransaction />} />
-            <Route path='team-management' element={<AdminManageHr />} />
+            <Route path='account-transactions' element={<AccountTransaction />}/>
             <Route path='customer' element={<ManageCustomer />} />
             <Route path='profile' element={<AdminProfile />} />
             <Route path='flow' element={<NetworkFlow />} />
@@ -48,13 +46,11 @@ function App() {
             <Route path='manage-salary' element={<ManageSalary />} />
             <Route path='stock-management' element={<StockManagement />} />
             <Route path='warehouse-management' element={<WarehouseManagement />} />
-            
             <Route path='manage-services' element={<ManageService />} />
             <Route path='all-tickets' element={<AllTickets />} />
             <Route path='assign-tickets' element={<AssignTickets />} />
             <Route path='manage-tickets-head' element={<TicketsHead />} />
             <Route path='manage-plans' element={<ManagePlans />} />
-
           </Route>
         </Routes>
       </BrowserRouter>

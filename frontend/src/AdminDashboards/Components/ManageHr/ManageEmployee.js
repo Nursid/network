@@ -19,6 +19,7 @@ import { API_URL } from '../../../config'
 import axios from 'axios'
 import EmployeeRolesAndPermission from './Forms/EmployeeRolesAndPermission'
 import AdminNavItems from '../../Elements/AdminNavItems'
+import { useMediaQuery, useTheme } from '@mui/material'
 
 
 const ManageEmployee = () => {
@@ -32,6 +33,10 @@ const ManageEmployee = () => {
     const [viewModal, setViewModel] = useState(false)
     const [employeeRolesId, setEmployeeRolesId] = useState(null)
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
     // Set initial block status when data changes
     useEffect(() => {
         if (data && data.length > 0) {
@@ -168,79 +173,193 @@ const ManageEmployee = () => {
 
 
     const column = [
-        { field: "_id", headerName: "Sr No", flex: 1, minWidth: 50, editable: false },
-        { field: "emp_id", headerName: "Emp Id", minWidth: 120, editable: false },
-        { field: "name", headerName: "Name", minWidth: 120, editable: false },
-        // { field: "design_name", headerName: "Designation", minWidth: 120, editable: false },
-        // { field: "dept_name", headerName: "Department", minWidth: 120, editable: false },
-        { field: "mobile_no", headerName: "Mobile No.", minWidth: 120, editable: false },
-        { field: "alterno", headerName: "Alternate No.", minWidth: 120, editable: false },
-        { field: "aadhar_no", headerName: "Aadhaar No.", minWidth: 150, editable: false },
-        { field: "pan_no", headerName: "Pan No", minWidth: 120, editable: false },
-        { field: "address", headerName: "Address", minWidth: 250, editable: false },
-        { field: "date", headerName: "Date Of Join", minWidth: 120, editable: false },
-        // {
-        //     field: "status",
-        //     minWidth: 150,
-        //     headerName: "Status",
-        //     renderCell: (params) => (
-        //         <Button className="text-white bg-green">Approved</Button>
-        //     ),
-        // },
+        { 
+            field: "_id", 
+            headerName: "Sr No", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 50 : 50, 
+            editable: false,
+            hide: isSmallMobile
+        },
+        { 
+            field: "emp_id", 
+            headerName: isMobile ? "ID" : "Emp Id", 
+            minWidth: isMobile ? 80 : 120, 
+            editable: false 
+        },
+        { 
+            field: "name", 
+            headerName: "Name", 
+            minWidth: isMobile ? 120 : 120, 
+            flex: isMobile ? 1 : undefined,
+            editable: false 
+        },
+        { 
+            field: "mobile_no", 
+            headerName: isMobile ? "Mobile" : "Mobile No.", 
+            minWidth: isMobile ? 100 : 120, 
+            editable: false,
+            hide: isSmallMobile
+        },
+        { 
+            field: "alterno", 
+            headerName: "Alt No.", 
+            minWidth: 120, 
+            editable: false,
+            hide: isMobile
+        },
+        { 
+            field: "aadhar_no", 
+            headerName: "Aadhaar", 
+            minWidth: 120, 
+            editable: false,
+            hide: isMobile
+        },
+        { 
+            field: "pan_no", 
+            headerName: "PAN", 
+            minWidth: 120, 
+            editable: false,
+            hide: isMobile
+        },
+        { 
+            field: "address", 
+            headerName: "Address", 
+            minWidth: 200, 
+            editable: false,
+            hide: isMobile
+        },
+        { 
+            field: "date", 
+            headerName: isMobile ? "Joined" : "Date Of Join", 
+            minWidth: isMobile ? 90 : 120, 
+            editable: false,
+            hide: isSmallMobile
+        },
         {
             field: "action",
             headerName: "Action",
-            minWidth: 150,
+            minWidth: isMobile ? 100 : 150,
+            flex: isMobile ? 0 : undefined,
+            sortable: false,
             renderCell: (params) => (
-                <div className="d-flex gap-2">
-                    <Button  onClick={(e)=>{toggleEditMode(params.row)}} variant='contained' color='primary' style={{minWidth: "40px", maxWidth: "40px"}} ><BorderColorIcon /></Button>
-                    <Button variant="contained" color="error"
-                    style={{minWidth: "40px", maxWidth: "40px"}}
-                    onClick={(e) => {
-                        GetDeleteByID(params.row.emp_id)
-                    }}
+                <div className={`d-flex ${isMobile ? 'flex-column gap-1' : 'gap-2'}`}>
+                    <Button  
+                        onClick={(e)=>{toggleEditMode(params.row)}} 
+                        variant='contained' 
+                        color='primary' 
+                        style={{
+                            minWidth: isMobile ? "28px" : "40px", 
+                            maxWidth: isMobile ? "28px" : "40px",
+                            minHeight: isMobile ? "28px" : "40px",
+                            maxHeight: isMobile ? "28px" : "40px",
+                            padding: isMobile ? "2px" : "4px"
+                        }}
                     >
-                        <DeleteForeverIcon />
+                        <BorderColorIcon fontSize={isMobile ? "small" : "medium"} />
                     </Button>
+                    {!isSmallMobile && (
+                        <Button 
+                            variant="contained" 
+                            color="error"
+                            style={{
+                                minWidth: isMobile ? "28px" : "40px", 
+                                maxWidth: isMobile ? "28px" : "40px",
+                                minHeight: isMobile ? "28px" : "40px",
+                                maxHeight: isMobile ? "28px" : "40px",
+                                padding: isMobile ? "2px" : "4px"
+                            }}
+                            onClick={(e) => {
+                                GetDeleteByID(params.row.emp_id)
+                            }}
+                        >
+                            <DeleteForeverIcon fontSize={isMobile ? "small" : "medium"} />
+                        </Button>
+                    )}
                 </div>
             ),
         },
-            {
-                field: "block",
-                headerName: "Block",
-                minWidth: 150,
-                renderCell: (params) => (
-                    <div className="d-flex gap-2">
-                        {blockStatus[params.row.id] ?
-                        <Button variant="contained" color="error" onClick={() => handleToggleBlock(params.row.id)}
-                        style={{minWidth: "40px", maxWidth: "40px"}}
-                        ><BlockIcon /
-                        
-                        ></Button>
-                            :
-                            <Button className="text-white bg-warning border-warning" onClick={() => handleToggleBlock(params.row.id)}> Un-Block </Button>
-                        }
-                    </div>
-                ),
-            },
-            {
-                field: "roles",
-                headerName: "Roles",
-                minWidth: 150,
-                renderCell: (params) => (
-                    <Button variant="contained" color="primary" onClick={() => toggleEmployeeRoles(params.row.id)}>Roles</Button>
-                ),
-            },
+        {
+            field: "block",
+            headerName: "Status",
+            minWidth: isMobile ? 80 : 150,
+            flex: isMobile ? 0 : undefined,
+            sortable: false,
+            renderCell: (params) => (
+                <div className="d-flex gap-1">
+                    {blockStatus[params.row.id] ?
+                    <Button 
+                        variant="contained" 
+                        color="error" 
+                        onClick={() => handleToggleBlock(params.row.id)}
+                        style={{
+                            minWidth: isMobile ? "28px" : "40px", 
+                            maxWidth: isMobile ? "28px" : "40px",
+                            minHeight: isMobile ? "28px" : "40px",
+                            maxHeight: isMobile ? "28px" : "40px",
+                            padding: isMobile ? "2px" : "4px"
+                        }}
+                    >
+                        <BlockIcon fontSize={isMobile ? "small" : "medium"} />
+                    </Button>
+                        :
+                        <Button 
+                            className="text-white bg-warning border-warning" 
+                            onClick={() => handleToggleBlock(params.row.id)}
+                            style={{
+                                fontSize: isMobile ? "0.7rem" : "0.875rem",
+                                minWidth: isMobile ? "60px" : "80px",
+                                maxWidth: isMobile ? "60px" : "80px",
+                                minHeight: isMobile ? "28px" : "36px",
+                                maxHeight: isMobile ? "28px" : "36px",
+                                padding: isMobile ? "2px 4px" : "4px 8px"
+                            }}
+                        > 
+                            {isMobile ? 'Unblock' : 'Un-Block'}
+                        </Button>
+                    }
+                </div>
+            ),
+        },
+        {
+            field: "roles",
+            headerName: "Roles",
+            minWidth: isMobile ? 70 : 150,
+            flex: isMobile ? 0 : undefined,
+            sortable: false,
+            hide: isSmallMobile,
+            renderCell: (params) => (
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={() => toggleEmployeeRoles(params.row.id)}
+                    style={{
+                        fontSize: isMobile ? "0.7rem" : "0.875rem",
+                        minWidth: isMobile ? "50px" : "70px",
+                        maxWidth: isMobile ? "50px" : "70px",
+                        minHeight: isMobile ? "28px" : "36px",
+                        maxHeight: isMobile ? "28px" : "36px",
+                        padding: isMobile ? "2px 4px" : "4px 8px"
+                    }}
+                >
+                    {isMobile ? 'Role' : 'Roles'}
+                </Button>
+            ),
+        },
     ];
 
     const CustomToolbar = () => {
         return (
             <GridToolbarContainer>
                 <GridToolbarQuickFilter />
-                <GridToolbarColumnsButton />
-                <GridToolbarFilterButton />
-                <GridToolbarExport />
-                <GridToolbarDensitySelector />
+                {!isMobile && (
+                    <>
+                        <GridToolbarColumnsButton />
+                        <GridToolbarFilterButton />
+                        <GridToolbarExport />
+                        <GridToolbarDensitySelector />
+                    </>
+                )}
             </GridToolbarContainer>
         );
     };
@@ -258,6 +377,33 @@ const ManageEmployee = () => {
     const handleSidebarToggle = (collapsed) => {
         setSidebarCollapsed(collapsed)
     }
+
+    // Calculate dynamic widths based on screen size and sidebar state
+    const getMainContentStyle = () => {
+        if (isMobile) {
+            return {
+                width: '100%',
+                marginLeft: 0,
+                height: '100vh',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: '#f8f9fa',
+                paddingTop: '60px' // Space for mobile menu button
+            }
+        }
+        
+        return {
+            width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
+            marginLeft: sidebarCollapsed ? '80px' : '280px',
+            height: '100vh',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: '#f8f9fa',
+            transition: 'width 0.3s ease, margin-left 0.3s ease'
+        }
+    };
 
     return (
         <Fragment>
@@ -281,67 +427,51 @@ const ManageEmployee = () => {
           />}
         />
 
-            {/* <div className='flex'>
-
-                <h4 className='p-3 px-4 mt-3 bg-transparent text-white headingBelowBorder' style={{ maxWidth: "15rem", minWidth: "15rem" }}>Employee List</h4>
-
-                <div className='AttendenceNavBtn w-100 py-2 px-4 gap-3 justify-content-end'>
-                    <div className={`py-2 px-4 border shadow rounded-2 cursor-p hoverThis text-white Fw_500 d-flex align-items-center justify-content-center `} style={{ minWidth: "15rem", maxWidth: "15rem" }} onClick={toggleModal} >
-                        Add Employee
-                    </div>
-                </div>
-            </div>
-            <div className='p-4'>
-                <AdminDataTable rows={DataWithID(data)} columns={column} CustomToolbar={CustomToolbar} />
-            </div> */}
-
 <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
-        {/* Left Sidebar - Dynamic width */}
-        <AdminNavItems onSidebarToggle={handleSidebarToggle} />
+        {/* Left Sidebar - Hidden on mobile */}
+        {!isMobile && <AdminNavItems onSidebarToggle={handleSidebarToggle} />}
+        {isMobile && <AdminNavItems onSidebarToggle={handleSidebarToggle} />}
 
         {/* Main Content - Dynamic width based on sidebar state */}
         <div
           className="main-content"
-          style={{
-            width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
-            marginLeft: sidebarCollapsed ? '80px' : '280px',
-            height: '100vh',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: '#f8f9fa',
-            transition: 'width 0.3s ease, margin-left 0.3s ease'
-          }}
+          style={getMainContentStyle()}
         >
           {/* Header Section with Gradient Background */}
           <div 
             className="flex-shrink-0"
             style={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: '0 0 20px 20px',
+              borderRadius: isMobile ? '0 0 15px 15px' : '0 0 20px 20px',
               boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-              margin: '10px',
-              marginBottom: '20px'
+              margin: isMobile ? '0' : '10px',
+              marginBottom: isMobile ? '10px' : '20px'
             }}
           >
-            <div className='d-flex align-items-center justify-content-between p-4'>
-              <div>
-                <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
-                  📊 All Employee List
+            <div className={`d-flex align-items-center ${isMobile ? 'flex-column' : 'justify-content-between'} p-${isMobile ? '3' : '4'}`}>
+              <div className={`${isMobile ? 'text-center mb-3' : ''}`}>
+                <h4 className='text-white mb-1' style={{ 
+                  fontWeight: '600', 
+                  fontSize: isMobile ? '1.2rem' : '1.5rem' 
+                }}>
+                  👥 Employee Management
                 </h4>
-                <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
-                  Manage and track all employee
+                <p className='text-white-50 mb-0' style={{ 
+                  fontSize: isMobile ? '0.8rem' : '0.9rem' 
+                }}>
+                  Manage and track all employees
                 </p>
               </div>
 
-              <div className="d-flex gap-3">
+              <div className="d-flex gap-2">
                 <div
-                  className="btn btn-light d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
+                  className="btn btn-light d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm"
                   style={{ 
                     fontWeight: '500',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    border: 'none'
+                    border: 'none',
+                    fontSize: isMobile ? '0.85rem' : '1rem'
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.transform = 'translateY(-2px)';
@@ -354,18 +484,30 @@ const ManageEmployee = () => {
                   onClick={toggleModal} 
                 >
                   <span>➕</span>
-                  Add New Employee
+                  {isMobile ? 'Add Employee' : 'Add New Employee'}
                 </div>
               </div>
             </div>
           </div>
           
           {/* Data Table Section */}
-          <div className="flex-grow-1 px-4 pb-4 " style={{ overflow: 'hidden' }}>
+          <div className={`flex-grow-1 ${isMobile ? 'px-2' : 'px-4'} pb-4`} style={{ overflow: 'hidden' }}>
+            <div style={{ 
+              height: '100%',
+              '& .MuiDataGrid-root': {
+                fontSize: isMobile ? '0.75rem' : '0.875rem'
+              }
+            }}>
               <AdminDataTable
-               rows={DataWithID(data)} columns={column} CustomToolbar={CustomToolbar}
+               rows={DataWithID(data)} 
+               columns={column} 
+               CustomToolbar={CustomToolbar}
+               pageSize={isMobile ? 10 : 25}
+               rowsPerPageOptions={isMobile ? [10, 25] : [25, 50, 100]}
+               density={isMobile ? 'compact' : 'standard'}
               />
             </div>
+          </div>
         </div>
       </div>
 

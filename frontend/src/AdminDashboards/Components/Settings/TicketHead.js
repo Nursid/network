@@ -13,13 +13,19 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import axios from 'axios';
 import { API_URL } from '../../../config';
 import AdminNavItems from '../../Elements/AdminNavItems';
+import { useMediaQuery } from '@mui/material';
 
 const TicketsHead = () => {
+    // Mobile responsiveness hooks
+    const isMobile = useMediaQuery('(max-width:768px)');
+    const isSmallMobile = useMediaQuery('(max-width:480px)');
+
     const { data } = useSelector(pre => pre.GetAllTicketHeadReducers)
     const [createTicket, setCreateTicket] = useState(false)
     const [editData, setEditData] = useState([])
     const dispatch = useDispatch()
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+    
     const DataWithID = (data) => {
         const NewData = []
         if (data !== undefined) {
@@ -33,31 +39,76 @@ const TicketsHead = () => {
     }
 
     const column = [
-        { field: "_id", headerName: "Sr No", minWidth: 50 },
-        { field: "shortCode", headerName: "Short Code", flex: 1 },
-        {
-            field: "name", headerName: "Name", flex: 1 },
-        {
-            field: "Type", headerName: "Type", flex: 1
+        { 
+            field: "_id", 
+            headerName: "Sr No", 
+            minWidth: isSmallMobile ? 40 : 50,
+            hide: isSmallMobile
+        },
+        { 
+            field: "shortCode", 
+            headerName: isMobile ? "Code" : "Short Code", 
+            flex: isMobile ? 0 : 1,
+            minWidth: isMobile ? 80 : 120
         },
         {
-            field: "TAT", headerName: 'TAT', flex: 1
+            field: "name", 
+            headerName: "Name", 
+            flex: isMobile ? 1 : 1,
+            minWidth: isMobile ? 120 : 150
+        },
+        {
+            field: "Type", 
+            headerName: "Type", 
+            flex: isMobile ? 0 : 1,
+            minWidth: isMobile ? 80 : 120,
+            hide: isSmallMobile
+        },
+        {
+            field: "TAT", 
+            headerName: 'TAT', 
+            flex: isMobile ? 0 : 1,
+            minWidth: isMobile ? 60 : 80,
+            hide: isMobile
         },
         {
             field: "action",
             headerName: "Action",
-            minWidth: 160,
+            minWidth: isMobile ? 100 : 160,
+            sortable: false,
             renderCell: (params) => (
-                <div className="d-flex gap-2">
-                    <Button variant='contained' color='primary'
-                    style={{minWidth: "40px", maxWidth: "40px"}}
-                    onClick={() => handleEdit(params.row)}
-                    ><BorderColorIcon /></Button>
-                    <Button onClick={() => handleDeleteServices(params.row.id)} variant="contained" color="error"
-                        style={{minWidth: "40px", maxWidth: "40px"}}
-                        >
-                        <DeleteForeverIcon />
+                <div className="d-flex gap-1" style={{ 
+                    flexDirection: isSmallMobile ? 'column' : 'row',
+                    alignItems: 'center'
+                }}>
+                    <Button 
+                        variant='contained' 
+                        color='primary'
+                        size={isMobile ? 'small' : 'medium'}
+                        style={{
+                            minWidth: isMobile ? "28px" : "40px", 
+                            maxWidth: isMobile ? "28px" : "40px",
+                            height: isMobile ? "28px" : "40px"
+                        }}
+                        onClick={() => handleEdit(params.row)}
+                    >
+                        <BorderColorIcon fontSize={isMobile ? 'small' : 'medium'} />
                     </Button>
+                    {!isSmallMobile && (
+                        <Button 
+                            onClick={() => handleDeleteServices(params.row.id)} 
+                            variant="contained" 
+                            color="error"
+                            size={isMobile ? 'small' : 'medium'}
+                            style={{
+                                minWidth: isMobile ? "28px" : "40px", 
+                                maxWidth: isMobile ? "28px" : "40px",
+                                height: isMobile ? "28px" : "40px"
+                            }}
+                        >
+                            <DeleteForeverIcon fontSize={isMobile ? 'small' : 'medium'} />
+                        </Button>
+                    )}
                 </div>
             ),
         },
@@ -71,10 +122,14 @@ const TicketsHead = () => {
         return (
             <GridToolbarContainer>
                 <GridToolbarQuickFilter />
-                <GridToolbarColumnsButton />
-                <GridToolbarFilterButton />
-                <GridToolbarExport />
-                <GridToolbarDensitySelector />
+                {!isMobile && (
+                    <>
+                        <GridToolbarColumnsButton />
+                        <GridToolbarFilterButton />
+                        <GridToolbarExport />
+                        <GridToolbarDensitySelector />
+                    </>
+                )}
             </GridToolbarContainer>
         );
     };
@@ -89,7 +144,6 @@ const TicketsHead = () => {
         setEditData(data)
         ToggleAddTickets()
     }
-
 
     const handleDeleteServices = (itemID)=>{
         Swal.fire({
@@ -118,9 +172,7 @@ const TicketsHead = () => {
               }
           }
       })
-    
-    
-      }
+    }
 
     const handleSidebarToggle = (collapsed) => {
         setSidebarCollapsed(collapsed)
@@ -138,14 +190,15 @@ const TicketsHead = () => {
                 <div
                     className="main-content"
                     style={{
-                        width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
-                        marginLeft: sidebarCollapsed ? '80px' : '280px',
+                        width: isMobile ? '100%' : `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
+                        marginLeft: isMobile ? '0' : (sidebarCollapsed ? '80px' : '280px'),
                         height: '100vh',
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
                         backgroundColor: '#f8f9fa',
-                        transition: 'width 0.3s ease, margin-left 0.3s ease'
+                        transition: 'width 0.3s ease, margin-left 0.3s ease',
+                        padding: isMobile ? '70px 10px 10px 10px' : '0'
                     }}
                 >
                     {/* Header Section with Gradient Background */}
@@ -155,16 +208,21 @@ const TicketsHead = () => {
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                             borderRadius: '0 0 20px 20px',
                             boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                            margin: '10px',
+                            margin: isMobile ? '0' : '10px',
                             marginBottom: '20px'
                         }}
                     >
-                        <div className='d-flex align-items-center justify-content-between p-4'>
-                            <div>
-                                <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
+                        <div className={`d-flex align-items-center ${isMobile ? 'flex-column text-center' : 'justify-content-between'}`} style={{ padding: isMobile ? '20px 15px' : '24px' }}>
+                            <div className={isMobile ? 'mb-3' : ''}>
+                                <h4 className='text-white mb-1' style={{ 
+                                    fontWeight: '600', 
+                                    fontSize: isMobile ? '1.25rem' : '1.5rem' 
+                                }}>
                                     🎟️ Ticket Head Management
                                 </h4>
-                                <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
+                                <p className='text-white-50 mb-0' style={{ 
+                                    fontSize: isMobile ? '0.8rem' : '0.9rem' 
+                                }}>
                                     Configure ticket categories and types
                                 </p>
                             </div>
@@ -176,7 +234,8 @@ const TicketsHead = () => {
                                         fontWeight: '500',
                                         cursor: 'pointer',
                                         transition: 'all 0.3s ease',
-                                        border: 'none'
+                                        border: 'none',
+                                        fontSize: isMobile ? '0.8rem' : '1rem'
                                     }}
                                     onMouseEnter={(e) => {
                                         e.target.style.transform = 'translateY(-2px)';
@@ -189,15 +248,37 @@ const TicketsHead = () => {
                                     onClick={ToggleAddTickets}
                                 >
                                     <span>➕</span>
-                                    Create New Ticket Head
+                                    {isMobile ? 'Add Ticket Head' : 'Create New Ticket Head'}
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     {/* Data Table Section */}
-                    <div className="flex-grow-1 px-4 pb-4" style={{ overflow: 'hidden' }}>
-                        <AdminDataTable rows={DataWithID(data.data)} columns={column} CustomToolbar={CustomToolbar} />
+                    <div className="flex-grow-1" style={{ 
+                        padding: isMobile ? '0 5px 10px 5px' : '0 16px 16px 16px',
+                        overflow: 'hidden' 
+                    }}>
+                        <AdminDataTable 
+                            rows={DataWithID(data.data)} 
+                            columns={column} 
+                            CustomToolbar={CustomToolbar}
+                            pageSize={isMobile ? 10 : 25}
+                            density={isMobile ? 'compact' : 'standard'}
+                            sx={{
+                                '& .MuiDataGrid-root': {
+                                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                                },
+                                '& .MuiDataGrid-cell': {
+                                    padding: isMobile ? '4px 8px' : '8px 16px',
+                                },
+                                '& .MuiDataGrid-columnHeader': {
+                                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                                    fontWeight: '600',
+                                    padding: isMobile ? '4px 8px' : '8px 16px',
+                                }
+                            }}
+                        />
                     </div>
                 </div>
             </div>

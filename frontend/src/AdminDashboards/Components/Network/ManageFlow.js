@@ -11,8 +11,12 @@ import axios from 'axios';
 import { API_URL } from '../../../config';
 import { Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
 import AdminNavItems from '../../Elements/AdminNavItems';
+import { useMediaQuery } from '@mui/material';
 
 const ManageFlow = () => {
+    // Mobile responsiveness hooks
+    const isMobile = useMediaQuery('(max-width:768px)');
+    const isSmallMobile = useMediaQuery('(max-width:480px)');
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -256,7 +260,7 @@ const ManageFlow = () => {
                 NewData.push({ 
                     ...item, 
                     _id: data.indexOf(item) + 1,
-                    date: item.createdAt ? moment(item.createdAt).format("DD/MM/YYYY") : "-",
+                    date: item.createdAt ? moment(item.createdAt).format(isMobile ? "DD/MM/YY" : "DD/MM/YYYY") : "-",
                     statusText: item.status ? "Active" : "Inactive",
                     totalONU,
                     totalRouter,
@@ -286,59 +290,154 @@ const ManageFlow = () => {
     };
 
     const column = [
-        { field: "_id", headerName: "Sr No", minWidth: 50, flex: 1 },       
-        { field: "name", headerName: "Connection Type", minWidth: 120, flex: 1,
-          renderCell: (params) => (
-            <div className="d-flex align-items-center">
-                <span>{params.row.name}</span>
-                {params.row.matchingNodes && params.row.matchingNodes.length > 0 && (
-                    <span 
-                        className="badge bg-warning text-dark ms-2" 
-                        style={{ fontSize: '10px' }}
-                        title={`${params.row.matchingNodes.length} matching node(s) found`}
-                    >
-                        {params.row.matchingNodes.length}
+        { 
+            field: "_id", 
+            headerName: "Sr No", 
+            minWidth: isSmallMobile ? 40 : 50, 
+            flex: isMobile ? 0 : 1,
+            hide: isSmallMobile
+        },       
+        { 
+            field: "name", 
+            headerName: isMobile ? "Type" : "Connection Type", 
+            minWidth: isMobile ? 100 : 120, 
+            flex: isMobile ? 1 : 1,
+            renderCell: (params) => (
+                <div className="d-flex align-items-center">
+                    <span style={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}>
+                        {params.row.name}
                     </span>
-                )}
-            </div>
-          )
+                    {params.row.matchingNodes && params.row.matchingNodes.length > 0 && (
+                        <span 
+                            className="badge bg-warning text-dark ms-2" 
+                            style={{ fontSize: isMobile ? '8px' : '10px' }}
+                            title={`${params.row.matchingNodes.length} matching node(s) found`}
+                        >
+                            {params.row.matchingNodes.length}
+                        </span>
+                    )}
+                </div>
+            )
         },
-        { field: "olt_name", headerName: "OLT Name", minWidth: 120, flex: 1 },
-        { field: "port", headerName: "Port", flex: 1, minWidth: 120 }, 
-        { field: "totalONU", headerName: "Total ONU", flex: 1, minWidth: 100 },
-        { field: "totalRouter", headerName: "Total Router", flex: 1, minWidth: 120 },
-        { field: "totalONT", headerName: "Total ONT", flex: 1, minWidth: 100 },
-        { field: "totalUsers", headerName: "Total Users", flex: 1, minWidth: 120, 
-          renderCell: (params) => (
-            <div className="badge bg-info text-dark">
-                {params.row.totalUsers}
-            </div>
-          )
+        { 
+            field: "olt_name", 
+            headerName: isMobile ? "OLT" : "OLT Name", 
+            minWidth: isMobile ? 80 : 120, 
+            flex: isMobile ? 0 : 1,
+            hide: isSmallMobile
         },
-        { field: "date", headerName: "Created Date", flex: 1, minWidth: 120 },
-        { field: "status", headerName: "Status", flex: 1, minWidth: 120,
-          renderCell: (params) => (
-            <div className={`badge ${params.row.status ? 'bg-success' : 'bg-danger'}`}>
-                {params.row.status ? "Active" : "Inactive"}
-            </div>
-          )
+        { 
+            field: "port", 
+            headerName: "Port", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 60 : 120,
+            hide: isMobile
+        }, 
+        { 
+            field: "totalONU", 
+            headerName: "ONU", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 60 : 100,
+            renderCell: (params) => (
+                <span style={{ 
+                    color: '#28a745', 
+                    fontWeight: '500',
+                    fontSize: isMobile ? '0.75rem' : '0.875rem'
+                }}>
+                    {params.value}
+                </span>
+            )
+        },
+        { 
+            field: "totalRouter", 
+            headerName: isMobile ? "Router" : "Total Router", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 70 : 120,
+            hide: isSmallMobile,
+            renderCell: (params) => (
+                <span style={{ 
+                    color: '#007bff', 
+                    fontWeight: '500',
+                    fontSize: isMobile ? '0.75rem' : '0.875rem'
+                }}>
+                    {params.value}
+                </span>
+            )
+        },
+        { 
+            field: "totalONT", 
+            headerName: "ONT", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 60 : 100,
+            hide: isMobile,
+            renderCell: (params) => (
+                <span style={{ 
+                    color: '#ffc107', 
+                    fontWeight: '500',
+                    fontSize: isMobile ? '0.75rem' : '0.875rem'
+                }}>
+                    {params.value}
+                </span>
+            )
+        },
+        { 
+            field: "totalUsers", 
+            headerName: isMobile ? "Users" : "Total Users", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 70 : 120,
+            renderCell: (params) => (
+                <div className="badge bg-info text-dark" style={{
+                    fontSize: isMobile ? '0.7rem' : '0.8rem',
+                    padding: isMobile ? '2px 6px' : '4px 8px'
+                }}>
+                    {params.row.totalUsers}
+                </div>
+            )
+        },
+        { 
+            field: "date", 
+            headerName: isMobile ? "Date" : "Created Date", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 120,
+            hide: isSmallMobile
+        },
+        { 
+            field: "status", 
+            headerName: "Status", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 120,
+            hide: isMobile,
+            renderCell: (params) => (
+                <div className={`badge ${params.row.status ? 'bg-success' : 'bg-danger'}`} style={{
+                    fontSize: isMobile ? '0.7rem' : '0.8rem',
+                    padding: isMobile ? '2px 6px' : '4px 8px'
+                }}>
+                    {params.row.status ? "Active" : "Inactive"}
+                </div>
+            )
         },
         { 
             field: "actions", 
             headerName: "Actions", 
-            flex: 1, 
-            minWidth: 120,
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 120,
+            sortable: false,
             renderCell: (params) => (
                 <div className="d-flex">
                     <Button 
                         variant="contained" 
                         color="primary" 
-                        size="small" 
-                        startIcon={<VisibilityIcon />}
+                        size={isMobile ? "small" : "small"}
+                        startIcon={!isSmallMobile ? <VisibilityIcon /> : null}
                         onClick={() => handleViewFlow(params.row)}
-                        style={{ margin: "0 5px" }}
+                        style={{ 
+                            margin: "0 5px",
+                            minWidth: isMobile ? "60px" : "80px",
+                            fontSize: isMobile ? '0.7rem' : '0.8rem',
+                            padding: isMobile ? '4px 8px' : '6px 16px'
+                        }}
                     >
-                        View
+                        {isSmallMobile ? <VisibilityIcon fontSize="small" /> : 'View'}
                     </Button>
                 </div>
             )
@@ -349,10 +448,14 @@ const ManageFlow = () => {
         return (
             <GridToolbarContainer>
                 <GridToolbarQuickFilter />
-                <GridToolbarColumnsButton />
-                <GridToolbarFilterButton />
-                <GridToolbarExport />
-                <GridToolbarDensitySelector />
+                {!isMobile && (
+                    <>
+                        <GridToolbarColumnsButton />
+                        <GridToolbarFilterButton />
+                        <GridToolbarExport />
+                        <GridToolbarDensitySelector />
+                    </>
+                )}
             </GridToolbarContainer>
         );
     }
@@ -383,84 +486,99 @@ const ManageFlow = () => {
     return (
         <Fragment>
             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
-        {/* Left Sidebar - Dynamic width */}
-        <AdminNavItems onSidebarToggle={handleSidebarToggle} />
+                {/* Left Sidebar - Dynamic width */}
+                <AdminNavItems onSidebarToggle={handleSidebarToggle} />
 
-        {/* Main Content - Dynamic width based on sidebar state */}
-        <div
-          className="main-content"
-          style={{
-            width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
-            marginLeft: sidebarCollapsed ? '80px' : '280px',
-            height: '100vh',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: '#f8f9fa',
-            transition: 'width 0.3s ease, margin-left 0.3s ease'
-          }}
-        >
-          {/* Header Section with Gradient Background */}
-          <div 
-            className="flex-shrink-0"
-            style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: '0 0 20px 20px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-              margin: '10px',
-              marginBottom: '20px'
-            }}
-          >
-            <div className='d-flex align-items-center justify-content-between p-4'>
-              <div>
-                <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
-                  📊 Network Flow
-                </h4>
-                <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
-                  Manage and track all network flows
-                </p>
-              </div>
-
-              <div className="d-flex gap-3">
+                {/* Main Content - Dynamic width based on sidebar state */}
                 <div
-                  className="btn btn-light d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
-                  style={{ 
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    border: 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-                  }}
-                  onClick={handleAddFlow}
+                    className="main-content"
+                    style={{
+                        width: isMobile ? '100%' : `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
+                        marginLeft: isMobile ? '0' : (sidebarCollapsed ? '80px' : '280px'),
+                        height: '100vh',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        backgroundColor: '#f8f9fa',
+                        transition: 'width 0.3s ease, margin-left 0.3s ease',
+                        padding: isMobile ? '70px 10px 10px 10px' : '0'
+                    }}
                 >
-                  <span>📈</span>
-                  Add New Flow
-                </div>
-              </div>
-            </div>
-          </div>
+                    {/* Header Section with Gradient Background */}
+                    <div 
+                        className="flex-shrink-0"
+                        style={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            borderRadius: '0 0 20px 20px',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                            margin: isMobile ? '0' : '10px',
+                            marginBottom: '20px'
+                        }}
+                    >
+                        <div className={`d-flex align-items-center ${isMobile ? 'flex-column text-center' : 'justify-content-between'}`} style={{ padding: isMobile ? '20px 15px' : '24px' }}>
+                            <div className={isMobile ? 'mb-3' : ''}>
+                                <h4 className='text-white mb-1' style={{ 
+                                    fontWeight: '600', 
+                                    fontSize: isMobile ? '1.25rem' : '1.5rem' 
+                                }}>
+                                    📊 Network Flow
+                                </h4>
+                                <p className='text-white-50 mb-0' style={{ 
+                                    fontSize: isMobile ? '0.8rem' : '0.9rem' 
+                                }}>
+                                    Manage and track all network flows
+                                </p>
+                            </div>
 
+                            <div className="d-flex gap-3">
+                                <div
+                                    className="btn btn-light d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
+                                    style={{ 
+                                        fontWeight: '500',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        border: 'none',
+                                        fontSize: isMobile ? '0.8rem' : '1rem'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.transform = 'translateY(-2px)';
+                                        e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                                    }}
+                                    onClick={handleAddFlow}
+                                >
+                                    <span>📈</span>
+                                    {isMobile ? 'Add Flow' : 'Add New Flow'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-<div className='AttendenceNavBtn w-100 py-1 px-4 gap-3 justify-content-end'>
-                        <div className='d-flex align-items-center gap-2' style={{ minWidth: "25rem" }}>
-                            <div className='d-flex align-items-center border rounded-2 bg-white' style={{ flex: 1 }}>
+                    {/* Search Section */}
+                    <div className='AttendenceNavBtn w-100 py-1 gap-3 justify-content-end' style={{ 
+                        padding: isMobile ? '8px 15px' : '8px 16px'
+                    }}>
+                        <div className='d-flex align-items-center gap-2' style={{ 
+                            minWidth: isMobile ? "100%" : "25rem",
+                            flexDirection: isMobile ? 'column' : 'row'
+                        }}>
+                            <div className='d-flex align-items-center border rounded-2 bg-white' style={{ 
+                                flex: 1,
+                                width: isMobile ? '100%' : 'auto'
+                            }}>
                                 <input
                                     type="text"
-                                    placeholder="Search by MAC address or User ID..."
+                                    placeholder={isMobile ? "Search by MAC or User ID..." : "Search by MAC address or User ID..."}
                                     value={searchQuery}
                                     onChange={handleSearchChange}
                                     onKeyPress={handleSearchKeyPress}
                                     className="form-control border-0"
                                     style={{ 
                                         boxShadow: 'none',
-                                        fontSize: '14px'
+                                        fontSize: isMobile ? '13px' : '14px'
                                     }}
                                 />
                                 <Button
@@ -470,9 +588,10 @@ const ManageFlow = () => {
                                     onClick={handleSearchClick}
                                     disabled={loading}
                                     style={{ 
-                                        minWidth: '40px',
+                                        minWidth: isMobile ? '35px' : '40px',
                                         margin: '2px',
-                                        borderRadius: '4px'
+                                        borderRadius: '4px',
+                                        height: isMobile ? '32px' : '36px'
                                     }}
                                 >
                                     <SearchIcon fontSize="small" />
@@ -486,29 +605,48 @@ const ManageFlow = () => {
                                     onClick={clearSearch}
                                     startIcon={<ClearIcon />}
                                     style={{ 
-                                        minWidth: '100px',
-                                        color: 'white',
-                                        borderColor: 'white'
+                                        minWidth: isMobile ? '80px' : '100px',
+                                        color: '#6c757d',
+                                        borderColor: '#6c757d',
+                                        fontSize: isMobile ? '0.7rem' : '0.8rem',
+                                        marginTop: isMobile ? '8px' : '0'
                                     }}
                                 >
                                     Clear
                                 </Button>
                             )}
                         </div>
-                        </div>
+                    </div>
           
-          {/* Data Table Section */}
-          <div className="flex-grow-1 px-4 pb-4 " style={{ overflow: 'hidden' }}>
-              <AdminDataTable
-                rows={DataWithID(isSearching ? searchResults : data)} 
-                columns={column} 
-                CustomToolbar={CustomToolbar} 
-                loading={loading}
-              />
+                    {/* Data Table Section */}
+                    <div className="flex-grow-1" style={{ 
+                        padding: isMobile ? '0 5px 10px 5px' : '0 16px 16px 16px',
+                        overflow: 'hidden' 
+                    }}>
+                        <AdminDataTable
+                            rows={DataWithID(isSearching ? searchResults : data)} 
+                            columns={column} 
+                            CustomToolbar={CustomToolbar} 
+                            loading={loading}
+                            pageSize={isMobile ? 10 : 25}
+                            density={isMobile ? 'compact' : 'standard'}
+                            sx={{
+                                '& .MuiDataGrid-root': {
+                                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                                },
+                                '& .MuiDataGrid-cell': {
+                                    padding: isMobile ? '4px 8px' : '8px 16px',
+                                },
+                                '& .MuiDataGrid-columnHeader': {
+                                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                                    fontWeight: '600',
+                                    padding: isMobile ? '4px 8px' : '8px 16px',
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
             </div>
-        </div>
-      </div>
-
 
             {/* Add Flow Modal */}
             <Modal isOpen={modalOpen} toggle={toggleModal} size="lg">

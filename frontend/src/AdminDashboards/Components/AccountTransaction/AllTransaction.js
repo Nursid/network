@@ -5,12 +5,16 @@ import moment from 'moment';
 import axios from 'axios';
 import { API_URL } from '../../../config';
 import AdminNavItems from '../../Elements/AdminNavItems';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const AllTransaction = () => { 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     // Fetch account data from API
     useEffect(() => {
@@ -35,41 +39,102 @@ const AllTransaction = () => {
     }, []);
 
     const all_columns = [
-        { field: "id", headerName: "ID", flex: 1, minWidth: 80 },
-        { field: "date", headerName: "Date", flex: 1, minWidth: 120 },
-        { field: "cust_id", headerName: "Customer ID", flex: 1, minWidth: 120 },
-        { field: "cust_name", headerName: "Customer Name", flex: 1, minWidth: 150 },
-        { field: "vc_no", headerName: "Voucher No.", flex: 1, minWidth: 120 },
-        { field: "address", headerName: "Address", flex: 1, minWidth: 200 },
+        { 
+            field: "id", 
+            headerName: "ID", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 60 : 80,
+            hide: isSmallMobile
+        },
+        { 
+            field: "date", 
+            headerName: "Date", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 100 : 120
+        },
+        { 
+            field: "cust_id", 
+            headerName: isMobile ? "Cust ID" : "Customer ID", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 120
+        },
+        { 
+            field: "cust_name", 
+            headerName: isMobile ? "Name" : "Customer Name", 
+            flex: isMobile ? 1 : 1, 
+            minWidth: isMobile ? 120 : 150
+        },
+        { 
+            field: "vc_no", 
+            headerName: isMobile ? "Voucher" : "Voucher No.", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 120,
+            hide: isSmallMobile
+        },
+        { 
+            field: "address", 
+            headerName: "Address", 
+            flex: 1, 
+            minWidth: isMobile ? 150 : 200,
+            hide: isSmallMobile
+        },
         { 
             field: "amount", 
             headerName: "Amount", 
-            flex: 1, 
-            minWidth: 120,
-            renderCell: (params) => `₹${params.value || 0}`
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 120,
+            renderCell: (params) => (
+                <span className="fw-bold text-success">
+                    ₹{params.value || 0}
+                </span>
+            )
         },
-        { field: "payment_mode", headerName: "Payment Mode", flex: 1, minWidth: 120 },
+        { 
+            field: "payment_mode", 
+            headerName: isMobile ? "Mode" : "Payment Mode", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 120,
+            hide: isSmallMobile
+        },
         { 
             field: "balance", 
             headerName: "Balance", 
-            flex: 1, 
-            minWidth: 120,
-            renderCell: (params) => `₹${params.value || 0}`
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 120,
+            renderCell: (params) => (
+                <span className={`fw-bold ${params.value > 0 ? 'text-danger' : 'text-success'}`}>
+                    ₹{params.value || 0}
+                </span>
+            ),
+            hide: isSmallMobile
         },
-        { field: "trans_id", headerName: "Transaction ID", flex: 1, minWidth: 150 },
-        { field: "partner_emp_id", headerName: "Partner/Emp. ID", flex: 1, minWidth: 140 },
+        { 
+            field: "trans_id", 
+            headerName: isMobile ? "Trans ID" : "Transaction ID", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 100 : 150,
+            hide: isSmallMobile
+        },
+        { 
+            field: "partner_emp_id", 
+            headerName: isMobile ? "Partner" : "Partner/Emp. ID", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 140,
+            hide: isSmallMobile
+        },
         { 
             field: "auto_renew", 
-            headerName: "Auto Renew", 
-            flex: 1, 
-            minWidth: 100,
-            renderCell: (params) => params.value ? 'Yes' : 'No'
+            headerName: isMobile ? "Auto" : "Auto Renew", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 60 : 100,
+            renderCell: (params) => params.value ? 'Yes' : 'No',
+            hide: isSmallMobile
         },
         { 
             field: "recharge_status", 
-            headerName: "Recharge Status", 
-            flex: 1, 
-            minWidth: 130,
+            headerName: "Status", 
+            flex: isMobile ? 0 : 1, 
+            minWidth: isMobile ? 80 : 130,
             renderCell: (params) => (
                 <span 
                     className={`badge ${
@@ -77,6 +142,7 @@ const AllTransaction = () => {
                         params.value === 'Paid' ? 'bg-success' : 
                         'bg-warning'
                     }`}
+                    style={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
                 >
                     {params.value || 'Pending'}
                 </span>
@@ -91,7 +157,7 @@ const AllTransaction = () => {
                 newData.push({
                     ...item,
                     _id: item.id || data.indexOf(item),
-                    date: item.date ? moment(item.date).format("DD-MM-YYYY") : 'N/A',
+                    date: item.date ? moment(item.date).format(isMobile ? "DD/MM/YY" : "DD-MM-YYYY") : 'N/A',
                 });
             }
         }
@@ -101,10 +167,14 @@ const AllTransaction = () => {
     const CustomToolbar = () => (
         <GridToolbarContainer>
             <GridToolbarQuickFilter />
-            <GridToolbarColumnsButton />
-            <GridToolbarFilterButton />
-            <GridToolbarExport />
-            <GridToolbarDensitySelector />
+            {!isMobile && (
+                <>
+                    <GridToolbarColumnsButton />
+                    <GridToolbarFilterButton />
+                    <GridToolbarExport />
+                    <GridToolbarDensitySelector />
+                </>
+            )}
         </GridToolbarContainer>
     );
 
@@ -112,16 +182,22 @@ const AllTransaction = () => {
         setSidebarCollapsed(isCollapsed);
     };
 
-    return (
-        <Fragment>
-<div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
-        {/* Left Sidebar - Dynamic width */}
-        <AdminNavItems onSidebarToggle={handleSidebarToggle} />
-
-        {/* Main Content - Dynamic width based on sidebar state */}
-        <div
-          className="main-content"
-          style={{
+    // Calculate dynamic widths based on screen size and sidebar state
+    const getMainContentStyle = () => {
+        if (isMobile) {
+            return {
+                width: '100%',
+                marginLeft: 0,
+                height: '100vh',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: '#f8f9fa',
+                paddingTop: '60px' // Space for mobile menu button
+            }
+        }
+        
+        return {
             width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
             marginLeft: sidebarCollapsed ? '80px' : '280px',
             height: '100vh',
@@ -130,62 +206,68 @@ const AllTransaction = () => {
             flexDirection: 'column',
             backgroundColor: '#f8f9fa',
             transition: 'width 0.3s ease, margin-left 0.3s ease'
-          }}
+        }
+    };
+
+    return (
+        <Fragment>
+<div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+        {/* Left Sidebar - Hidden on mobile */}
+        {!isMobile && <AdminNavItems onSidebarToggle={handleSidebarToggle} />}
+        {isMobile && <AdminNavItems onSidebarToggle={handleSidebarToggle} />}
+
+        {/* Main Content - Dynamic width based on sidebar state */}
+        <div
+          className="main-content"
+          style={getMainContentStyle()}
         >
           {/* Header Section with Gradient Background */}
           <div 
             className="flex-shrink-0"
             style={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: '0 0 20px 20px',
+              borderRadius: isMobile ? '0 0 15px 15px' : '0 0 20px 20px',
               boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-              margin: '10px',
-              marginBottom: '20px'
+              margin: isMobile ? '0' : '10px',
+              marginBottom: isMobile ? '10px' : '20px'
             }}
           >
-            <div className='d-flex align-items-center justify-content-between p-4'>
+            <div className={`d-flex align-items-center justify-content-between p-${isMobile ? '3' : '4'}`}>
               <div>
-                <h4 className='text-white mb-1' style={{ fontWeight: '600', fontSize: '1.5rem' }}>
+                <h4 className='text-white mb-1' style={{ 
+                  fontWeight: '600', 
+                  fontSize: isMobile ? '1.2rem' : '1.5rem' 
+                }}>
                   💰 All Transactions
                 </h4>
-                <p className='text-white-50 mb-0' style={{ fontSize: '0.9rem' }}>
+                <p className='text-white-50 mb-0' style={{ 
+                  fontSize: isMobile ? '0.8rem' : '0.9rem' 
+                }}>
                   View and manage all account transactions
                 </p>
               </div>
-
-              {/* <div className="d-flex gap-3">
-                <div
-                  className="btn btn-light d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
-                  style={{ 
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    border: 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-                  }}
-                >
-                  <span>➕</span>
-                  Add New Transaction
-                </div>
-              </div> */}
             </div>
           </div>
           
           {/* Data Table Section */}
-          <div className="flex-grow-1 px-4 pb-4 " style={{ overflow: 'hidden' }}>
+          <div className={`flex-grow-1 ${isMobile ? 'px-2' : 'px-4'} pb-4`} style={{ overflow: 'hidden' }}>
+            <div style={{ 
+              height: '100%',
+              '& .MuiDataGrid-root': {
+                fontSize: isMobile ? '0.75rem' : '0.875rem'
+              }
+            }}>
               <AdminDataTable
                 rows={DataWithID(data)}
                 CustomToolbar={CustomToolbar}
                 columns={all_columns}
+                loading={loading}
+                pageSize={isMobile ? 10 : 25}
+                rowsPerPageOptions={isMobile ? [10, 25] : [25, 50, 100]}
+                density={isMobile ? 'compact' : 'standard'}
               />
             </div>
+          </div>
         </div>
       </div>
         </Fragment>
