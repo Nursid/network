@@ -1008,71 +1008,6 @@ const FlowContent = ({ flowData }) => {
     // Set the viewport to center on the found nodes
     setViewport(newViewport);
 
-    // Temporarily highlight the found nodes
-    const highlightNodes = foundNodes.map(node => ({
-      ...node,
-      data: {
-        ...node.data,
-        isHighlighted: true
-      },
-      style: {
-        ...node.style,
-        border: '3px solid #ff6b6b',
-        boxShadow: '0 0 20px rgba(255, 107, 107, 0.6)'
-      }
-    }));
-
-    // Update nodes with highlight
-    setNodes(nds => nds.map(node => {
-      const highlightedNode = highlightNodes.find(hn => hn.id === node.id);
-      return highlightedNode || node;
-    }));
-
-    // Remove highlight after 3 seconds
-    setTimeout(() => {
-      setNodes(nds => nds.map(node => ({
-        ...node,
-        data: {
-          ...node.data,
-          isHighlighted: false
-        },
-        style: {
-          ...node.style,
-          border: node.data.isHighlighted ? undefined : node.style?.border,
-          boxShadow: node.data.isHighlighted ? undefined : node.style?.boxShadow
-        }
-      })));
-    }, 3000);
-
-    // Show notification
-    const searchNotification = document.createElement('div');
-    searchNotification.style.position = 'fixed';
-    searchNotification.style.top = '80px'; // Below navbar
-    searchNotification.style.left = '50%';
-    searchNotification.style.transform = 'translateX(-50%)';
-    searchNotification.style.backgroundColor = 'rgba(52, 152, 219, 0.95)';
-    searchNotification.style.color = 'white';
-    searchNotification.style.padding = '12px 24px';
-    searchNotification.style.borderRadius = '8px';
-    searchNotification.style.zIndex = '1001';
-    searchNotification.style.fontSize = '14px';
-    searchNotification.style.fontWeight = '500';
-    searchNotification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-    searchNotification.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span>🎯</span>
-        <span>Found ${foundNodes.length} node(s) matching "${searchQuery}"</span>
-      </div>
-    `;
-    document.body.appendChild(searchNotification);
-
-    // Remove notification after 4 seconds
-    setTimeout(() => {
-      if (document.body.contains(searchNotification)) {
-        document.body.removeChild(searchNotification);
-      }
-    }, 4000);
-
   }, [searchContext, nodes, rfInstance, setViewport, setNodes]);
 
   // Handle back navigation
@@ -1084,19 +1019,6 @@ const FlowContent = ({ flowData }) => {
     onRestore();
     // eslint-disable-next-line
   }, []);
-
-  // Effect to center on searched nodes after flow is loaded
-  useEffect(() => {
-    // Only run if we have search context and nodes are loaded
-    if (searchContext && searchContext.isFromSearch && nodes.length > 0 && rfInstance) {
-      // Add a small delay to ensure the flow is fully rendered
-      const timer = setTimeout(() => {
-        centerOnSearchedNodes();
-      }, 500);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [searchContext, nodes.length, rfInstance, centerOnSearchedNodes]);
 
   return (
     <div style={{ height: '100vh', width: '100%', backgroundColor: '#f5f5f5' }}>
@@ -1123,18 +1045,6 @@ const FlowContent = ({ flowData }) => {
           )}
         </NavbarBrand>
         <Nav className="ml-auto" navbar>
-          {searchContext && searchContext.isFromSearch && (
-            <NavItem>
-              <Button 
-                color="warning" 
-                onClick={centerOnSearchedNodes} 
-                style={{ marginRight: '10px', fontSize: '12px' }}
-                title="Re-center view on searched nodes"
-              >
-                🎯 Re-center Search
-              </Button>
-            </NavItem>
-          )}
           <NavItem>
             <Button 
               color={showReport ? "warning" : "info"} 
