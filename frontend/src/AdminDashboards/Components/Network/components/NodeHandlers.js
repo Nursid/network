@@ -5,7 +5,7 @@ export const createPonClickHandler = (
   ponId, 
   idCounterRef, 
   nodeStore, 
-  nodes, 
+  getNodes, // Change to a function that returns current nodes
   setNodes, 
   setEdges,
   onNodeUpdate,
@@ -21,6 +21,9 @@ export const createPonClickHandler = (
     console.error("ponId is undefined");
     return;
   }
+  
+  // Get fresh nodes state
+  const nodes = typeof getNodes === 'function' ? getNodes() : getNodes;
   
   let ponNumber;
   
@@ -107,7 +110,7 @@ export const createPonClickHandler = (
 
 export const createSplitterHandler = (
   nodeStore,
-  nodes, 
+  getNodes, // Change to a function that returns current nodes
   setNodes, 
   setEdges,
   onNodeUpdate,
@@ -116,6 +119,8 @@ export const createSplitterHandler = (
   flowData
 ) => {
   return (event, parentId, numChildren, splitterType, originalPonId) => {
+    // Get fresh nodes state
+    const nodes = typeof getNodes === 'function' ? getNodes() : getNodes;
 
    
     const edges = EdgeStore.getAllEdges();
@@ -297,7 +302,7 @@ export const createDeviceHandler = (
   nodeStore, 
   onNodeUpdate, 
   idCounterRef, 
-  nodes, 
+  getNodes, // Change to a function that returns current nodes
   setNodes, 
   setEdges,
   logState,
@@ -305,6 +310,8 @@ export const createDeviceHandler = (
   handleOnuDeviceCreate = null
 ) => {
   return (event, parentId, deviceType) => {
+    // Get fresh nodes state
+    const nodes = typeof getNodes === 'function' ? getNodes() : getNodes;
     
     const edges = EdgeStore.getAllEdges();
 
@@ -425,14 +432,12 @@ export const createDeviceHandler = (
         onUpdate: (updatedData) => onNodeUpdate(newDeviceId, updatedData),
         onDelete: (nodeId) => {
           console.log("Delete button clicked for node:", nodeId);
-          // Get current state and call deleteNodeHandler
-          setNodes((currentNodes) => {
-            setEdges((currentEdges) => {
-              deleteNodeHandler(nodeId, nodeStore, currentNodes, currentEdges, setNodes, setEdges, logState);
-              return currentEdges;
-            });
-            return currentNodes;
-          });
+          // Get current state by using the getter functions
+          const currentNodes = typeof getNodes === 'function' ? getNodes() : getNodes;
+          const currentEdges = EdgeStore.getAllEdges();
+          
+          // Call deleteNodeHandler with fresh state
+          deleteNodeHandler(nodeId, nodeStore, currentNodes, currentEdges, setNodes, setEdges, logState);
         },
         // Add device creation handler specifically for OnuNode
         ...(deviceType === 'ONU' && handleOnuDeviceCreate && {
@@ -557,8 +562,8 @@ export const createNodeOnEdge = (
   position,
   idCounterRef,
   nodeStore,
-  nodes,
-  edges,
+  getNodes, // Change to a function that returns current nodes
+  getEdges, // Change to a function that returns current edges
   setNodes,
   setEdges,
   onNodeUpdate,
@@ -568,6 +573,10 @@ export const createNodeOnEdge = (
     console.error("Missing required parameters for edge node creation");
     return;
   }
+
+  // Get fresh state
+  const nodes = typeof getNodes === 'function' ? getNodes() : getNodes;
+  const edges = typeof getEdges === 'function' ? getEdges() : getEdges;
 
   // Find the source and target nodes
   const sourceNode = nodeStore.getNode(sourceId) || nodes.find(n => n.id === sourceId);
@@ -668,7 +677,7 @@ export const createOnuDeviceHandler = (
   nodeStore, 
   onNodeUpdate, 
   idCounterRef, 
-  nodes, 
+  getNodes, // Change to a function that returns current nodes
   setNodes, 
   setEdges,
   logState,
@@ -681,6 +690,9 @@ export const createOnuDeviceHandler = (
       console.error("parentId is undefined");
       return;
     }
+    
+    // Get fresh nodes state
+    const nodes = typeof getNodes === 'function' ? getNodes() : getNodes;
     
     // Find the parent node (OnuNode)
     const parentNode = nodeStore.getNode(parentId) || nodes.find(node => node.id === parentId);
@@ -735,14 +747,12 @@ export const createOnuDeviceHandler = (
         onUpdate: (updatedData) => onNodeUpdate(newDeviceId, updatedData),
         onDelete: (nodeId) => {
           console.log("Delete button clicked for ONU device node:", nodeId);
-          // Get current state and call deleteNodeHandler
-          setNodes((currentNodes) => {
-            setEdges((currentEdges) => {
-              deleteNodeHandler(nodeId, nodeStore, currentNodes, currentEdges, setNodes, setEdges, logState);
-              return currentEdges;
-            });
-            return currentNodes;
-          });
+          // Get current state by using the getter functions
+          const currentNodes = typeof getNodes === 'function' ? getNodes() : getNodes;
+          const currentEdges = EdgeStore.getAllEdges();
+          
+          // Call deleteNodeHandler with fresh state
+          deleteNodeHandler(nodeId, nodeStore, currentNodes, currentEdges, setNodes, setEdges, logState);
         }
       },
       position: {

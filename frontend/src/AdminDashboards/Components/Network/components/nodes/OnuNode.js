@@ -8,6 +8,7 @@ const OnuNode = ({ data }) => {
   const dispatch = useDispatch();
   const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerFilterByFlowReducer)
   const childDeviceSelectRef = useRef(null);
+  const debounceTimeoutRef = useRef(null);
   
   const [fields, setFields] = useState({
     ponOp: data.ponOp || '',
@@ -47,10 +48,27 @@ const OnuNode = ({ data }) => {
     });
   }, [data]);
 
-  
-  
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
 
-    const handleFieldChange = (e) => {
+  const debouncedUpdate = (updatedFields) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    
+    debounceTimeoutRef.current = setTimeout(() => {
+      if (data.onUpdate) {
+        data.onUpdate(updatedFields);
+      }
+    }, 500);
+  };
+
+  const handleFieldChange = (e) => {
     const { name, value } = e.target;
     
     // Handle file upload
@@ -71,11 +89,10 @@ const OnuNode = ({ data }) => {
     }
     
     // Handle other fields normally
-    setFields((prevFields) => ({ ...prevFields, [name]: value }));
+    const updatedFields = { ...fields, [name]: value };
+    setFields(updatedFields);
 
-    if (data.onUpdate) {
-      data.onUpdate({ ...fields, [name]: value });
-    }
+    debouncedUpdate(updatedFields);
   };
 
   const handleImageUpload = async (file) => {

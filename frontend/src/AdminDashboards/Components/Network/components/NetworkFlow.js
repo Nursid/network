@@ -144,7 +144,7 @@ const FlowContent = ({ flowData }) => {
     NodeStore, 
     onNodeUpdate, 
     idCounterRef, 
-    nodes, 
+    () => nodes, // Pass a function that returns current nodes
     setNodes, 
     setEdges,
     logState,
@@ -156,7 +156,7 @@ const FlowContent = ({ flowData }) => {
     NodeStore, 
     onNodeUpdate, 
     idCounterRef,
-    nodes,
+    () => nodes, // Pass a function that returns current nodes
     setNodes,
     setEdges,
     logState,
@@ -166,7 +166,7 @@ const FlowContent = ({ flowData }) => {
   
   const handleSplitterSelect = createSplitterHandler(
     NodeStore,
-    nodes,
+    () => nodes, // Pass a function that returns current nodes
     setNodes,
     setEdges,
     onNodeUpdate,
@@ -181,7 +181,7 @@ const FlowContent = ({ flowData }) => {
       ponId,
       idCounterRef,
       NodeStore,
-      nodes,
+      () => nodes, // Pass a function that returns current nodes
       setNodes,
       setEdges,
       onNodeUpdate,
