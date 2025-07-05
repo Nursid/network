@@ -97,6 +97,7 @@ const OntNode = ({ data }) => {
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();
+    console.log("data", data);
     
     if (window.confirm("Are you sure you want to delete this ONT node?")) {
       if (data.onDelete) {

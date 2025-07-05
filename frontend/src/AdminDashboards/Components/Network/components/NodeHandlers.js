@@ -424,13 +424,14 @@ export const createDeviceHandler = (
                deviceType === 'Switch-S' ? '#e67e22' : '#95a5a6',
         onUpdate: (updatedData) => onNodeUpdate(newDeviceId, updatedData),
         onDelete: (nodeId) => {
-          // Use a closure to access current state
-          setEdges((currentEdges) => {
-            setNodes((currentNodes) => {
+          console.log("Delete button clicked for node:", nodeId);
+          // Get current state and call deleteNodeHandler
+          setNodes((currentNodes) => {
+            setEdges((currentEdges) => {
               deleteNodeHandler(nodeId, nodeStore, currentNodes, currentEdges, setNodes, setEdges, logState);
-              return currentNodes; // Return unchanged since deleteNodeHandler handles the update
+              return currentEdges;
             });
-            return currentEdges; // Return unchanged since deleteNodeHandler handles the update
+            return currentNodes;
           });
         },
         // Add device creation handler specifically for OnuNode
@@ -440,7 +441,7 @@ export const createDeviceHandler = (
       },
       position: {
         x: parentX,
-        y: parentY
+        y: parentY + 850  // Position device node below parent with 250px spacing
       },
       targetPosition: 'top',
       sourcePosition: 'bottom'
@@ -483,6 +484,10 @@ export const deleteNodeHandler = (
   setEdges,
   logState
 ) => {
+  console.log("deleteNodeHandler called with nodeId:", nodeId);
+  console.log("Available nodes:", nodes.map(n => n.id));
+  console.log("Available edges:", edges.map(e => e.id));
+  
   if (!nodeId) {
     console.error("Cannot delete node: nodeId is undefined");
     return;
@@ -492,8 +497,11 @@ export const deleteNodeHandler = (
   const nodeToDelete = nodeStore.getNode(nodeId);
   if (!nodeToDelete) {
     console.error("Node not found for deletion:", nodeId);
+    console.log("Available nodes in store:", Object.keys(nodeStore.nodes || {}));
     return;
   }
+  
+  console.log("Found node to delete:", nodeToDelete);
 
   // Get all child nodes and edges to delete recursively
   const getAllDescendants = (nodeId) => {
@@ -521,6 +529,11 @@ export const deleteNodeHandler = (
   
   // Remove from NodeStore
   allNodesToDelete.forEach(id => nodeStore.removeNode(id));
+  
+  // Remove edges from EdgeStore
+  edgesToDelete.forEach(edge => {
+    EdgeStore.removeEdge(edge.id);
+  });
   
   // Update React state
   setNodes(nodes => nodes.filter(node => !allNodesToDelete.includes(node.id)));
@@ -721,13 +734,14 @@ export const createOnuDeviceHandler = (
                deviceType === 'switch-s' ? '#e67e22' : '#95a5a6',
         onUpdate: (updatedData) => onNodeUpdate(newDeviceId, updatedData),
         onDelete: (nodeId) => {
-          // Use a closure to access current state
-          setEdges((currentEdges) => {
-            setNodes((currentNodes) => {
+          console.log("Delete button clicked for ONU device node:", nodeId);
+          // Get current state and call deleteNodeHandler
+          setNodes((currentNodes) => {
+            setEdges((currentEdges) => {
               deleteNodeHandler(nodeId, nodeStore, currentNodes, currentEdges, setNodes, setEdges, logState);
-              return currentNodes; // Return unchanged since deleteNodeHandler handles the update
+              return currentEdges;
             });
-            return currentEdges; // Return unchanged since deleteNodeHandler handles the update
+            return currentNodes;
           });
         }
       },
