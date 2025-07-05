@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Handle } from '@xyflow/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetAllCustomersFilterByFlow } from '../../../../../Store/Actions/Dashboard/Customer/CustomerActions';
@@ -6,6 +6,7 @@ import { GetAllCustomersFilterByFlow } from '../../../../../Store/Actions/Dashbo
 const SwitchSNode = ({ data }) => {
   const dispatch = useDispatch();
   const { data: customers, isLoading } = useSelector(state => state.GetAllCustomerFilterByFlowReducer)
+  const debounceTimeoutRef = useRef(null); // Add debounce timeout ref
 
   const [fields, setFields] = useState({
     ports: data.ports || '',
@@ -43,13 +44,35 @@ const SwitchSNode = ({ data }) => {
     });
   }, [data]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Debounced update function
+  const debouncedUpdate = (updatedFields) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    
+    debounceTimeoutRef.current = setTimeout(() => {
+      if (data.onUpdate) {
+        data.onUpdate(updatedFields);
+      }
+    }, 500); // 500ms delay
+  };
+
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
-    setFields((prevFields) => ({ ...prevFields, [name]: value }));
+    const updatedFields = { ...fields, [name]: value };
+    setFields(updatedFields);
 
-    if (data.onUpdate) {
-      data.onUpdate({ ...fields, [name]: value });
-    }
+    // Use debounced update instead of immediate update
+    debouncedUpdate(updatedFields);
   };
 
   const handleDeleteClick = (e) => {
