@@ -305,7 +305,48 @@ export const createDeviceHandler = (
   handleOnuDeviceCreate = null
 ) => {
   return (event, parentId, deviceType) => {
-    console.log("handleDeviceSelect called with parentId:", parentId, "deviceType:", deviceType);
+    
+    const edges = EdgeStore.getAllEdges();
+
+    const childNodes = edges
+    .filter(edge => edge.source === parentId)
+    .map(edge => edge.target);
+
+    // Delete existing child nodes if present
+    if (childNodes.length > 0) {
+      console.log(`Deleting ${childNodes.length} existing child nodes:`, childNodes);
+      
+      // Remove child nodes from state
+      setNodes(prevNodes => {
+        const filteredNodes = prevNodes.filter(node => !childNodes.includes(node.id));
+        console.log(`Removed ${prevNodes.length - filteredNodes.length} nodes from state`);
+        return filteredNodes;
+      });
+      
+      // Remove child nodes from store
+      childNodes.forEach(childId => {
+        nodeStore.removeNode(childId);
+      });
+      
+      // Remove edges connected to child nodes
+      const edgesToRemove = edges.filter(edge => 
+        childNodes.includes(edge.source) || childNodes.includes(edge.target)
+      );
+      
+      setEdges(prevEdges => {
+        const filteredEdges = prevEdges.filter(edge => 
+          !edgesToRemove.some(edgeToRemove => edgeToRemove.id === edge.id)
+        );
+        console.log(`Removed ${prevEdges.length - filteredEdges.length} edges from state`);
+        return filteredEdges;
+      });
+      
+      // Remove edges from EdgeStore
+      edgesToRemove.forEach(edge => {
+        EdgeStore.removeEdge(edge.id);
+      });
+    }
+
     
     if (!parentId) {
       console.error("parentId is undefined");
@@ -399,7 +440,7 @@ export const createDeviceHandler = (
       },
       position: {
         x: parentX,
-        y: parentY + 350
+        y: parentY
       },
       targetPosition: 'top',
       sourcePosition: 'bottom'
