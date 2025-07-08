@@ -377,9 +377,19 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const handleInventoryItemChange = (index, field, value) => {
 		setFormData(prev => ({
 			...prev,
-			selectedItems: prev.selectedItems.map((item, i) => 
-				i === index ? { ...item, [field]: value } : item
-			)
+			selectedItems: prev.selectedItems.map((item, i) => {
+				if (i === index) {
+					if (field === 'quantity') {
+						// Get the available quantity for the selected item
+						const availableQty = item.item ? item.item.qty : 0;
+						// Ensure quantity doesn't exceed available stock
+						const validatedQuantity = Math.min(Math.max(1, parseInt(value) || 1), availableQty);
+						return { ...item, [field]: validatedQuantity };
+					}
+					return { ...item, [field]: value };
+				}
+				return item;
+			})
 		}));
 	};
 
@@ -502,7 +512,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 			<div className="mb-4">
 				<div className="d-flex justify-content-between mb-2">
 					<span className="small">Step {currentStep} of 4</span>
-					<span className="small">{Math.round(progress)}% Complete</span>
+					{/* <span className="small">{Math.round(progress)}% Complete</span> */}
 				</div>
 				<Progress value={progress} color="primary" />
 			</div>
@@ -679,7 +689,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 								<ErrorMessage name="email" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
-						<Col md={6}>
+						<Col md={6}>	
 							<FormGroup>
 								<Label for="image">Upload Image</Label>
 								<Input 
@@ -724,25 +734,10 @@ const AddNewCustomerForm = ({prop, data}) => {
 							<CardBody>
 								<p><strong>Plan:</strong> {formData.selectedPackage.plan}</p>
 								<p><strong>Connection Type:</strong> {formData.selectedPackage.connectionType}</p>
-								<p><strong>Code:</strong> {formData.selectedPackage.code}</p>
-								<p><strong>Base Price:</strong> ₹{formData.selectedPackage.basePrice}</p>
-								<p><strong>Final Price:</strong> ₹{formData.selectedPackage.finalPrice}</p>
-								<p><strong>Duration:</strong> {formData.selectedPackage.days ? 'Daily' : 'Monthly'}</p>
 							</CardBody>
 						</Card>
 					</Col>
 				)}
-				<Col md={12}>
-					<FormGroup>
-						<Label for="packageDetails">Package Details/Notes</Label>
-						<Input
-							type="textarea"
-							value={formData.packageDetails}
-							onChange={(e) => setFormData(prev => ({ ...prev, packageDetails: e.target.value }))}
-							placeholder="Enter any additional package details or notes"
-						/>
-					</FormGroup>
-				</Col>
 			</Row>
 			<div className="d-flex justify-content-between">
 				<Button color="secondary" onClick={handlePrevious}>
@@ -755,7 +750,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 				>
 					Next <ALlIcon.FaArrowRight className="ml-2" />
 				</Button>
-			</div>
+			</div>	
 		</div>
 	);
 
@@ -790,9 +785,16 @@ const AddNewCustomerForm = ({prop, data}) => {
 							<Input
 								type="number"
 								min="1"
+								max={item.item ? item.item.qty : 1}
 								value={item.quantity}
 								onChange={(e) => handleInventoryItemChange(index, 'quantity', parseInt(e.target.value))}
+								invalid={item.item && item.quantity > item.item.qty}
 							/>
+							{item.item && item.quantity > item.item.qty && (
+								<div className="invalid-feedback d-block">
+									Quantity cannot exceed available stock ({item.item.qty})
+								</div>
+							)}
 						</FormGroup>
 					</Col>
 					<Col md={3}>
@@ -833,7 +835,11 @@ const AddNewCustomerForm = ({prop, data}) => {
 				<Button color="secondary" onClick={handlePrevious}>
 					<ALlIcon.FaArrowLeft className="mr-2" /> Previous
 				</Button>
-				<Button color="primary" onClick={() => handleNext({})}>
+				<Button 
+					color="primary" 
+					onClick={() => handleNext({})}
+					disabled={formData.selectedItems.some(item => item.item && item.quantity > item.item.qty)}
+				>
 					Next <ALlIcon.FaArrowRight className="ml-2" />
 				</Button>
 			</div>

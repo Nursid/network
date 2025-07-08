@@ -10,7 +10,7 @@ const CustomerProfile = ({ data }) => {
   };
 
   return (
-    <Card className="border-0 shadow-sm h-100">
+    <Card className="border-0 shadow-sm">
       <CardBody className="text-center p-4">
         {/* Profile Image */}
         <div className="profile-image-wrapper mb-4">
@@ -51,13 +51,6 @@ const CustomerProfile = ({ data }) => {
             <div className="stat-label">Monthly Bill</div>
           </div>
         </div>
-
-        {/* Customer ID */}
-        {data?.id && (
-          <div className="customer-id mt-4">
-            <small className="text-muted">Customer ID: <strong>{data.id}</strong></small>
-          </div>
-        )}
       </CardBody>
     </Card>
   );

@@ -18,17 +18,6 @@ const CustomerHeader = ({ toggleModal }) => {
               </div>
             </div>
           </Col>
-          <Col md={4} className="text-end">
-            <Button 
-              color="outline-secondary" 
-              size="sm" 
-              onClick={toggleModal}
-              className="border-0"
-            >
-              <FaIcons.FaTimes className="me-1" />
-              Close
-            </Button>
-          </Col>
         </Row>
       </CardHeader>
     </Card>

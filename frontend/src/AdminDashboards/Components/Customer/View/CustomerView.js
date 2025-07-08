@@ -16,7 +16,6 @@ import KYCInfoCard from './components/KYCInfoCard';
 import DocumentsCard from './components/DocumentsCard';
 
 export default function CustomerView({ data, toggleModal }) {
-  console.log(data);
 
   return (
     <div className="customer-view-professional">
@@ -25,53 +24,53 @@ export default function CustomerView({ data, toggleModal }) {
         <CustomerHeader toggleModal={toggleModal} />
 
         {/* Main Content */}
-        <Row className="g-4">
-          {/* Left Column - Profile */}
-          <Col lg={4}>
-            <CustomerProfile data={data} />
-          </Col>
-
-          {/* Right Column - Information Cards */}
-          <Col lg={8}>
-            <div className="info-cards-container">
+        <div className="customer-view-content">
+          {/* Profile and Basic Info Row */}
+          <Row className="g-3 mb-4"> 
+            <Col xl={4} lg={5} md={12} sm={12} xs={12}>
+              <CustomerProfile data={data} />
+            </Col>
+            <Col xl={8} lg={7} md={12} sm={12} xs={12}>
               <BasicInfoCard data={data} />
-              
-              <Row className="g-4 mb-4">
-                <Col md={6}>
+            </Col>
+          </Row>
+
+          {/* Information Cards */}
+          <Row className="g-3 mb-4">
+            <Col xl={6} lg={6} md={12} sm={12} xs={12}>
                   <ContactInfoCard data={data} />
                 </Col>
-                <Col md={6}>
+            <Col xl={6} lg={6} md={12} sm={12} xs={12}>
                   <AddressInfoCard data={data} />
                 </Col>
               </Row>
 
-              <Row className="g-4 mb-4">
-                <Col md={6}>
+          <Row className="g-3 mb-4">
+            <Col xl={6} lg={6} md={12} sm={12} xs={12}>
                   <PackageInfoCard data={data} />
                 </Col>
-                <Col md={6}>
+            <Col xl={6} lg={6} md={12} sm={12} xs={12}>
                   <InventoryInfoCard data={data} />
                 </Col>
               </Row>
 
+          <Row className="g-3 mb-4">
+            <Col xs={12}>
               <BillingInfoCard data={data} />
+            </Col>
+          </Row>
+
+          <Row className="g-3 mb-4">
+            <Col xs={12}>
               <KYCInfoCard data={data} />
+            </Col>
+          </Row>
+
+          <Row className="g-3 mb-4">
+            <Col xs={12}>
               <DocumentsCard data={data} />
-            </div>
           </Col>
         </Row>
-
-        {/* Footer */}
-        <div className="customer-view-footer">
-          <Button 
-            color="secondary" 
-            size="sm"
-            onClick={toggleModal}
-            className="close-btn"
-          >
-            <FaIcons.FaTimes className="me-2" />
-            Close
-          </Button>
         </div>
       </div>
     </div>
