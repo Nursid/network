@@ -25,10 +25,30 @@ import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { Button, Tooltip, TextField, Select, MenuItem, FormControl, InputLabel, Collapse, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import { 
+    Button, 
+    Tooltip, 
+    TextField, 
+    Select, 
+    MenuItem, 
+    FormControl, 
+    InputLabel, 
+    Collapse, 
+    IconButton, 
+    useMediaQuery, 
+    useTheme,
+    Box,
+    Typography,
+    InputAdornment,
+    Paper,
+    Chip,
+    Badge
+} from '@mui/material';
 import UpdateCustomerForm from './Froms/UpdateCustomerForm';
 import CustomerView from './View/CustomerView';
 import AdminNavItems from '../../Elements/AdminNavItems';
+
 
 
 const ManageCustomer = () => {
@@ -38,6 +58,7 @@ const ManageCustomer = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
     const [showFilters, setShowFilters] = useState(!isMobile)
+    const [globalSearch, setGlobalSearch] = useState('')
 
     // Area options for locality filter
     const areaOptions = [
@@ -340,44 +361,38 @@ const ManageCustomer = () => {
     const column = [
         { 
             field: "id", 
-            headerName: "Customer ID", 
-            minWidth: isMobile ? 100 : 120, 
+            headerName: "Cust. ID", 
+            minWidth: isMobile ? 80 : 100, 
             editable: false,
             flex: isMobile ? 0 : undefined
         },
         { 
             field: "name", 
-            headerName: "Name", 
-            minWidth: isMobile ? 100 : 120, 
+            headerName: "Cust. Name", 
+            minWidth: isMobile ? 120 : 150, 
             editable: false,
             flex: isMobile ? 1 : undefined
         },
         { 
-            field: "username", 
-            headerName: "Username", 
+            field: "mobile", 
+            headerName: "Contact", 
             minWidth: isMobile ? 100 : 120, 
             editable: false,
-            hide: isSmallMobile
+            flex: isMobile ? 0 : undefined
         },
         { 
             field: "address", 
             headerName: "Address", 
-            minWidth: isMobile ? 200 : 350,
-            minHeight: 200,
+            minWidth: isMobile ? 150 : 200,
             renderCell: (params) => (
                 <div style={{ 
                     whiteSpace: "pre-line",
-                    fontSize: isMobile ? '12px' : '14px',
-                    lineHeight: isMobile ? '1.3' : '1.5'
+                    fontSize: isMobile ? '11px' : '12px',
+                    lineHeight: isMobile ? '1.2' : '1.3'
                 }}>
                     <div>
                         {params.row.address && <span>{params.row.address}</span>}
                         {params.row.area && <span>{params.row.address ? ', ' : ''}{params.row.area}</span>}
-                        {params.row.apartment && <span>{(params.row.address || params.row.area) ? ', ' : ''}{params.row.apartment}</span>}
-                    </div>
-                    <div>
-                        {params.row.block && <span>{params.row.block}</span>}
-                        {params.row.t_address && <span>{params.row.block ? ', ' : ''}{params.row.t_address}</span>}
                     </div>
                 </div>
             ),
@@ -385,179 +400,152 @@ const ManageCustomer = () => {
             hide: isSmallMobile
         },
         { 
-            field: "mobile", 
-            headerName: "Mobile", 
+            field: "plan", 
+            headerName: "Plan Amt.", 
+            minWidth: isMobile ? 80 : 100, 
+            editable: false,
+            hide: isSmallMobile,
+            renderCell: (params) => (
+                <span style={{ color: '#1976d2', fontWeight: 'bold' }}>
+                    ₹{params.row.billing_amount || 0}
+                </span>
+            )
+        },
+        { 
+            field: "validity", 
+            headerName: "Validity", 
+            minWidth: isMobile ? 80 : 100, 
+            editable: false,
+            hide: isSmallMobile,
+            renderCell: (params) => (
+                <span style={{ fontSize: '11px' }}>
+                    From & To
+                </span>
+            )
+        },
+        { 
+            field: "balance", 
+            headerName: "Balance", 
+            minWidth: isMobile ? 80 : 100, 
+            editable: false,
+            hide: isSmallMobile,
+            renderCell: (params) => (
+                <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>
+                    ₹{params.row.balance || 0}
+                </span>
+            )
+        },
+        { 
+            field: "last_payment", 
+            headerName: "Last Payment", 
             minWidth: isMobile ? 100 : 120, 
             editable: false,
-            flex: isMobile ? 0 : undefined
-        },
-        { 
-            field: "status", 
-            headerName: "Status", 
-            minWidth: isMobile ? 80 : 120, 
-            editable: false,
-            hide: isSmallMobile
-        },
-        { 
-            field: "billing_amount", 
-            headerName: isMobile ? "Amount" : "Billing Amount", 
-            minWidth: isMobile ? 80 : 120, 
-            editable: false,
-            hide: isSmallMobile
+            hide: isSmallMobile,
+            renderCell: (params) => (
+                <span style={{ fontSize: '11px' }}>
+                    [Date]
+                </span>
+            )
         },
         {
             field: "action",
             headerName: "Action",
-            minWidth: isMobile ? 120 : 400,
+            minWidth: isMobile ? 200 : 300,
             sortable: false,
             renderCell: (params) => (
-                <div className={`d-flex gap-1 ${isMobile ? 'flex-column' : 'flex-wrap'}`}>
-                    {/* Primary actions - always visible */}
-                    <div className="d-flex gap-1">
-                        <Tooltip title="Edit" arrow>
-                            <Button variant='contained' color='primary' 
-                                onClick={(e)=>{GetUpdateCustomer(params.row)}}
-                                style={{
-                                    minWidth: isMobile ? "28px" : "32px", 
-                                    maxWidth: isMobile ? "28px" : "32px", 
-                                    minHeight: isMobile ? "28px" : "32px", 
-                                    maxHeight: isMobile ? "28px" : "32px", 
-                                    padding: "2px"
-                                }}
-                            >
-                                <BorderColorIcon fontSize={isMobile ? "small" : "small"} />
-                            </Button>
-                        </Tooltip>
+                <div className="d-flex gap-1 align-items-center flex-wrap">
+                    <Tooltip title="View" arrow>
+                        <IconButton 
+                            size="small" 
+                            style={{ backgroundColor: '#4caf50', color: 'white' }}
+                            onClick={() => toggleView(params.row)}
+                        >
+                            <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
 
-                        <Tooltip title="View" arrow>
-                            <Button variant="contained" color="success" 
-                                onClick={(e)=>{toggleView(params.row)}}
-                                style={{
-                                    minWidth: isMobile ? "28px" : "32px", 
-                                    maxWidth: isMobile ? "28px" : "32px", 
-                                    minHeight: isMobile ? "28px" : "32px", 
-                                    maxHeight: isMobile ? "28px" : "32px", 
-                                    padding: "2px"
-                                }}
-                            >
-                                <VisibilityIcon fontSize={isMobile ? "small" : "small"} />
-                            </Button>
-                        </Tooltip>
+                    <Tooltip title="Edit" arrow>
+                        <IconButton 
+                            size="small" 
+                            style={{ backgroundColor: '#2196f3', color: 'white' }}
+                            onClick={() => GetUpdateCustomer(params.row)}
+                        >
+                            <BorderColorIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
 
-                        <Tooltip title="WhatsApp" arrow>
-                            <Button variant="contained" 
-                                onClick={(e) => handleWhatsAppMessage(params.row.user_id, params.row.name, params.row.mobile)}
-                                style={{
-                                    minWidth: isMobile ? "28px" : "32px", 
-                                    maxWidth: isMobile ? "28px" : "32px", 
-                                    minHeight: isMobile ? "28px" : "32px", 
-                                    maxHeight: isMobile ? "28px" : "32px", 
-                                    padding: "2px", 
-                                    backgroundColor: "#25d366"
-                                }}
-                            >
-                                <WhatsAppIcon fontSize={isMobile ? "small" : "small"} />
-                            </Button>
-                        </Tooltip>
-                    </div>
+                    <Tooltip title="Delete" arrow>
+                        <IconButton 
+                            size="small" 
+                            style={{ backgroundColor: '#f44336', color: 'white' }}
+                            onClick={() => GetDeleteByID(params.row.user_id)}
+                        >
+                            <DeleteForeverIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
 
-                    {/* Secondary actions - hidden on small mobile */}
+                    <Tooltip title="Block/Unblock" arrow>
+                        <IconButton 
+                            size="small" 
+                            style={{ backgroundColor: '#ff9800', color: 'white' }}
+                            onClick={() => handleToggleBlock(params.row.user_id)}
+                        >
+                            <BlockIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+
                     {!isSmallMobile && (
-                        <div className="d-flex gap-1 flex-wrap">
-                            <Tooltip title="Reminder" arrow>
-                                <Button variant="contained" color="warning" 
-                                    onClick={(e) => handleAddRemainder(params.row.user_id)}
-                                    style={{
-                                        minWidth: isMobile ? "28px" : "32px", 
-                                        maxWidth: isMobile ? "28px" : "32px", 
-                                        minHeight: isMobile ? "28px" : "32px", 
-                                        maxHeight: isMobile ? "28px" : "32px", 
-                                        padding: "2px"
-                                    }}
-                                >
-                                    <NotificationsIcon fontSize="small" />
-                                </Button>
-                            </Tooltip>
-
+                        <>
                             <Tooltip title="Payment" arrow>
-                                <Button variant="contained" color="info" 
-                                    onClick={(e) => handlePaymentEntry(params.row.user_id)}
-                                    style={{
-                                        minWidth: isMobile ? "28px" : "32px", 
-                                        maxWidth: isMobile ? "28px" : "32px", 
-                                        minHeight: isMobile ? "28px" : "32px", 
-                                        maxHeight: isMobile ? "28px" : "32px", 
-                                        padding: "2px"
-                                    }}
+                                <IconButton 
+                                    size="small" 
+                                    style={{ backgroundColor: '#9c27b0', color: 'white' }}
+                                    onClick={() => handlePaymentEntry(params.row.user_id)}
                                 >
                                     <PaymentIcon fontSize="small" />
-                                </Button>
+                                </IconButton>
                             </Tooltip>
 
                             <Tooltip title="Recharge" arrow>
-                                <Button variant="contained" 
-                                    onClick={(e) => handleRecharge(params.row.user_id)}
-                                    style={{
-                                        minWidth: isMobile ? "28px" : "32px", 
-                                        maxWidth: isMobile ? "28px" : "32px", 
-                                        minHeight: isMobile ? "28px" : "32px", 
-                                        maxHeight: isMobile ? "28px" : "32px", 
-                                        padding: "2px", 
-                                        backgroundColor: "#9c27b0"
-                                    }}
+                                <IconButton 
+                                    size="small" 
+                                    style={{ backgroundColor: '#607d8b', color: 'white' }}
+                                    onClick={() => handleRecharge(params.row.user_id)}
                                 >
                                     <BatteryChargingFullIcon fontSize="small" />
-                                </Button>
+                                </IconButton>
                             </Tooltip>
 
                             <Tooltip title="Bills" arrow>
-                                <Button variant="contained" 
-                                    onClick={(e) => handleBillTransaction(params.row.user_id)}
-                                    style={{
-                                        minWidth: isMobile ? "28px" : "32px", 
-                                        maxWidth: isMobile ? "28px" : "32px", 
-                                        minHeight: isMobile ? "28px" : "32px", 
-                                        maxHeight: isMobile ? "28px" : "32px", 
-                                        padding: "2px", 
-                                        backgroundColor: "#795548"
-                                    }}
+                                <IconButton 
+                                    size="small" 
+                                    style={{ backgroundColor: '#795548', color: 'white' }}
+                                    onClick={() => handleBillTransaction(params.row.user_id)}
                                 >
                                     <ReceiptIcon fontSize="small" />
-                                </Button>
+                                </IconButton>
                             </Tooltip>
 
                             <Tooltip title="Complain" arrow>
-                                <Button variant="contained" 
-                                    onClick={(e) => handleComplain(params.row.user_id)}
-                                    style={{
-                                        minWidth: isMobile ? "28px" : "32px", 
-                                        maxWidth: isMobile ? "28px" : "32px", 
-                                        minHeight: isMobile ? "28px" : "32px", 
-                                        maxHeight: isMobile ? "28px" : "32px", 
-                                        padding: "2px", 
-                                        backgroundColor: "#ff9800"
-                                    }}
+                                <IconButton 
+                                    size="small" 
+                                    style={{ backgroundColor: '#ff5722', color: 'white' }}
+                                    onClick={() => handleComplain(params.row.user_id)}
                                 >
                                     <ReportProblemIcon fontSize="small" />
-                                </Button>
+                                </IconButton>
                             </Tooltip>
 
-                            <Tooltip title="Delete" arrow>
-                                <Button onClick={(e) => {
-                                        GetDeleteByID(params.row.user_id)
-                                    }} variant="contained" color="error"
-                                    style={{
-                                        minWidth: isMobile ? "28px" : "32px", 
-                                        maxWidth: isMobile ? "28px" : "32px", 
-                                        minHeight: isMobile ? "28px" : "32px", 
-                                        maxHeight: isMobile ? "28px" : "32px", 
-                                        padding: "2px"
-                                    }}
+                            <Tooltip title="WhatsApp" arrow>
+                                <IconButton 
+                                    size="small" 
+                                    style={{ backgroundColor: '#25d366', color: 'white' }}
+                                    onClick={() => handleWhatsAppMessage(params.row.user_id, params.row.name, params.row.mobile)}
                                 >
-                                    <DeleteForeverIcon fontSize="small" />
-                                </Button>
+                                    <WhatsAppIcon fontSize="small" />
+                                </IconButton>
                             </Tooltip>
-                        </div>
+                        </>
                     )}
                 </div>
             ),
@@ -600,8 +588,8 @@ const ManageCustomer = () => {
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
-                backgroundColor: '#f8f9fa',
-                paddingTop: '60px' // Space for mobile menu button
+                backgroundColor: '#f5f5f5',
+                paddingTop: '60px'
             }
         }
         
@@ -612,14 +600,19 @@ const ManageCustomer = () => {
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: '#f5f5f5',
             transition: 'width 0.3s ease, margin-left 0.3s ease'
         }
     }
 
+    // Get current data count
+    const getCurrentDataCount = () => {
+        const currentData = isFiltered ? filteredData.data : data.data;
+        return currentData ? currentData.length : 0;
+    }
+
     return (
     <>
-
         <Fragment>
             <ModalComponent modal={addCustomer} toggle={ToggleAddCustomer} data={<AddNewCustomerForm  prop={ToggleAddCustomer } />} modalTitle={"Add New Customer"} size={"xl"} scrollable={true} />
 
@@ -632,111 +625,74 @@ const ManageCustomer = () => {
                 size={"xl"} scrollable={true}
             />
 
-   
             <ModalComponent modal={updateCustomer} toggle={ToggleUpdateCustomer} data={<UpdateCustomerForm  prop={ToggleUpdateCustomer } updateData={update} />} modalTitle={"Update Customer"} size={"xl"} scrollable={true} />
            
-           
-<div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+<div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f5f5f5' }}>
         {/* Left Sidebar - Hidden on mobile */}
         {!isMobile && <AdminNavItems onSidebarToggle={handleSidebarToggle} />}
         {isMobile && <AdminNavItems onSidebarToggle={handleSidebarToggle} />}
 
-        {/* Main Content - Dynamic width based on sidebar state */}
-        <div
-          className="main-content"
-          style={getMainContentStyle()}
-        >
-          {/* Header Section with Gradient Background */}
-          <div 
-            className="flex-shrink-0"
+        {/* Main Content */}
+        <div className="main-content" style={getMainContentStyle()}>
+          {/* Top Header Section */}
+          <Paper 
+            elevation={2} 
             style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: isMobile ? '0 0 15px 15px' : '0 0 20px 20px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-              margin: isMobile ? '0' : '10px',
-              marginBottom: isMobile ? '10px' : '20px'
+              margin: isMobile ? '0 10px 10px 10px' : '10px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+              color: 'white'
             }}
           >
-            <div className={`d-flex align-items-center ${isMobile ? 'flex-column' : 'justify-content-between'} p-${isMobile ? '3' : '4'}`}>
-              <div className={`${isMobile ? 'text-center mb-3' : ''}`}>
-                <h4 className='text-white mb-1' style={{ 
-                  fontWeight: '600', 
-                  fontSize: isMobile ? '1.2rem' : '1.5rem' 
-                }}>
-                  📱 Customer List
-                </h4>
-                <p className='text-white-50 mb-0' style={{ 
-                  fontSize: isMobile ? '0.8rem' : '0.9rem' 
-                }}>
-                  Manage and track all customers
-                </p>
-              </div>
-
-              <div className="d-flex gap-2">
-                <div
-                  className="btn btn-light d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm"
-                  style={{ 
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    border: 'none',
-                    fontSize: isMobile ? '0.85rem' : '1rem'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-                  }}
-                  onClick={ToggleAddCustomer}
-                >
-                  <span>💳</span>
-                  {isMobile ? 'Add Customer' : 'Add New Customer'}
+            <Box sx={{ p: isMobile ? 2 : 3 }}>
+              <div className="row align-items-center">
+                <div className="col-md-6 col-12">
+                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="600">
+                    🏢 LO-GO Customer Management
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
+                    Manage customers, connections, and billing
+                  </Typography>
+                </div>
+                <div className="col-md-6 col-12">
+                  <Box sx={{ display: 'flex', gap: 1, justifyContent: isMobile ? 'center' : 'flex-end' }}>
+                    <Button
+                      variant="contained"
+                      onClick={ToggleAddCustomer}
+                      sx={{
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                        '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' },
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Add Connection
+                    </Button>
+                  </Box>
                 </div>
               </div>
-            </div>
-          </div>
+            </Box>
+          </Paper>
 
-          {/* Filters Section */}
-          <div className={`${isMobile ? 'px-2' : 'px-4'} border-bottom`}>
-            {/* Filter Toggle Button for Mobile */}
-            {isMobile && (
-              <div className="d-flex align-items-center justify-content-between mb-3">
-                <Button
-                  variant="outlined"
-                  startIcon={<FilterListIcon />}
-                  endIcon={showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                  onClick={() => setShowFilters(!showFilters)}
-                  size="small"
-                  style={{ 
-                    borderRadius: '20px',
-                    textTransform: 'none',
-                    fontWeight: '500'
-                  }}
-                >
-                  Filters
-                </Button>
-                {isFiltered && (
-                  <span className='badge bg-info'>
-                    {filteredData?.count || 0} results
-                  </span>
-                )}
-              </div>
-            )}
-
-            <Collapse in={showFilters}>
-              <div className={`${isMobile ? 'pb-3' : 'p-2'} rounded-2`} style={{ background: "#fff" }}>
-                <div className={`row align-items-end ${isMobile ? 'g-2' : 'g-3'}`}>
-                  <div className={isMobile ? 'col-6' : 'col-md-2'}>
-                    <FormControl fullWidth size="small" sx={{ background: "#fff" }}>
-                      <InputLabel>Status</InputLabel>
+          {/* Main Content */}
+            {/* Search and Filter Section */}
+            <Paper 
+              elevation={1} 
+              style={{
+                margin: isMobile ? '0 10px 10px 10px' : '0 10px 10px 10px',
+                borderRadius: '8px'
+              }}
+            >
+              <Box sx={{ p: 2 }}>
+                <div className="row align-items-center">
+                  <div className="col-md-3 col-12 mb-2">
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Cust. Id</InputLabel>
                       <Select
                         value={filters.status}
-                        label="Status"
+                        label="Cust. Id"
                         onChange={(e) => handleFilterChange('status', e.target.value)}
-                        sx={{ background: "#fff" }}
                       >
                         <MenuItem value="">All</MenuItem>
                         <MenuItem value="0">Active</MenuItem>
@@ -745,14 +701,137 @@ const ManageCustomer = () => {
                     </FormControl>
                   </div>
                   
-                  <div className={isMobile ? 'col-6' : 'col-md-2'}>
-                    <FormControl fullWidth size="small" sx={{ background: "#fff" }}>
-                      <InputLabel>Locality</InputLabel>
+                  <div className="col-md-6 col-12 mb-2">
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Type here for a Global Search"
+                      value={globalSearch}
+                      onChange={(e) => setGlobalSearch(e.target.value)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="col-md-3 col-12 mb-2">
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        variant="contained"
+                        onClick={applyFilters}
+                        size="small"
+                        sx={{ flex: 1 }}
+                      >
+                        Search
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={clearFilters}
+                        size="small"
+                        sx={{ flex: 1 }}
+                      >
+                        Clear
+                      </Button>
+                    </Box>
+                  </div>
+                </div>
+
+                {/* Additional Filters Row */}
+                <div className="row mt-3">
+                  <div className="col-md-3 col-3 mb-2">
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="date"
+                      label="Start Date"
+                      value={filters.startDate}
+                      onChange={(e) => handleFilterChange('startDate', e.target.value)}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </div>
+                  
+                  <div className="col-md-3 col-3 mb-2">
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="date"
+                      label="End Date"
+                      value={filters.endDate}
+                      onChange={(e) => handleFilterChange('endDate', e.target.value)}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </div>
+                  
+                  <div className="col-md-3 col-3 mb-2">
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Cust. ID"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            📋
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="col-md-3 col-3 mb-2">
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Type here !!"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            🔍
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </div>
+                 
+                </div>
+
+                {/* Additional Filter Options */}
+                <div className="row mt-3">
+                  <div className="col-md-3 col-3 mb-2">
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Search by Block</InputLabel>
+                      <Select
+                        value=""
+                        label="Search by Block"
+                      >
+                        <MenuItem value="">All</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </div>
+                  
+                  <div className="col-md-3 col-3 mb-2">
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Search by Locality</InputLabel>
+                      <Select
+                        value=""
+                        label="Search by Locality"
+                      >
+                        <MenuItem value="">All</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </div>
+
+ 
+                  <div className="col-md-3 col-3 mb-2">
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Search by Area</InputLabel>
                       <Select
                         value={filters.locality}
-                        label="Locality"
+                        label="Search by Area"
                         onChange={(e) => handleFilterChange('locality', e.target.value)}
-                        sx={{ background: "#fff" }}
                       >
                         <MenuItem value="">All</MenuItem>
                         {areaOptions.map((area, index) => (
@@ -762,125 +841,119 @@ const ManageCustomer = () => {
                         ))}
                       </Select>
                     </FormControl>
-                  </div> 
-                 
-                  <div className={isMobile ? 'col-6' : 'col-md-2'}>
-                    <FormControl fullWidth size="small" sx={{ background: "#fff" }}>
-                      <InputLabel>Broadband</InputLabel>
+                  </div>
+
+                  <div className="col-md-3 col-3 mb-2">
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Status</InputLabel>
                       <Select
-                        value={filters.broadband}
-                        label="Broadband"
-                        onChange={(e) => handleFilterChange('broadband', e.target.value)}
-                        sx={{ background: "#fff" }}
+                        value={filters.status}
+                        label="Status"
+                        onChange={(e) => handleFilterChange('status', e.target.value)}
                       >
                         <MenuItem value="">All</MenuItem>
-                        {plans.map((plan) => (
-                          <MenuItem key={plan.id} value={plan.id}>
-                            {plan.plan} - ₹{plan.finalPrice}
-                          </MenuItem>
-                        ))}
+                        <MenuItem value="0">Active</MenuItem>
+                        <MenuItem value="1">Inactive</MenuItem>
                       </Select>
                     </FormControl>
                   </div>
-                              
-                  <div className={isMobile ? 'col-6' : 'col-md-2'}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      type="date"
-                      label="Start Date"
-                      value={filters.startDate}
-                      onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                      InputLabelProps={{ shrink: true }}
-                      sx={{ background: "#fff" }}
-                      InputProps={{ style: { background: "#fff" } }}
-                    />
-                  </div>
 
-                  <div className={isMobile ? 'col-6' : 'col-md-2'}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      type="date"
-                      label="End Date"
-                      value={filters.endDate}
-                      onChange={(e) => handleFilterChange('endDate', e.target.value)}
-                      InputLabelProps={{ shrink: true }}
-                      sx={{ background: "#fff" }}
-                      InputProps={{ style: { background: "#fff" } }}
-                    />
                   </div>
-                  
-                  <div className={isMobile ? 'col-12' : 'col-md-2'}>
-                    <div className={`d-flex gap-2 ${isMobile ? 'justify-content-center' : ''}`}>
-                      <Button 
-                        variant="contained" 
-                        color="primary" 
-                        onClick={applyFilters}
-                        size="small"
-                        style={{
-                          minWidth: "80px", 
-                          background: "#1976d2", 
-                          color: "#fff",
-                          flex: isMobile ? 1 : 'none'
-                        }}
-                      >
-                        Filter
-                      </Button>
-                      <Button 
-                        variant="outlined" 
-                        color="secondary" 
-                        onClick={clearFilters}
-                        size="small"
-                        style={{
-                          minWidth: "80px", 
-                          background: "#fff",
-                          flex: isMobile ? 1 : 'none'
-                        }}
-                      >
-                        Clear
-                      </Button>
-                    </div>
-                  </div>
+                 <div className="col-md-12 col-12 mb-2">
+                    <Box sx={{ 
+                      display: 'flex', 
+                      gap: 1.25, 
+                      alignItems: 'center', 
+                      overflowX: 'auto',
+                      whiteSpace: 'nowrap',
+                      '&::-webkit-scrollbar': {
+                        height: '4px'
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        background: '#f1f1f1',
+                        borderRadius: '2px'
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        background: '#c1c1c1',
+                        borderRadius: '2px'
+                      }
+                    }}>
+                      <Typography variant="body2" sx={{ minWidth: 'fit-content', mr: 1 }}></Typography>
+                      {['ALL', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map((letter) => (
+                        <Chip 
+                          key={letter}
+                          label={letter} 
+                          size="small" 
+                          clickable 
+                          sx={{   
+                            minWidth: '32px',
+                            height: '28px',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            backgroundColor: '#f0f0f0',
+                            color: '#333'
+                          }}
+                        />
+                      ))}
+                    </Box>
+                 
                 </div>
-              </div>
-            </Collapse>
-            
-            {/* Desktop filter results */}
-            {!isMobile && isFiltered && (
-              <div className='mt-3'>
-                <span className='badge bg-info'>
-                  Showing {filteredData?.count || 0} filtered results
-                </span>
-              </div>
-            )}
-          </div> 
-          
-          {/* Data Table Section */}
-          <div className={`flex-grow-1 ${isMobile ? 'px-2' : 'px-4'} pb-4`} style={{ overflow: 'hidden' }}>
-            <div style={{ 
-              height: '100%',
-              '& .MuiDataGrid-root': {
-                fontSize: isMobile ? '0.75rem' : '0.875rem'
-              }
-            }}>
-              <AdminDataTable
-                rows={DataWithID(isFiltered ? filteredData.data : data.data)} 
-                columns={column} 
-                CustomToolbar={CustomToolbar} 
-                loading={isFiltered ? filterLoading : isLoading}
-                pageSize={isMobile ? 10 : 25}
-                rowsPerPageOptions={isMobile ? [10, 25] : [25, 50, 100]}
-                density={isMobile ? 'compact' : 'standard'}
-              />
-            </div>
-          </div>
+              </Box>
+            </Paper>
+
+            {/* Data Table */}
+            <Paper 
+              elevation={1} 
+              style={{
+                margin: isMobile ? '0 10px 10px 10px' : '0 10px 10px 10px',
+                borderRadius: '8px',
+                flex: 1,
+                overflow: 'hidden'
+              }}
+            >
+              <Box sx={{ p: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                    Show: 100 entries
+                  </Typography>
+                  <Typography variant="body2">
+                    Total: {getCurrentDataCount()} customers
+                  </Typography>
+                </Box>
+                
+                <div style={{ height: 'calc(100vh - 400px)', minHeight: '400px' }}>
+                  <AdminDataTable
+                    rows={DataWithID(isFiltered ? filteredData.data : data.data)} 
+                    columns={column} 
+                    CustomToolbar={CustomToolbar} 
+                    loading={isFiltered ? filterLoading : isLoading}
+                    pageSize={isMobile ? 10 : 100}
+                    rowsPerPageOptions={[10, 25, 50, 100]}
+                    density="compact"
+                    disableSelectionOnClick
+                    sx={{
+                      '& .MuiDataGrid-root': {
+                        border: 'none',
+                      },
+                      '& .MuiDataGrid-cell': {
+                        borderBottom: '1px solid #f0f0f0',
+                        fontSize: '12px'
+                      },
+                      '& .MuiDataGrid-columnHeaders': {
+                        backgroundColor: '#f8f9fa',
+                        fontSize: '12px',
+                        fontWeight: 'bold'
+                      }
+                    }}
+                  />
+                </div>
+              </Box>
+            </Paper>
         </div>
       </div>
         </Fragment>
         </>
     )
 }
-
 
 export default ManageCustomer

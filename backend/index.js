@@ -67,6 +67,6 @@ app.use("/plan",Plan)
 app.use("/salary",SalaryRoutes)
 
 // Start the server
-app.listen(6000, () => {
+app.listen(5000, () => {
   console.log(`Server started at port 5000`);
 });

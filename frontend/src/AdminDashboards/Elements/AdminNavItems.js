@@ -27,6 +27,9 @@ const AdminNavItems = ({ onSidebarToggle }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [hoverTimeout, setHoverTimeout] = useState(null);
+  const [hoverPosition, setHoverPosition] = useState({ top: 0, left: 90 });
 
   // Check if device is mobile
   useEffect(() => {
@@ -49,6 +52,15 @@ const AdminNavItems = ({ onSidebarToggle }) => {
       setIsMobileMenuOpen(false);
     }
   }, [location.pathname, isMobile]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+    };
+  }, [hoverTimeout]);
 
   const NavItems = [
     { 
@@ -152,15 +164,63 @@ const AdminNavItems = ({ onSidebarToggle }) => {
   }, [location.pathname]);
 
   const handleNavigation = (item, index) => {
-    if (item.children && item.children.length > 0 && (!isCollapsed || isMobile)) {
-      toggleExpanded(index);
+    if (item.children && item.children.length > 0) {
+      if (!isCollapsed || isMobile) {
+        // Normal behavior: toggle expansion
+        toggleExpanded(index);
+      } else {
+        // Collapsed sidebar behavior: navigate to first child
+        if (item.children[0] && item.children[0].path) {
+          navigate(item.children[0].path);
+        }
+      }
     } else {
+      // No children, navigate to the item's path
       const path = item.path || `/admin/${item.title.toLowerCase().split(" ").join("-")}`;
       navigate(path);
       if (isMobile) {
         setIsMobileMenuOpen(false);
       }
     }
+  };
+
+  const handleMouseEnter = (index, item, event) => {
+    if (isCollapsed && !isMobile && item.children && item.children.length > 0) {
+      // Clear any existing timeout
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+      
+      // Calculate position based on the hovered element
+      const rect = event.currentTarget.getBoundingClientRect();
+      const sidebarWidth = 80; // Width of collapsed sidebar
+      
+      setHoverPosition({
+        top: rect.top + window.scrollY, // Account for page scroll
+        left: sidebarWidth + 10 // 10px gap from sidebar
+      });
+      
+      // Set a small delay before showing the popup
+      const timeout = setTimeout(() => {
+        setHoveredItem(index);
+      }, 200);
+      
+      setHoverTimeout(timeout);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    
+    // Add a small delay before hiding to prevent flickering
+    const timeout = setTimeout(() => {
+      setHoveredItem(null);
+    }, 100);
+    
+    setHoverTimeout(timeout);
   };
 
   const toggleSidebar = () => {
@@ -369,12 +429,15 @@ const AdminNavItems = ({ onSidebarToggle }) => {
                 {/* Parent Item */}
                 <div
                   onClick={() => handleNavigation(item, index)}
+                  onMouseEnter={(e) => handleMouseEnter(index, item, e)}
+                  onMouseLeave={handleMouseLeave}
                   className={`${isActive ? "activeNavItem" : ""} d-flex align-items-center ${(isCollapsed && !isMobile) ? 'justify-content-center' : 'justify-content-between'} cursor-pointer bg-white text-blue hoverShadow hoverPrimary gap-2 p-2 border rounded-3 hoverNavItem`}
                   style={{
                     cursor: "pointer",
                     transition: "all 0.3s ease",
                     minHeight: isMobile ? '44px' : '48px',
-                    fontSize: isMobile ? '14px' : '16px'
+                    fontSize: isMobile ? '14px' : '16px',
+                    position: 'relative'
                   }}
                   title={(isCollapsed && !isMobile) ? item.title : ''}
                 >
@@ -388,6 +451,57 @@ const AdminNavItems = ({ onSidebarToggle }) => {
                     </div>
                   )}
                 </div>
+
+                {/* Hover Popup for Collapsed Sidebar */}
+                {hoveredItem === index && isCollapsed && !isMobile && item.children && item.children.length > 0 && (
+                  <div
+                    className="position-fixed bg-white border rounded-3 shadow-lg"
+                    style={{
+                      left: `${hoverPosition.left}px`,
+                      top: `${hoverPosition.top}px`,
+                      minWidth: '200px',
+                      zIndex: 1000,
+                      padding: '8px',
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      border: '1px solid #e0e0e0'
+                    }}
+                    onMouseEnter={() => {
+                      if (hoverTimeout) {
+                        clearTimeout(hoverTimeout);
+                        setHoverTimeout(null);
+                      }
+                    }}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <div className="mb-2 px-2 py-1 border-bottom">
+                      <small className="text-muted fw-bold">{item.title}</small>
+                    </div>
+                    {item.children.map((child, childIndex) => {
+                      const isChildActive = isPathActive(child.path);
+                      return (
+                        <div
+                          key={childIndex}
+                          onClick={() => {
+                            navigate(child.path);
+                            setHoveredItem(null);
+                          }}
+                          className={`${isChildActive ? "activeNavItem" : ""} d-flex align-items-center cursor-pointer bg-white text-blue hoverShadow hoverPrimary gap-2 p-2 mb-1 border rounded-2 hoverNavItem`}
+                          style={{
+                            cursor: "pointer",
+                            transition: "all 0.3s ease",
+                            fontSize: '14px',
+                            minHeight: '36px'
+                          }}
+                        >
+                          {child.icon}
+                          <span className="m-0">{child.title}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {/* Child Items */}
                 {item.children && item.children.length > 0 && (!isCollapsed || isMobile) && (
