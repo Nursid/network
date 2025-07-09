@@ -1,5 +1,6 @@
 import { Box } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
+import { gridClasses } from '@mui/x-data-grid-pro'
 import React from 'react';
 import "./AnimatedBackground.css"
 const AdminDataTable = ({ rows, columns, CustomToolbar, ...args }) => {
@@ -62,6 +63,12 @@ const AdminDataTable = ({ rows, columns, CustomToolbar, ...args }) => {
                 columns={columns}
                 components={{ Toolbar: CustomToolbar }}
                 getRowClassName={getRowClassName}
+                getRowHeight={() => 80}
+                sx={{
+                  [`& .${gridClasses.cell}`]: {
+                    py: 1,
+                  },
+                }}
             />
         </Box>
     )

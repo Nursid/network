@@ -383,12 +383,17 @@ const ManageCustomer = () => {
         { 
             field: "address", 
             headerName: "Address", 
-            minWidth: isMobile ? 150 : 200,
+            flex: 1,
+            minWidth: isMobile ? 180 : 350,
             renderCell: (params) => (
                 <div style={{ 
                     whiteSpace: "pre-line",
                     fontSize: isMobile ? '11px' : '12px',
-                    lineHeight: isMobile ? '1.2' : '1.3'
+                    lineHeight: isMobile ? '1.3' : '1.4',
+                    padding: '4px 0',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center'
                 }}>
                     <div>
                         {params.row.address && <span>{params.row.address}</span>}
@@ -450,103 +455,193 @@ const ManageCustomer = () => {
         {
             field: "action",
             headerName: "Action",
-            minWidth: isMobile ? 200 : 300,
+            minWidth: isMobile ? 140 : 180,
             sortable: false,
             renderCell: (params) => (
-                <div className="d-flex gap-1 align-items-center flex-wrap">
-                    <Tooltip title="View" arrow>
-                        <IconButton 
-                            size="small" 
-                            style={{ backgroundColor: '#4caf50', color: 'white' }}
-                            onClick={() => toggleView(params.row)}
-                        >
-                            <VisibilityIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
+                <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '4px',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    padding: '4px 0'
+                }}>
+                    {/* First Row of Action Buttons */}
+                    <div style={{ 
+                        display: 'flex', 
+                        gap: '3px', 
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <Tooltip title="View" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#4caf50', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => toggleView(params.row)}
+                            >
+                                <VisibilityIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
 
-                    <Tooltip title="Edit" arrow>
-                        <IconButton 
-                            size="small" 
-                            style={{ backgroundColor: '#2196f3', color: 'white' }}
-                            onClick={() => GetUpdateCustomer(params.row)}
-                        >
-                            <BorderColorIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
+                        <Tooltip title="Edit" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#2196f3', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => GetUpdateCustomer(params.row)}
+                            >
+                                <BorderColorIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
 
-                    <Tooltip title="Delete" arrow>
-                        <IconButton 
-                            size="small" 
-                            style={{ backgroundColor: '#f44336', color: 'white' }}
-                            onClick={() => GetDeleteByID(params.row.user_id)}
-                        >
-                            <DeleteForeverIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
+                        <Tooltip title="Delete" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#f44336', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => GetDeleteByID(params.row.user_id)}
+                            >
+                                <DeleteForeverIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
 
-                    <Tooltip title="Block/Unblock" arrow>
-                        <IconButton 
-                            size="small" 
-                            style={{ backgroundColor: '#ff9800', color: 'white' }}
-                            onClick={() => handleToggleBlock(params.row.user_id)}
-                        >
-                            <BlockIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
+                        <Tooltip title="Block/Unblock" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#ff9800', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => handleToggleBlock(params.row.user_id)}
+                            >
+                                <BlockIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
 
-                    {!isSmallMobile && (
-                        <>
-                            <Tooltip title="Payment" arrow>
-                                <IconButton 
-                                    size="small" 
-                                    style={{ backgroundColor: '#9c27b0', color: 'white' }}
-                                    onClick={() => handlePaymentEntry(params.row.user_id)}
-                                >
-                                    <PaymentIcon fontSize="small" />
-                                </IconButton>
-                            </Tooltip>
+                        <Tooltip title="Remainder" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#9c27b0', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => handleAddRemainder(params.row.user_id)}
+                            >
+                                <NotificationsIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
 
-                            <Tooltip title="Recharge" arrow>
-                                <IconButton 
-                                    size="small" 
-                                    style={{ backgroundColor: '#607d8b', color: 'white' }}
-                                    onClick={() => handleRecharge(params.row.user_id)}
-                                >
-                                    <BatteryChargingFullIcon fontSize="small" />
-                                </IconButton>
-                            </Tooltip>
+                    {/* Second Row of Action Buttons */}
+                    <div style={{ 
+                        display: 'flex', 
+                        gap: '3px', 
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <Tooltip title="Payment" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#607d8b', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => handlePaymentEntry(params.row.user_id)}
+                            >
+                                <PaymentIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
 
-                            <Tooltip title="Bills" arrow>
-                                <IconButton 
-                                    size="small" 
-                                    style={{ backgroundColor: '#795548', color: 'white' }}
-                                    onClick={() => handleBillTransaction(params.row.user_id)}
-                                >
-                                    <ReceiptIcon fontSize="small" />
-                                </IconButton>
-                            </Tooltip>
+                        <Tooltip title="Recharge" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#795548', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => handleRecharge(params.row.user_id)}
+                            >
+                                <BatteryChargingFullIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
 
-                            <Tooltip title="Complain" arrow>
-                                <IconButton 
-                                    size="small" 
-                                    style={{ backgroundColor: '#ff5722', color: 'white' }}
-                                    onClick={() => handleComplain(params.row.user_id)}
-                                >
-                                    <ReportProblemIcon fontSize="small" />
-                                </IconButton>
-                            </Tooltip>
+                        <Tooltip title="Bills" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#ff5722', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => handleBillTransaction(params.row.user_id)}
+                            >
+                                <ReceiptIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
 
-                            <Tooltip title="WhatsApp" arrow>
-                                <IconButton 
-                                    size="small" 
-                                    style={{ backgroundColor: '#25d366', color: 'white' }}
-                                    onClick={() => handleWhatsAppMessage(params.row.user_id, params.row.name, params.row.mobile)}
-                                >
-                                    <WhatsAppIcon fontSize="small" />
-                                </IconButton>
-                            </Tooltip>
-                        </>
-                    )}
+                        <Tooltip title="Complain" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#e91e63', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => handleComplain(params.row.user_id)}
+                            >
+                                <ReportProblemIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="WhatsApp" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#25d366', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => handleWhatsAppMessage(params.row.user_id, params.row.name, params.row.mobile)}
+                            >
+                                <WhatsAppIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
                 </div>
             ),
         },
@@ -585,7 +680,8 @@ const ManageCustomer = () => {
                 width: '100%',
                 marginLeft: 0,
                 height: '100vh',
-                overflow: 'hidden',
+                overflowY: 'auto',
+                overflowX: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
                 backgroundColor: '#f5f5f5',
@@ -597,7 +693,8 @@ const ManageCustomer = () => {
             width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
             marginLeft: sidebarCollapsed ? '80px' : '280px',
             height: '100vh',
-            overflow: 'hidden',
+            overflowY: 'auto',
+            overflowX: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: '#f5f5f5',
@@ -899,58 +996,22 @@ const ManageCustomer = () => {
                  
                 </div>
               </Box>
-            </Paper>
-
+                          </Paper>
+                  
             {/* Data Table */}
-            <Paper 
-              elevation={1} 
-              style={{
-                margin: isMobile ? '0 10px 10px 10px' : '0 10px 10px 10px',
-                borderRadius: '8px',
-                flex: 1,
-                overflow: 'hidden'
-              }}
-            >
+            <Paper>
               <Box sx={{ p: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                    Show: 100 entries
-                  </Typography>
-                  <Typography variant="body2">
-                    Total: {getCurrentDataCount()} customers
-                  </Typography>
-                </Box>
-                
-                <div style={{ height: 'calc(100vh - 400px)', minHeight: '400px' }}>
+                <div>
                   <AdminDataTable
                     rows={DataWithID(isFiltered ? filteredData.data : data.data)} 
                     columns={column} 
                     CustomToolbar={CustomToolbar} 
-                    loading={isFiltered ? filterLoading : isLoading}
-                    pageSize={isMobile ? 10 : 100}
-                    rowsPerPageOptions={[10, 25, 50, 100]}
-                    density="compact"
-                    disableSelectionOnClick
-                    sx={{
-                      '& .MuiDataGrid-root': {
-                        border: 'none',
-                      },
-                      '& .MuiDataGrid-cell': {
-                        borderBottom: '1px solid #f0f0f0',
-                        fontSize: '12px'
-                      },
-                      '& .MuiDataGrid-columnHeaders': {
-                        backgroundColor: '#f8f9fa',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                      }
-                    }}
                   />
                 </div>
               </Box>
             </Paper>
+          </div>
         </div>
-      </div>
         </Fragment>
         </>
     )
