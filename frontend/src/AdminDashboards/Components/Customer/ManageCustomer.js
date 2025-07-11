@@ -57,11 +57,6 @@ const ManageCustomer = () => {
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
     const [showFilters, setShowFilters] = useState(!isMobile)
     const [globalSearch, setGlobalSearch] = useState('')
-    const [block, setBlock] = useState('')
-    const [locality, setLocality] = useState('')
-    const [area, setArea] = useState('')
-    const [status, setStatus] = useState('')
-    const [custId, setCustId] = useState('')
 
     // Area options for locality filter
     const areaOptions = [
@@ -176,7 +171,7 @@ const ManageCustomer = () => {
                         // Re-apply current filters
                         const filterData = {}
                         Object.keys(filters).forEach(key => {
-                            if (filters[key] && filters[key].trim() !== '') {
+                            if (filters[key] && filters[key] !== '') {
                                 filterData[key] = filters[key]
                             }
                         })
@@ -279,12 +274,12 @@ const ManageCustomer = () => {
     }
 
         // Handle filter changes
-    const handleFilterChange = (field, value) => {
-        setFilters(prev => ({
-            ...prev,
-            [field]: value
-        }))
-    }
+    // const handleFilterChange = (field, value) => {
+    //     setFilters(prev => ({
+    //         ...prev,
+    //         [field]: value
+    //     }))
+    // }
 
 
 
@@ -328,7 +323,7 @@ const ManageCustomer = () => {
                         // Re-apply current filters
                         const filterData = {}
                         Object.keys(filters).forEach(key => {
-                            if (filters[key] && filters[key].trim() !== '') {
+                            if (filters[key] && filters[key]!== '') {
                                 filterData[key] = filters[key]
                             }
                         })
@@ -372,6 +367,15 @@ const ManageCustomer = () => {
     useEffect(() => {
         dispatch(GetAllCustomers())
         fetchPlans()
+    }, [])
+
+    // Cleanup debounce timer on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+            }
+        };
     }, [])
 
     const GetUpdateCustomer=(data)=>{
@@ -729,6 +733,71 @@ const ManageCustomer = () => {
     }
 
 
+    // In your filter change handler
+const handleFilterChange = (field, value) => {
+
+  const filterData = {
+    [field]: value.value
+  }
+           if (Object.keys(filterData).length > 0) {
+               dispatch(FilterCustomers(filterData));
+               setIsFiltered(true);
+           }
+            else {
+               dispatch(GetAllCustomers());
+               setIsFiltered(false);
+           }
+};
+
+
+// Global search handler with debouncing
+const handleGlobalSearch = (value) => {
+  setGlobalSearch(value);
+  
+  // Clear previous debounce timer
+  if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+  }
+  
+  // Set new debounce timer (500ms delay)
+  debounceTimer.current = setTimeout(() => {
+      if (value === '') {
+          // If search is empty, get all customers
+          dispatch(GetAllCustomers());
+          setIsFiltered(false);
+      } else {
+          const filterData = {
+              globalSearch: value
+          };
+          dispatch(DynamicFilterCustomers(filterData));
+          setIsFiltered(true);
+      }
+  }, 500);
+};
+
+
+const handleClearFilters = () => {
+  setFilters({
+      status: '',
+      locality: '',
+      endDate: '',
+      startDate: '',
+      globalSearch: '',
+      block: '',
+      area: '',
+      custId: '',
+      name: '',
+      mobile: '',
+      email: '',
+      apartment: '',
+  });
+  setGlobalSearch('');
+  
+  // Fetch all customers
+  dispatch(GetAllCustomers());
+  setIsFiltered(false);
+};
+
 
     return (
     <>
@@ -789,8 +858,7 @@ const ManageCustomer = () => {
                       value={globalSearch}
                       onChange={(e) => {
                         const value = e.target.value
-                        setGlobalSearch(value)
-                        handleFilterChange('globalSearch', value)
+                        handleGlobalSearch(value)
                       }}
                       InputProps={{
                         startAdornment: (
@@ -820,7 +888,7 @@ const ManageCustomer = () => {
                       </Button>
                       <Button
                         variant="outlined"
-                        onClick={()=>{}}
+                        onClick={handleClearFilters}
                         size="small"
                         sx={{ flex: 1 }}
                       >
@@ -916,10 +984,10 @@ const ManageCustomer = () => {
                   
                   <div className="col-md-3 col-3 mb-2">
                     <FormControl fullWidth size="small">
-                      <InputLabel>Cust. ID</InputLabel>
+                      <InputLabel>Status</InputLabel>
                       <Select
                         value={filters.status}
-                        label="Cust. ID"
+                        label="Status"
                         onChange={(e) => {
                           const value = e.target.value
                           handleFilterChange('status', value)
@@ -962,10 +1030,9 @@ const ManageCustomer = () => {
                       <SelectBox 
                         options={block_option} 
                         setSelcted={(value) => {
-                          setBlock(value)
                           handleFilterChange('block', value)
                         }} 
-                        initialValue={block}
+                        initialValue={filters.block}
                       />
                     </FormControl>
                   </div>
@@ -976,10 +1043,9 @@ const ManageCustomer = () => {
                       <SelectBox 
                         options={apartment_options} 
                         setSelcted={(value) => {
-                          setLocality(value)
                           handleFilterChange('locality', value)
                         }} 
-                        initialValue={locality}
+                        initialValue={filters.locality}
                       />
                     </FormControl>
                   </div>
@@ -991,27 +1057,32 @@ const ManageCustomer = () => {
                       <SelectBox 
                         options={area_option} 
                         setSelcted={(value) => {
-                          setArea(value)
                           handleFilterChange('area', value)
                         }} 
-                        initialValue={area}
+                        initialValue={filters.area}
                       />
                     </FormControl>
                   </div>
-
+{/* 
                   <div className="col-md-3 col-3 mb-2">
-                    <FormControl fullWidth size="small">
-                      <Label>Status</Label>
-                      <SelectBox 
-                        options={status_option} 
-                        setSelcted={(value) => {
-                          setStatus(value)
-                          handleFilterChange('status', value)
-                        }} 
-                        initialValue={status}
-                      /> 
-                    </FormControl>
-                  </div>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Search by Customer ID"
+                      value={filters.custId}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        handleFilterChange('custId', value)
+                      }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            🆔
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </div> */}
 
                   </div>
 
