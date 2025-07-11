@@ -5,7 +5,7 @@ import AddNewCustomerForm from './Froms/AddNewCustomerForm';
 import ModalComponent from '../../Elements/ModalComponent';
 import AdminDataTable from '../../Elements/AdminDataTable';
 import { useDispatch, useSelector } from 'react-redux';
-import { GetAllCustomers, FilterCustomers } from '../../../Store/Actions/Dashboard/Customer/CustomerActions';
+import { GetAllCustomers, FilterCustomers, DynamicFilterCustomers } from '../../../Store/Actions/Dashboard/Customer/CustomerActions';
 import moment from 'moment';
 import axios from 'axios';
 import { API_URL } from '../../../config';
@@ -22,9 +22,6 @@ import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import SearchIcon from '@mui/icons-material/Search';
 import { 
     Button, 
@@ -48,7 +45,8 @@ import {
 import UpdateCustomerForm from './Froms/UpdateCustomerForm';
 import CustomerView from './View/CustomerView';
 import AdminNavItems from '../../Elements/AdminNavItems';
-
+import SelectBox from '../../Elements/SelectBox';
+import { Label } from 'reactstrap';
 
 
 const ManageCustomer = () => {
@@ -59,6 +57,11 @@ const ManageCustomer = () => {
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
     const [showFilters, setShowFilters] = useState(!isMobile)
     const [globalSearch, setGlobalSearch] = useState('')
+    const [block, setBlock] = useState('')
+    const [locality, setLocality] = useState('')
+    const [area, setArea] = useState('')
+    const [status, setStatus] = useState('')
+    const [custId, setCustId] = useState('')
 
     // Area options for locality filter
     const areaOptions = [
@@ -85,6 +88,64 @@ const ManageCustomer = () => {
         "BSF Campus",
         "RPS Colony"
     ]
+
+    const apartment_options = [
+      { value: "Shiv Shakti Apartment", label: "Shiv Shakti Apartment" },
+      { value: "Lottan Apartment", label: "Lottan Apartment" },
+      { value: "Sai Apartment", label: "Sai Apartment" },
+      { value: "Geetanjali Apartment", label: "Geetanjali Apartment" },
+      { value: "Ganga Apartment", label: "Ganga Apartment" },
+      { value: "Deepmala Apartment", label: "Deepmala Apartment" },
+      { value: "Yamuna Apartment", label: "Yamuna Apartment" },
+      { value: "Krishna Apartment", label: "Krishna Apartment" },
+      { value: "Ashirwad Apartment", label: "Ashirwad Apartment" },
+      { value: "Swagat Apartment", label: "Swagat Apartment" },
+    ];
+
+    const area_option = [
+      { value: "Tigri", label: "Tigri" },
+      { value: "Tigri Village", label: "Tigri Village" },
+      { value: "Tigri Extn.", label: "Tigri Extn." },
+      { value: "Tigri Camp", label: "Tigri Camp" },
+      { value: "Karnal Farm Tigri", label: "Karnal Farm Tigri" },
+      { value: "DDA Flat Tigri", label: "DDA Flat Tigri" },
+      { value: "Khanpur", label: "Khanpur" },
+      { value: "Khanpur Extn.", label: "Khanpur Extn." },
+      { value: "Shiv Park", label: "Shiv Park" },
+      { value: "Duggal Colony", label: "Duggal Colony" },
+      { value: "Devli Road", label: "Devli Road" },
+      { value: "Devli Extension", label: "Devli Extension" },
+      { value: "Krishna Park", label: "Krishna Park" },
+      { value: "Jawahar Park", label: "Jawahar Park" },
+      { value: "Raju Park", label: "Raju Park" },
+      { value: "Durga Vihar", label: "Durga Vihar" },
+      { value: "Bandh Road Sangam Vihar", label: "Bandh Road Sangam Vihar" },
+      { value: "Sangam Vihar", label: "Sangam Vihar" },
+      { value: "Madangir", label: "Madangir" },
+      { value: "Dakshinpuri", label: "Dakshinpuri" },
+      { value: "BSF Campus", label: "BSF Campus" },
+      { value: "RPS Colony", label: "RPS Colony" },
+    ];
+    
+    const block_option = [
+      { value: "A", label: "A" },
+      { value: "B", label: "B" },
+      { value: "C", label: "C" },
+      { value: "D", label: "D" },
+      { value: "E", label: "E" },
+      { value: "F", label: "F" },
+      { value: "G", label: "G" },
+      { value: "H", label: "H" },
+    ];
+
+    const custId_option = [
+      { value: "0", label: "Active" },
+      { value: "1", label: "Inactive" },
+    ];
+    const status_option = [
+      { value: "0", label: "Active" },
+      { value: "1", label: "Inactive" },
+    ];
 
     // Auto-hide filters on mobile when screen size changes
     useEffect(() => {
@@ -185,13 +246,21 @@ const ManageCustomer = () => {
     const [filters, setFilters] = useState({
         status: '',
         locality: '',
-        company: '',
-        broadband: '',
         endDate: '',
-        startDate: ''
+        startDate: '',
+        globalSearch: '',
+        block: '',
+        area: '',
+        custId: '',
+        name: '',
+        mobile: '',
+        email: '',
+        apartment: '',
+        
     })
     const [isFiltered, setIsFiltered] = useState(false)
     const [plans, setPlans] = useState([])
+    const debounceTimer = useRef(null)
 
     const DataWithID = (data) => {
         const NewData = []
@@ -209,7 +278,7 @@ const ManageCustomer = () => {
         return NewData
     }
 
-    // Handle filter changes
+        // Handle filter changes
     const handleFilterChange = (field, value) => {
         setFilters(prev => ({
             ...prev,
@@ -217,53 +286,10 @@ const ManageCustomer = () => {
         }))
     }
 
-    // Apply filters
-    const applyFilters = () => {
-        const filterData = {}
-        
-        console.log(filters)
-        
-        // Only include non-empty filters
-        Object.keys(filters).forEach(key => {
-                filterData[key] = filters[key]
-        })
 
-        if (Object.keys(filterData).length > 0) {
-            dispatch(FilterCustomers(filterData))
-            setIsFiltered(true)
-        } else {
-            Swal.fire('Info', 'Please select at least one filter', 'info')
-        }
-    }
 
-    // Clear filters
-    const clearFilters = () => {
-        setFilters({
-            status: '',
-            locality: '',
-            company: '',
-            broadband: '',
-            endDate: '',
-            startDate: ''
-        })
-        setIsFiltered(false)
-        dispatch(GetAllCustomers())
-    }
-    
     const [blockStatus, setBlockStatus] = useState({});
- 
 
-    // Set initial block status when data changes
-    useEffect(() => {
-        const currentData = isFiltered ? filteredData.data : data.data;
-        if (currentData && currentData.length > 0) {
-            const initialBlockStatus = {};
-            currentData.forEach(item => {
-                initialBlockStatus[item.user_id] = item.is_block;
-            });
-            setBlockStatus(initialBlockStatus);
-        }
-    }, [data, filteredData, isFiltered]);
 
     const handleToggleBlock = (userId) => {
 
@@ -702,11 +728,7 @@ const ManageCustomer = () => {
         }
     }
 
-    // Get current data count
-    const getCurrentDataCount = () => {
-        const currentData = isFiltered ? filteredData.data : data.data;
-        return currentData ? currentData.length : 0;
-    }
+
 
     return (
     <>
@@ -731,6 +753,85 @@ const ManageCustomer = () => {
 
         {/* Main Content */}
         <div className="main-content" style={getMainContentStyle()}>
+
+        <Paper 
+              elevation={1} 
+              style={{
+                margin: isMobile ? '10px 10px 10px 10px' : '10px 10px 10px 10px',
+                borderRadius: '8px'
+              }}
+            >
+              <Box sx={{ p: 2 }}>
+        <div className="row align-items-center">
+                  <div className="col-md-3 col-12 mb-2">
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Cust. Id</InputLabel>
+                      <Select
+                        value={filters.status}
+                        label="Cust. Id"
+                        onChange={(e) => {
+                          const value = e.target.value
+                          handleFilterChange('status', value)
+                        }}
+                      >
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="0">Active</MenuItem>
+                        <MenuItem value="1">Inactive</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </div>
+                  
+                  <div className="col-md-6 col-12 mb-2">
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Type here for a Global Search"
+                      value={globalSearch}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        setGlobalSearch(value)
+                        handleFilterChange('globalSearch', value)
+                      }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="col-md-3 col-12 mb-2">
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        variant="contained"
+                        // onClick={"#"}
+                        size="small"
+                        sx={{ 
+                          flex: 1,
+                          backgroundColor:  '#ff9800',
+                          '&:hover': {
+                            backgroundColor: '#f57c00'
+                          }
+                        }}
+                      >
+                        Search
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={()=>{}}
+                        size="small"
+                        sx={{ flex: 1 }}
+                      >
+                        Clear
+                      </Button>
+                    </Box>
+                  </div>
+                </div>
+              </Box>
+            </Paper>
+
           {/* Top Header Section */}
           <Paper 
             elevation={2} 
@@ -782,61 +883,7 @@ const ManageCustomer = () => {
               }}
             >
               <Box sx={{ p: 2 }}>
-                <div className="row align-items-center">
-                  <div className="col-md-3 col-12 mb-2">
-                    <FormControl fullWidth size="small">
-                      <InputLabel>Cust. Id</InputLabel>
-                      <Select
-                        value={filters.status}
-                        label="Cust. Id"
-                        onChange={(e) => handleFilterChange('status', e.target.value)}
-                      >
-                        <MenuItem value="">All</MenuItem>
-                        <MenuItem value="0">Active</MenuItem>
-                        <MenuItem value="1">Inactive</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </div>
-                  
-                  <div className="col-md-6 col-12 mb-2">
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder="Type here for a Global Search"
-                      value={globalSearch}
-                      onChange={(e) => setGlobalSearch(e.target.value)}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <SearchIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </div>
-                  
-                  <div className="col-md-3 col-12 mb-2">
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button
-                        variant="contained"
-                        onClick={applyFilters}
-                        size="small"
-                        sx={{ flex: 1 }}
-                      >
-                        Search
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        onClick={clearFilters}
-                        size="small"
-                        sx={{ flex: 1 }}
-                      >
-                        Clear
-                      </Button>
-                    </Box>
-                  </div>
-                </div>
-
+              
                 {/* Additional Filters Row */}
                 <div className="row mt-3">
                   <div className="col-md-3 col-3 mb-2">
@@ -846,7 +893,9 @@ const ManageCustomer = () => {
                       type="date"
                       label="Start Date"
                       value={filters.startDate}
-                      onChange={(e) => handleFilterChange('startDate', e.target.value)}
+                      onChange={(e) => {
+                        handleFilterChange('startDate', e.target.value)
+                      }}
                       InputLabelProps={{ shrink: true }}
                     />
                   </div>
@@ -858,35 +907,45 @@ const ManageCustomer = () => {
                       type="date"
                       label="End Date"
                       value={filters.endDate}
-                      onChange={(e) => handleFilterChange('endDate', e.target.value)}
+                      onChange={(e) => {
+                        handleFilterChange('endDate', e.target.value)
+                      }}
                       InputLabelProps={{ shrink: true }}
                     />
                   </div>
                   
                   <div className="col-md-3 col-3 mb-2">
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder="Cust. ID"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            📋
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Cust. ID</InputLabel>
+                      <Select
+                        value={filters.status}
+                        label="Cust. ID"
+                        onChange={(e) => {
+                          const value = e.target.value
+                          handleFilterChange('status', value)
+                        }}
+                      >
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="0">Active</MenuItem>
+                        <MenuItem value="1">Inactive</MenuItem>
+                      </Select>
+                    </FormControl>
                   </div>
                   
                   <div className="col-md-3 col-3 mb-2">
                     <TextField
                       fullWidth
                       size="small"
-                      placeholder="Type here !!"
+                      placeholder="Search by Name"
+                      value={filters.name}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        handleFilterChange('name', value)
+                      }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            🔍
+                            👤
                           </InputAdornment>
                         ),
                       }}
@@ -899,64 +958,66 @@ const ManageCustomer = () => {
                 <div className="row mt-3">
                   <div className="col-md-3 col-3 mb-2">
                     <FormControl fullWidth size="small">
-                      <InputLabel>Search by Block</InputLabel>
-                      <Select
-                        value=""
-                        label="Search by Block"
-                      >
-                        <MenuItem value="">All</MenuItem>
-                      </Select>
+                      <Label>Search by Block</Label>
+                      <SelectBox 
+                        options={block_option} 
+                        setSelcted={(value) => {
+                          setBlock(value)
+                          handleFilterChange('block', value)
+                        }} 
+                        initialValue={block}
+                      />
                     </FormControl>
                   </div>
                   
                   <div className="col-md-3 col-3 mb-2">
                     <FormControl fullWidth size="small">
-                      <InputLabel>Search by Locality</InputLabel>
-                      <Select
-                        value=""
-                        label="Search by Locality"
-                      >
-                        <MenuItem value="">All</MenuItem>
-                      </Select>
+                      <Label>Search by Locality</Label>
+                      <SelectBox 
+                        options={apartment_options} 
+                        setSelcted={(value) => {
+                          setLocality(value)
+                          handleFilterChange('locality', value)
+                        }} 
+                        initialValue={locality}
+                      />
                     </FormControl>
                   </div>
 
  
                   <div className="col-md-3 col-3 mb-2">
                     <FormControl fullWidth size="small">
-                      <InputLabel>Search by Area</InputLabel>
-                      <Select
-                        value={filters.locality}
-                        label="Search by Area"
-                        onChange={(e) => handleFilterChange('locality', e.target.value)}
-                      >
-                        <MenuItem value="">All</MenuItem>
-                        {areaOptions.map((area, index) => (
-                          <MenuItem key={index} value={area}>
-                            {area}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      <Label>Search by Area</Label>
+                      <SelectBox 
+                        options={area_option} 
+                        setSelcted={(value) => {
+                          setArea(value)
+                          handleFilterChange('area', value)
+                        }} 
+                        initialValue={area}
+                      />
                     </FormControl>
                   </div>
 
                   <div className="col-md-3 col-3 mb-2">
                     <FormControl fullWidth size="small">
-                      <InputLabel>Status</InputLabel>
-                      <Select
-                        value={filters.status}
-                        label="Status"
-                        onChange={(e) => handleFilterChange('status', e.target.value)}
-                      >
-                        <MenuItem value="">All</MenuItem>
-                        <MenuItem value="0">Active</MenuItem>
-                        <MenuItem value="1">Inactive</MenuItem>
-                      </Select>
+                      <Label>Status</Label>
+                      <SelectBox 
+                        options={status_option} 
+                        setSelcted={(value) => {
+                          setStatus(value)
+                          handleFilterChange('status', value)
+                        }} 
+                        initialValue={status}
+                      /> 
                     </FormControl>
                   </div>
 
                   </div>
-                 <div className="col-md-12 col-12 mb-2">
+
+                {/* Alphabetical Filter */}
+                <div className="row mt-3">
+                  <div className="col-md-12 col-12 mb-2">
                     <Box sx={{ 
                       display: 'flex', 
                       gap: 1.25, 
@@ -990,13 +1051,14 @@ const ManageCustomer = () => {
                             backgroundColor: '#f0f0f0',
                             color: '#333'
                           }}
+                          onClick={() => {}}
                         />
                       ))}
                     </Box>
-                 
+                  </div>
                 </div>
               </Box>
-                          </Paper>
+            </Paper>
                   
             {/* Data Table */}
             <Paper>

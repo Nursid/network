@@ -595,40 +595,6 @@ const FilterCustomers = async (req, res) => {
 
 const AllCustomerFilterByFlow = async (req, res) => {
 	try {
-		// Get all flows
-		// const flows = await FlowModel.findAll();
-		
-		// // Extract all userIds from flow data
-		// const userIdsInFlows = new Set();
-		
-		// flows.forEach(flow => {
-		// 	if (flow.data) {
-		// 		let parsedData;
-		// 		try {
-		// 			// Handle both string and object data types
-		// 			if (typeof flow.data === 'string') {
-		// 				parsedData = JSON.parse(flow.data);
-		// 				// Handle double-encoded JSON
-		// 				while (typeof parsedData === 'string') {
-		// 					parsedData = JSON.parse(parsedData);
-		// 				}
-		// 			} else {
-		// 				parsedData = flow.data;
-		// 			}
-					
-		// 			// Extract userIds from nodes in the flow data
-		// 			if (parsedData && parsedData.nodes && Array.isArray(parsedData.nodes)) {
-		// 				parsedData.nodes.forEach(node => {
-		// 					if (node.data && node.data.userId) {
-		// 						userIdsInFlows.add(node.data.userId.toString());
-		// 					}
-		// 				});
-		// 			}
-		// 		} catch (error) {
-		// 			console.error('Error parsing flow data:', error);
-		// 		}
-		// 	}
-		// });
 
 		// Get all customers
 		const allCustomers = await CustomerModel.findAll({
@@ -636,11 +602,6 @@ const AllCustomerFilterByFlow = async (req, res) => {
 				['id', 'ASC']
 			]
 		});
-
-		// // Filter customers that are NOT in any flow
-		// const customersNotInFlow = allCustomers.filter(customer => {
-		// 	return !userIdsInFlows.has(customer.id.toString());
-		// });
 
 		if (allCustomers.length === 0) {
 			return res.status(200).json({
@@ -664,6 +625,201 @@ const AllCustomerFilterByFlow = async (req, res) => {
 	}
 };
 
+
+const GetCustomerFilter = async (req, res) => {
+	try {
+		const { 
+			status, 
+			locality, 
+			company, 
+			broadband, 
+			endDate, 
+			startDate,
+			globalSearch,
+			block,
+			area,
+			custId,
+			apartment,
+			name,
+			mobile,
+			email,
+			address,
+			billing_amount_min,
+			billing_amount_max,
+			payment_method,
+			gender,
+			aadhar_no,
+			pan_no
+		} = req.body;
+		
+		// Build dynamic where clause
+		let whereClause = {};
+		
+		// Handle global search first (if present, it overrides other filters except date range)
+		if (globalSearch && globalSearch.trim() !== '') {
+			const searchTerm = globalSearch.trim();
+			
+			// Check if it's a single letter for alphabetical search
+			if (searchTerm.length === 1 && /^[A-Za-z]$/.test(searchTerm)) {
+				whereClause.name = { [Op.like]: `${searchTerm}%` };
+			} else {
+				// Global search across multiple fields
+				whereClause[Op.or] = [
+					{ name: { [Op.like]: `%${searchTerm}%` } },
+					{ username: { [Op.like]: `%${searchTerm}%` } },
+					{ mobile: { [Op.like]: `%${searchTerm}%` } },
+					{ email: { [Op.like]: `%${searchTerm}%` } },
+					{ address: { [Op.like]: `%${searchTerm}%` } },
+					{ t_address: { [Op.like]: `%${searchTerm}%` } },
+					{ area: { [Op.like]: `%${searchTerm}%` } },
+					{ block: { [Op.like]: `%${searchTerm}%` } },
+					{ apartment: { [Op.like]: `%${searchTerm}%` } },
+					{ aadhar_no: { [Op.like]: `%${searchTerm}%` } },
+					{ pan_no: { [Op.like]: `%${searchTerm}%` } }
+				];
+			}
+		} else {
+			// Apply individual filters only if no global search
+			
+			// Status filter (maps to is_block field)
+			if (status && status !== '' && status !== 'all') {
+				whereClause.is_block = parseInt(status);
+			}
+			
+			// Customer ID filter (same as status, maps to is_block)
+			if (custId && custId !== '' && custId !== 'all') {
+				whereClause.is_block = parseInt(custId);
+			}
+			
+			// Block filter
+			if (block && block !== '' && block !== 'all') {
+				whereClause.block = block;
+			}
+			
+			// Area filter
+			if (area && area !== '' && area !== 'all') {
+				whereClause.area = area;
+			}
+			
+			// Locality/Apartment filter
+			if (locality && locality !== '' && locality !== 'all') {
+				whereClause.apartment = locality;
+			}
+			
+			// Company filter (if you have a company field)
+			if (company && company.trim() !== '') {
+				whereClause.company = { [Op.like]: `%${company}%` };
+			}
+			
+			// Broadband/Package filter
+			if (broadband && broadband !== '' && broadband !== 'all') {
+				whereClause.selectedPackage = broadband;
+			}
+			
+			// Name filter
+			if (name && name.trim() !== '') {
+				whereClause.name = { [Op.like]: `%${name}%` };
+			}
+			
+			// Mobile filter
+			if (mobile && mobile.trim() !== '') {
+				whereClause.mobile = { [Op.like]: `%${mobile}%` };
+			}
+			
+			// Email filter
+			if (email && email.trim() !== '') {
+				whereClause.email = { [Op.like]: `%${email}%` };
+			}
+			
+			// Address filter
+			if (address && address.trim() !== '') {
+				whereClause[Op.or] = [
+					{ address: { [Op.like]: `%${address}%` } },
+					{ t_address: { [Op.like]: `%${address}%` } }
+				];
+			}
+			
+			// Billing amount range filter
+			if (billing_amount_min || billing_amount_max) {
+				whereClause.billing_amount = {};
+				if (billing_amount_min) {
+					whereClause.billing_amount[Op.gte] = parseFloat(billing_amount_min);
+				}
+				if (billing_amount_max) {
+					whereClause.billing_amount[Op.lte] = parseFloat(billing_amount_max);
+				}
+			}
+			
+			// Payment method filter
+			if (payment_method && payment_method !== '' && payment_method !== 'all') {
+				whereClause.payment_method = payment_method;
+			}
+			
+			// Gender filter
+			if (gender && gender !== '' && gender !== 'all') {
+				whereClause.gender = gender;
+			}
+			
+			// Aadhar number filter
+			if (aadhar_no && aadhar_no.trim() !== '') {
+				whereClause.aadhar_no = { [Op.like]: `%${aadhar_no}%` };
+			}
+			
+			// PAN number filter
+			if (pan_no && pan_no.trim() !== '') {
+				whereClause.pan_no = { [Op.like]: `%${pan_no}%` };
+			}
+		}
+		
+		// Date range filter (always applied regardless of global search)
+		if (startDate && endDate) {
+			whereClause.createdAt = {
+				[Op.between]: [new Date(startDate), new Date(endDate)]
+			};
+		} else if (endDate) {
+			whereClause.createdAt = {
+				[Op.lte]: new Date(endDate)
+			};
+		} else if (startDate) {
+			whereClause.createdAt = {
+				[Op.gte]: new Date(startDate)
+			};
+		}
+		
+		console.log('Filter whereClause:', whereClause);
+		
+		const customers = await CustomerModel.findAll({
+			where: whereClause,
+			order: [['id', 'DESC']]
+		});
+		
+		if (customers.length === 0) {
+			return res.status(200).json({
+				status: 200, 
+				data: [],
+				message: "No customers found matching the filter criteria"
+			});
+		}
+		
+		res.status(200).json({
+			status: 200, 
+			data: customers,
+			count: customers.length,
+			message: `Found ${customers.length} customers matching the filter criteria`
+		});
+		
+	} catch (error) {
+		console.error('GetCustomerFilter error:', error);
+		res.status(500).json({
+			error: true, 
+			message: "Internal Server Error: " + error.message
+		});
+	}
+}
+
+
+
+
 module.exports = {
 	SignupUser,
 	LoginUser,
@@ -673,6 +829,8 @@ module.exports = {
 	GetDeleteCustomerById,
 	GetUpdateTheCustomer,
 	UpdateStatus,
+	GetupdateBlockStatus,
 	FilterCustomers,
-	AllCustomerFilterByFlow
+	AllCustomerFilterByFlow,
+	GetCustomerFilter
 };

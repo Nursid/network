@@ -34,6 +34,7 @@ router.get("/getall", customerRouter.AllCustomer);
 router.get("/getbyid/:id", customerRouter.GetCustomer);
 router.post("/get", customerRouter.AllCustomer);
 router.post("/filter", customerRouter.FilterCustomers);
+router.post("/dynamicfilter", customerRouter.GetCustomerFilter);
 router.get("/getallcustomerfilterbyflow", customerRouter.AllCustomerFilterByFlow);
 
 router.put('/getupdate/:user_id', upload.fields([
@@ -44,6 +45,6 @@ router.put('/getupdate/:user_id', upload.fields([
   { name: 'otherIdImage', maxCount: 1 },
   { name: 'signature', maxCount: 1 }
 ]), customerRouter.GetUpdateTheCustomer);
-router.post('/block/:id', customerRouter.UpdateStatus);
+router.post('/block/:id', customerRouter.GetupdateBlockStatus);
 
 module.exports = router;

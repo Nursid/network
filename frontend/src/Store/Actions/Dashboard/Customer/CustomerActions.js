@@ -125,6 +125,20 @@ export const FilterCustomers = (filterData) => {
     }
 }
 
+export const DynamicFilterCustomers = (filterData) => {
+    return async (dispatch) => {
+        dispatch({ type: constant.FILTER_CUSTOMERS_LOADING })
+        try {
+            const response = await axios.post(API_URL + '/customer/dynamicfilter', filterData)
+            if (response.status === 200) {
+                dispatch({ type: constant.FILTER_CUSTOMERS_SUCCESS, payload: response.data })
+            }
+        } catch (error) {
+            dispatch({ type: constant.FILTER_CUSTOMERS_ERROR })
+        }
+    }
+}
+
 
 
 
