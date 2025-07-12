@@ -518,7 +518,9 @@ const UpdateStatus = async (req, res) => {
 
 const FilterCustomers = async (req, res) => {
 	try {
-		const { status, locality, company, broadband, endDate, startDate } = req.body;
+		const { status, locality, block, area, apartment, name, custId, endDate, startDate } = req.body;
+
+		console.log({ status, locality, block, area, apartment, name, custId, endDate, startDate })
 		
 		// Build dynamic where clause
 		let whereClause = {};
@@ -529,7 +531,7 @@ const FilterCustomers = async (req, res) => {
 		}
 		
 		// Locality filter (searching in area, block, apartment, address fields)
-		if (locality && locality.trim() !== '') {
+		if (locality && locality !== 'all' && locality !== '' && locality.value !== '') {
 			whereClause[Op.or] = [
 				{ area: { [Op.like]: `%${locality}%` } },
 				{ block: { [Op.like]: `%${locality}%` } },
@@ -540,13 +542,24 @@ const FilterCustomers = async (req, res) => {
 		}
 		
 		// Company filter (if you have a company field)
-		if (company && company.trim() !== '') {
-			whereClause.company = { [Op.like]: `%${company}%` };
+		if (block && block !== 'all' && block !== '' && block.value !== '') {
+			whereClause.block = { [Op.like]: `%${block}%` };
 		}
 		
 		// Broadband filter (assuming this is package related)
-		if (broadband && broadband !== 'all') {
-			whereClause.selectedPackage = broadband;
+		if (apartment && apartment !== 'all' && apartment !== '' && apartment.value !== '') {
+			whereClause.apartment = apartment;
+		}
+		if (area && area !== 'all' && area !== '' && area.value !== '') {
+			whereClause.area = area;
+		}
+
+		if (name && name !== 'all' && name !== '' && name.value !== '') {
+			whereClause.name = { [Op.like]: `%${name}%` };
+		}
+		
+		if (custId && custId !== 'all' && custId !== '' && custId.value !== '') {
+			whereClause.id = custId;
 		}
 		
 		// Date range filter
@@ -563,6 +576,8 @@ const FilterCustomers = async (req, res) => {
 				[Op.gte]: new Date(startDate)
 			};
 		}
+
+		console.log("=---",JSON.stringify(whereClause))
 		
 		const customers = await CustomerModel.findAll({
 			where: whereClause,
@@ -717,7 +732,8 @@ const GetCustomerFilter = async (req, res) => {
             };
         }
         
-        console.log('Filter whereClause:', whereClause);
+        console.log('Filter whereClause:', JSON.stringify(whereClause));
+		return;
         
         const customers = await CustomerModel.findAll({
             where: whereClause,

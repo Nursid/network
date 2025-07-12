@@ -45,8 +45,6 @@ import {
 import UpdateCustomerForm from './Froms/UpdateCustomerForm';
 import CustomerView from './View/CustomerView';
 import AdminNavItems from '../../Elements/AdminNavItems';
-import SelectBox from '../../Elements/SelectBox';
-import { Label } from 'reactstrap';
 
 
 const ManageCustomer = () => {
@@ -369,6 +367,11 @@ const ManageCustomer = () => {
         fetchPlans()
     }, [])
 
+    // Debug: Log filter state changes
+    useEffect(() => {
+        console.log('Current filters state:', filters);
+    }, [filters])
+
     // Cleanup debounce timer on unmount
     useEffect(() => {
         return () => {
@@ -428,13 +431,15 @@ const ManageCustomer = () => {
                     <div>
                         {params.row.address && <span>{params.row.address}</span>}
                         {params.row.area && <span>{params.row.address ? ', ' : ''}{params.row.area}</span>}
+                        {params.row.apartment && <span>{params.row.apartment ? ', ' : ''}{params.row.apartment}</span>}
+                        {params.row.block && <span>{params.row.block ? ', ' : ''}{params.row.block}</span>}
                     </div>
                 </div>
             ),
             editable: false,
             hide: isSmallMobile
         },
-        { 
+        {   
             field: "plan", 
             headerName: "Plan Amt.", 
             minWidth: isMobile ? 80 : 100, 
@@ -735,18 +740,32 @@ const ManageCustomer = () => {
 
     // In your filter change handler
 const handleFilterChange = (field, value) => {
+    const actualValue = value.value !== undefined ? value.value : value;
+    
+    console.log('Filter change:', field, actualValue); // Debug log
+    
+    // Update local state
+    setFilters(prev => {
+        const newFilters = {
+            ...prev,
+            [field]: actualValue
+        };
+        console.log('Updated filters:', newFilters); // Debug log
+        return newFilters;
+    });
 
-  const filterData = {
-    [field]: value.value
-  }
-           if (Object.keys(filterData).length > 0) {
-               dispatch(FilterCustomers(filterData));
-               setIsFiltered(true);
-           }
-            else {
-               dispatch(GetAllCustomers());
-               setIsFiltered(false);
-           }
+    // If value is empty string ("All" option), fetch all customers
+    if (actualValue === '' || actualValue === null || actualValue === undefined) {
+        dispatch(GetAllCustomers());
+        setIsFiltered(false);
+    } else {
+        // Apply filter with non-empty value
+        const filterData = {
+            [field]: actualValue
+        }
+        dispatch(FilterCustomers(filterData));
+        setIsFiltered(true);
+    }
 };
 
 
@@ -792,7 +811,6 @@ const handleClearFilters = () => {
       apartment: '',
   });
   setGlobalSearch('');
-  
   // Fetch all customers
   dispatch(GetAllCustomers());
   setIsFiltered(false);
@@ -826,31 +844,40 @@ const handleClearFilters = () => {
         <Paper 
               elevation={1} 
               style={{
-                margin: isMobile ? '10px 10px 10px 10px' : '10px 10px 10px 10px',
-                borderRadius: '8px'
+                margin: isMobile ? '5px 10px 5px 10px' : '5px 10px 5px 10px',
+                borderRadius: '6px'
               }}
             >
-              <Box sx={{ p: 2 }}>
+              <Box sx={{ p: 1 }}>
         <div className="row align-items-center">
-                  <div className="col-md-3 col-12 mb-2">
+                  <div className="col-md-3 col-12 mb-1">
                     <FormControl fullWidth size="small">
-                      <InputLabel>Cust. Id</InputLabel>
+                      <InputLabel shrink sx={{ fontSize: '0.875rem' }}>Cust. Id</InputLabel>
                       <Select
                         value={filters.status}
                         label="Cust. Id"
+                        displayEmpty
+                        notched
                         onChange={(e) => {
                           const value = e.target.value
-                          handleFilterChange('status', value)
+                          handleFilterChange('status', { value })
+                        }}
+                        sx={{ 
+                          height: '36px',
+                          '& .MuiSelect-select': {
+                            fontSize: '0.875rem',
+                            padding: '8px 12px'
+                          }
                         }}
                       >
-                        <MenuItem value="">All</MenuItem>
-                        <MenuItem value="0">Active</MenuItem>
-                        <MenuItem value="1">Inactive</MenuItem>
+                        <MenuItem value="" sx={{ fontSize: '0.875rem' }}>All</MenuItem>
+                        <MenuItem value="0" sx={{ fontSize: '0.875rem' }}>Active</MenuItem>
+                        <MenuItem value="1" sx={{ fontSize: '0.875rem' }}>Inactive</MenuItem>
                       </Select>
                     </FormControl>
                   </div>
                   
-                  <div className="col-md-6 col-12 mb-2">
+                  <div className="col-md-6 col-12 mb-1">
                     <TextField
                       fullWidth
                       size="small"
@@ -860,24 +887,35 @@ const handleClearFilters = () => {
                         const value = e.target.value
                         handleGlobalSearch(value)
                       }}
+                      sx={{ 
+                        '& .MuiInputBase-root': {
+                          height: '36px',
+                          fontSize: '0.875rem'
+                        },
+                        '& .MuiInputBase-input': {
+                          padding: '8px 12px'
+                        }
+                      }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <SearchIcon />
+                            <SearchIcon sx={{ fontSize: '18px' }} />
                           </InputAdornment>
                         ),
                       }}
                     />
                   </div>
                   
-                  <div className="col-md-3 col-12 mb-2">
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                  <div className="col-md-3 col-12 mb-1">
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
                       <Button
                         variant="contained"
                         // onClick={"#"}
                         size="small"
                         sx={{ 
                           flex: 1,
+                          height: '32px',
+                          fontSize: '0.75rem',
                           backgroundColor:  '#ff9800',
                           '&:hover': {
                             backgroundColor: '#f57c00'
@@ -890,7 +928,11 @@ const handleClearFilters = () => {
                         variant="outlined"
                         onClick={handleClearFilters}
                         size="small"
-                        sx={{ flex: 1 }}
+                        sx={{ 
+                          flex: 1,
+                          height: '32px',
+                          fontSize: '0.75rem'
+                        }}
                       >
                         Clear
                       </Button>
@@ -904,33 +946,38 @@ const handleClearFilters = () => {
           <Paper 
             elevation={2} 
             style={{
-              margin: isMobile ? '0 10px 10px 10px' : '10px',
-              borderRadius: '12px',
+              margin: isMobile ? '0 10px 5px 10px' : '5px 10px 5px 10px',
+              borderRadius: '8px',
               background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-              color: 'white'
+              color: 'white',
+              height: '65px'
             }}
           >
-            <Box sx={{ p: isMobile ? 2 : 3 }}>
+            <Box sx={{ p: isMobile ? 1 : 1.5 }} >
               <div className="row align-items-center">
                 <div className="col-md-6 col-12">
-                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="600">
-                    🏢 LO-GO Customer Management
+                  <Typography variant={isMobile ? "h6" : "h6"} fontWeight="600" sx={{ fontSize: '1.1rem' }}>
+                    Customer Management
                   </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
+                  <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.2, fontSize: '0.75rem' }}>
                     Manage customers, connections, and billing
                   </Typography>
                 </div>
                 <div className="col-md-6 col-12">
-                  <Box sx={{ display: 'flex', gap: 1, justifyContent: isMobile ? 'center' : 'flex-end' }}>
+                  <Box sx={{ display: 'flex', gap: 0.5, justifyContent: isMobile ? 'center' : 'flex-end' }}>
                     <Button
                       variant="contained"
                       onClick={ToggleAddCustomer}
+                      size="small"
                       sx={{
                         backgroundColor: 'rgba(255,255,255,0.2)',
                         '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' },
-                        borderRadius: '8px',
+                        borderRadius: '6px',
                         textTransform: 'none',
-                        fontWeight: '500'
+                        fontWeight: '500',
+                        fontSize: '0.8rem',
+                        height: '32px',
+                        padding: '4px 12px'
                       }}
                     >
                       Add Connection
@@ -946,15 +993,15 @@ const handleClearFilters = () => {
             <Paper 
               elevation={1} 
               style={{
-                margin: isMobile ? '0 10px 10px 10px' : '0 10px 10px 10px',
-                borderRadius: '8px'
+                margin: isMobile ? '0 10px 5px 10px' : '0 10px 5px 10px',
+                borderRadius: '6px'
               }}
             >
-              <Box sx={{ p: 2 }}>
+              <Box sx={{ p: 1 }}>
               
                 {/* Additional Filters Row */}
-                <div className="row mt-3">
-                  <div className="col-md-3 col-3 mb-2">
+                <div className="row mt-1">
+                  <div className="col-md-3 col-3 mb-1">
                     <TextField
                       fullWidth
                       size="small"
@@ -962,13 +1009,19 @@ const handleClearFilters = () => {
                       label="Start Date"
                       value={filters.startDate}
                       onChange={(e) => {
-                        handleFilterChange('startDate', e.target.value)
+                        handleFilterChange('startDate', { value: e.target.value })
                       }}
-                      InputLabelProps={{ shrink: true }}
+                      InputLabelProps={{ shrink: true, sx: { fontSize: '0.875rem' } }}
+                      sx={{ 
+                        '& .MuiInputBase-root': {
+                          height: '36px',
+                          fontSize: '0.875rem'
+                        }
+                      }}
                     />
                   </div>
                   
-                  <div className="col-md-3 col-3 mb-2">
+                  <div className="col-md-3 col-3 mb-1">
                     <TextField
                       fullWidth
                       size="small"
@@ -976,31 +1029,46 @@ const handleClearFilters = () => {
                       label="End Date"
                       value={filters.endDate}
                       onChange={(e) => {
-                        handleFilterChange('endDate', e.target.value)
+                        handleFilterChange('endDate', { value: e.target.value })
                       }}
-                      InputLabelProps={{ shrink: true }}
+                      InputLabelProps={{ shrink: true, sx: { fontSize: '0.875rem' } }}
+                      sx={{ 
+                        '& .MuiInputBase-root': {
+                          height: '36px',
+                          fontSize: '0.875rem'
+                        }
+                      }}
                     />
                   </div>
                   
-                  <div className="col-md-3 col-3 mb-2">
+                  <div className="col-md-3 col-3 mb-1">
                     <FormControl fullWidth size="small">
-                      <InputLabel>Status</InputLabel>
+                      <InputLabel shrink sx={{ fontSize: '0.875rem' }}>Status</InputLabel>
                       <Select
                         value={filters.status}
                         label="Status"
+                        displayEmpty
+                        notched
                         onChange={(e) => {
                           const value = e.target.value
-                          handleFilterChange('status', value)
+                          handleFilterChange('status', { value })
+                        }}
+                        sx={{ 
+                          height: '36px',
+                          '& .MuiSelect-select': {
+                            fontSize: '0.875rem',
+                            padding: '8px 12px'
+                          }
                         }}
                       >
-                        <MenuItem value="">All</MenuItem>
-                        <MenuItem value="0">Active</MenuItem>
-                        <MenuItem value="1">Inactive</MenuItem>
+                        <MenuItem value="" sx={{ fontSize: '0.875rem' }}>All</MenuItem>
+                        <MenuItem value="0" sx={{ fontSize: '0.875rem' }}>Active</MenuItem>
+                        <MenuItem value="1" sx={{ fontSize: '0.875rem' }}>Inactive</MenuItem>
                       </Select>
                     </FormControl>
                   </div>
                   
-                  <div className="col-md-3 col-3 mb-2">
+                  <div className="col-md-3 col-3 mb-1">
                     <TextField
                       fullWidth
                       size="small"
@@ -1008,12 +1076,21 @@ const handleClearFilters = () => {
                       value={filters.name}
                       onChange={(e) => {
                         const value = e.target.value
-                        handleFilterChange('name', value)
+                        handleFilterChange('name', { value })
+                      }}
+                      sx={{ 
+                        '& .MuiInputBase-root': {
+                          height: '36px',
+                          fontSize: '0.875rem'
+                        },
+                        '& .MuiInputBase-input': {
+                          padding: '8px 12px'
+                        }
                       }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            👤
+                            <span style={{ fontSize: '16px' }}>👤</span>
                           </InputAdornment>
                         ),
                       }}
@@ -1023,47 +1100,98 @@ const handleClearFilters = () => {
                 </div>
 
                 {/* Additional Filter Options */}
-                <div className="row mt-3">
-                  <div className="col-md-3 col-3 mb-2">
+                <div className="row mt-1">
+                  <div className="col-md-3 col-3 mb-1">
                     <FormControl fullWidth size="small">
-                      <Label>Search by Block</Label>
-                      <SelectBox 
-                        options={block_option} 
-                        setSelcted={(value) => {
-                          handleFilterChange('block', value)
-                        }} 
-                        initialValue={filters.block}
-                      />
+                      <InputLabel shrink sx={{ fontSize: '0.875rem' }}>Search by Block</InputLabel>
+                      <Select
+                        value={filters.block}
+                        label="Search by Block"
+                        displayEmpty
+                        notched
+                        onChange={(e) => {
+                          const value = e.target.value
+                          handleFilterChange('block', { value })
+                        }}
+                        sx={{ 
+                          height: '36px',
+                          '& .MuiSelect-select': {
+                            fontSize: '0.875rem',
+                            padding: '8px 12px'
+                          }
+                        }}
+                      >
+                        <MenuItem value="" sx={{ fontSize: '0.875rem' }}>All</MenuItem>
+                        {block_option.map((option) => (
+                          <MenuItem key={option.value} value={option.value} sx={{ fontSize: '0.875rem' }}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
                     </FormControl>
                   </div>
                   
-                  <div className="col-md-3 col-3 mb-2">
+                  <div className="col-md-3 col-3 mb-1">
                     <FormControl fullWidth size="small">
-                      <Label>Search by Locality</Label>
-                      <SelectBox 
-                        options={apartment_options} 
-                        setSelcted={(value) => {
-                          handleFilterChange('locality', value)
-                        }} 
-                        initialValue={filters.locality}
-                      />
+                      <InputLabel shrink sx={{ fontSize: '0.875rem' }}>Search by Locality</InputLabel>
+                      <Select
+                        value={filters.locality}
+                        label="Search by Locality"
+                        displayEmpty
+                        notched
+                        onChange={(e) => {
+                          const value = e.target.value
+                          handleFilterChange('locality', { value })
+                        }}
+                        sx={{ 
+                          height: '36px',
+                          '& .MuiSelect-select': {
+                            fontSize: '0.875rem',
+                            padding: '8px 12px'
+                          }
+                        }}
+                      >
+                        <MenuItem value="" sx={{ fontSize: '0.875rem' }}>All</MenuItem>
+                        {apartment_options.map((option) => (
+                          <MenuItem key={option.value} value={option.value} sx={{ fontSize: '0.875rem' }}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
                     </FormControl>
                   </div>
 
  
-                  <div className="col-md-3 col-3 mb-2">
+                  <div className="col-md-3 col-3 mb-1">
                     <FormControl fullWidth size="small">
-                      <Label>Search by Area</Label>
-                      <SelectBox 
-                        options={area_option} 
-                        setSelcted={(value) => {
-                          handleFilterChange('area', value)
-                        }} 
-                        initialValue={filters.area}
-                      />
+                      <InputLabel shrink sx={{ fontSize: '0.875rem' }}>Search by Area</InputLabel>
+                      <Select
+                        value={filters.area}
+                        label="Search by Area"
+                        displayEmpty
+                        notched
+                        onChange={(e) => {
+                          const value = e.target.value
+                          handleFilterChange('area', { value })
+                        }}
+                        sx={{ 
+                          height: '36px',
+                          '& .MuiSelect-select': {
+                            fontSize: '0.875rem',
+                            padding: '8px 12px'
+                          }
+                        }}
+                      >
+                        <MenuItem value="" sx={{ fontSize: '0.875rem' }}>All</MenuItem>
+                        {area_option.map((option) => (
+                          <MenuItem key={option.value} value={option.value} sx={{ fontSize: '0.875rem' }}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
                     </FormControl>
                   </div>
-{/* 
+
                   <div className="col-md-3 col-3 mb-2">
                     <TextField
                       fullWidth
@@ -1072,7 +1200,7 @@ const handleClearFilters = () => {
                       value={filters.custId}
                       onChange={(e) => {
                         const value = e.target.value
-                        handleFilterChange('custId', value)
+                        handleFilterChange('custId', { value })
                       }}
                       InputProps={{
                         startAdornment: (
@@ -1082,21 +1210,21 @@ const handleClearFilters = () => {
                         ),
                       }}
                     />
-                  </div> */}
+                  </div>
 
                   </div>
 
                 {/* Alphabetical Filter */}
-                <div className="row mt-3">
-                  <div className="col-md-12 col-12 mb-2">
+                <div className="row mt-1">
+                  <div className="col-md-12 col-12 mb-1">
                     <Box sx={{ 
                       display: 'flex', 
-                      gap: 1.25, 
+                      gap: 0.5, 
                       alignItems: 'center', 
                       overflowX: 'auto',
                       whiteSpace: 'nowrap',
                       '&::-webkit-scrollbar': {
-                        height: '4px'
+                        height: '3px'
                       },
                       '&::-webkit-scrollbar-track': {
                         background: '#f1f1f1',
@@ -1107,7 +1235,7 @@ const handleClearFilters = () => {
                         borderRadius: '2px'
                       }
                     }}>
-                      <Typography variant="body2" sx={{ minWidth: 'fit-content', mr: 1 }}></Typography>
+                      <Typography variant="body2" sx={{ minWidth: 'fit-content', mr: 0.5, fontSize: '0.75rem' }}></Typography>
                       {['ALL', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map((letter) => (
                         <Chip 
                           key={letter}
@@ -1115,9 +1243,9 @@ const handleClearFilters = () => {
                           size="small" 
                           clickable 
                           sx={{   
-                            minWidth: '32px',
-                            height: '28px',
-                            fontSize: '12px',
+                            minWidth: '24px',
+                            height: '22px',
+                            fontSize: '10px',
                             fontWeight: 'bold',
                             backgroundColor: '#f0f0f0',
                             color: '#333'
