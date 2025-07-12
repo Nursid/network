@@ -518,7 +518,7 @@ const UpdateStatus = async (req, res) => {
 
 const FilterCustomers = async (req, res) => {
 	try {
-		const { status, locality, block, area, apartment, name, custId, endDate, startDate } = req.body;
+		const { status, locality, block, area, apartment, name, custId, endDate, startDate, alphabet } = req.body;
 
 		console.log({ status, locality, block, area, apartment, name, custId, endDate, startDate })
 		
@@ -575,6 +575,10 @@ const FilterCustomers = async (req, res) => {
 			whereClause.createdAt = {
 				[Op.gte]: new Date(startDate)
 			};
+		}
+
+		if (alphabet && alphabet !== 'all' && alphabet !== '' && alphabet !== 'ALL') {
+			whereClause.name = { [Op.like]: `${alphabet}%` };
 		}
 
 		console.log("=---",JSON.stringify(whereClause))
@@ -644,16 +648,7 @@ const AllCustomerFilterByFlow = async (req, res) => {
 const GetCustomerFilter = async (req, res) => {
     try {
         const { 
-            status, 
-            locality, 
-            endDate, 
-            startDate,
-            globalSearch,
-            block,
-            area,
-            custId,
-            name,
-            apartment
+            globalSearch
         } = req.body;
         
         // Build dynamic where clause
@@ -675,65 +670,11 @@ const GetCustomerFilter = async (req, res) => {
                     { address: { [Op.like]: `%${searchTerm}%` } },
                     { area: { [Op.like]: `%${searchTerm}%` } },
                     { block: { [Op.like]: `%${searchTerm}%` } },
-                    { apartment: { [Op.like]: `%${searchTerm}%` } }
+                    { apartment: { [Op.like]: `%${searchTerm}%` } },
+					{ username: { [Op.like]: `%${searchTerm}%` } }
                 ];
             }
-        } else {
-            // Apply individual filters only if no global search
-            
-            // Status filter (maps to is_block field)
-            if (status && status !== '' && status !== 'all') {
-                whereClause.is_block = parseInt(status);
-            }
-            
-            // Customer ID filter (same as status, maps to is_block)
-            if (custId && custId !== '' && custId !== 'all') {
-                whereClause.is_block = parseInt(custId);
-            }
-            
-            // Block filter
-            if (block && block !== '' && block !== 'all') {
-                whereClause.block = block;
-            }
-            
-            // Area filter
-            if (area && area !== '' && area !== 'all') {
-                whereClause.area = area;
-            }
-            
-            // Locality/Apartment filter
-            if (locality && locality !== '' && locality !== 'all') {
-                whereClause.apartment = locality;
-            }
-            
-            // Name filter
-            if (name && name !== '') {
-                whereClause.name = { [Op.like]: `%${name}%` };
-            }
-            
-            // Apartment filter (separate from locality)
-            if (apartment && apartment !== '' && apartment !== 'all') {
-                whereClause.apartment = apartment;
-            }
-        }
-        
-        // Date range filter (always applied regardless of global search)
-        if (startDate && endDate) {
-            whereClause.createdAt = {
-                [Op.between]: [new Date(startDate), new Date(endDate)]
-            };
-        } else if (endDate) {
-            whereClause.createdAt = {
-                [Op.lte]: new Date(endDate)
-            };
-        } else if (startDate) {
-            whereClause.createdAt = {
-                [Op.gte]: new Date(startDate)
-            };
-        }
-        
-        console.log('Filter whereClause:', JSON.stringify(whereClause));
-		return;
+        } 
         
         const customers = await CustomerModel.findAll({
             where: whereClause,

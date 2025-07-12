@@ -249,11 +249,11 @@ const ManageCustomer = () => {
         mobile: '',
         email: '',
         apartment: '',
+        alphabet: '',
         
     })
     const [isFiltered, setIsFiltered] = useState(false)
     const [plans, setPlans] = useState([])
-    const debounceTimer = useRef(null)
 
     const DataWithID = (data) => {
         const NewData = []
@@ -367,19 +367,9 @@ const ManageCustomer = () => {
         fetchPlans()
     }, [])
 
-    // Debug: Log filter state changes
-    useEffect(() => {
-        console.log('Current filters state:', filters);
-    }, [filters])
 
-    // Cleanup debounce timer on unmount
-    useEffect(() => {
-        return () => {
-            if (debounceTimer.current) {
-                clearTimeout(debounceTimer.current);
-            }
-        };
-    }, [])
+
+
 
     const GetUpdateCustomer=(data)=>{
         setUpdate(data)
@@ -452,18 +442,6 @@ const ManageCustomer = () => {
             )
         },
         { 
-            field: "validity", 
-            headerName: "Validity", 
-            minWidth: isMobile ? 80 : 100, 
-            editable: false,
-            hide: isSmallMobile,
-            renderCell: (params) => (
-                <span style={{ fontSize: '11px' }}>
-                    From & To
-                </span>
-            )
-        },
-        { 
             field: "balance", 
             headerName: "Balance", 
             minWidth: isMobile ? 80 : 100, 
@@ -483,7 +461,7 @@ const ManageCustomer = () => {
             hide: isSmallMobile,
             renderCell: (params) => (
                 <span style={{ fontSize: '11px' }}>
-                    [Date]
+                    {params.row.bill_date ? moment(params.row.bill_date).format("DD-MM-YYYY") : ''}
                 </span>
             )
         },
@@ -742,17 +720,11 @@ const ManageCustomer = () => {
 const handleFilterChange = (field, value) => {
     const actualValue = value.value !== undefined ? value.value : value;
     
-    console.log('Filter change:', field, actualValue); // Debug log
-    
     // Update local state
-    setFilters(prev => {
-        const newFilters = {
-            ...prev,
-            [field]: actualValue
-        };
-        console.log('Updated filters:', newFilters); // Debug log
-        return newFilters;
-    });
+    setFilters(prev => ({
+        ...prev,
+        [field]: actualValue
+    }));
 
     // If value is empty string ("All" option), fetch all customers
     if (actualValue === '' || actualValue === null || actualValue === undefined) {
@@ -769,31 +741,48 @@ const handleFilterChange = (field, value) => {
 };
 
 
-// Global search handler with debouncing
-const handleGlobalSearch = (value) => {
+// Global search handler - only updates input value
+const handleGlobalSearchChange = (value) => {
   setGlobalSearch(value);
-  
-  // Clear previous debounce timer
-  if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-  }
-  
-  // Set new debounce timer (500ms delay)
-  debounceTimer.current = setTimeout(() => {
-      if (value === '') {
-          // If search is empty, get all customers
-          dispatch(GetAllCustomers());
-          setIsFiltered(false);
-      } else {
-          const filterData = {
-              globalSearch: value
-          };
-          dispatch(DynamicFilterCustomers(filterData));
-          setIsFiltered(true);
-      }
-  }, 500);
 };
 
+// Handle search button click
+const handleSearchButtonClick = () => {
+  if (globalSearch === '') {
+      // If search is empty, get all customers
+      dispatch(GetAllCustomers());
+      setIsFiltered(false);
+  } else {
+      const filterData = {
+          globalSearch: globalSearch
+      };
+      dispatch(DynamicFilterCustomers(filterData));
+      setIsFiltered(true);
+  }
+};
+
+
+// Handle alphabet filter
+const handleAlphabetFilter = (letter) => {
+    // Update local state
+    setFilters(prev => ({
+        ...prev,
+        alphabet: letter
+    }));
+
+    if (letter === 'ALL') {
+        // Fetch all customers
+        dispatch(GetAllCustomers());
+        setIsFiltered(false);
+    } else {
+        // Apply alphabet filter
+        const filterData = {
+            alphabet: letter
+        };
+        dispatch(FilterCustomers(filterData));
+        setIsFiltered(true);
+    }
+};
 
 const handleClearFilters = () => {
   setFilters({
@@ -809,6 +798,7 @@ const handleClearFilters = () => {
       mobile: '',
       email: '',
       apartment: '',
+      alphabet: '',
   });
   setGlobalSearch('');
   // Fetch all customers
@@ -885,7 +875,12 @@ const handleClearFilters = () => {
                       value={globalSearch}
                       onChange={(e) => {
                         const value = e.target.value
-                        handleGlobalSearch(value)
+                        handleGlobalSearchChange(value)
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSearchButtonClick()
+                        }
                       }}
                       sx={{ 
                         '& .MuiInputBase-root': {
@@ -910,7 +905,7 @@ const handleClearFilters = () => {
                     <Box sx={{ display: 'flex', gap: 0.5 }}>
                       <Button
                         variant="contained"
-                        // onClick={"#"}
+                        onClick={handleSearchButtonClick}
                         size="small"
                         sx={{ 
                           flex: 1,
@@ -1247,10 +1242,13 @@ const handleClearFilters = () => {
                             height: '22px',
                             fontSize: '10px',
                             fontWeight: 'bold',
-                            backgroundColor: '#f0f0f0',
-                            color: '#333'
+                            backgroundColor: filters.alphabet === letter ? '#1976d2' : '#f0f0f0',
+                            color: filters.alphabet === letter ? 'white' : '#333',
+                            '&:hover': {
+                              backgroundColor: filters.alphabet === letter ? '#1565c0' : '#e0e0e0'
+                            }
                           }}
-                          onClick={() => {}}
+                          onClick={() => handleAlphabetFilter(letter)}
                         />
                       ))}
                     </Box>
