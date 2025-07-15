@@ -96,18 +96,18 @@ const AllTransaction = () => {
             minWidth: isMobile ? 80 : 120,
             hide: isSmallMobile
         },
-        { 
-            field: "balance", 
-            headerName: "Balance", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 80 : 120,
-            renderCell: (params) => (
-                <span className={`fw-bold ${params.value > 0 ? 'text-danger' : 'text-success'}`}>
-                    ₹{params.value || 0}
-                </span>
-            ),
-            hide: isSmallMobile
-        },
+        // { 
+        //     field: "balance", 
+        //     headerName: "Balance", 
+        //     flex: isMobile ? 0 : 1, 
+        //     minWidth: isMobile ? 80 : 120,
+        //     renderCell: (params) => (
+        //         <span className={`fw-bold ${params.value > 0 ? 'text-danger' : 'text-success'}`}>
+        //             ₹{params.value || 0}
+        //         </span>
+        //     ),
+        //     hide: isSmallMobile
+        // },
         { 
             field: "trans_id", 
             headerName: isMobile ? "Trans ID" : "Transaction ID", 

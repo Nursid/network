@@ -23,7 +23,7 @@ module.exports = (sequelize) => {
       allowNull: true,
     },
     days: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
   },{

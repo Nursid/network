@@ -121,7 +121,9 @@ const validateBillingKYC = (values, showKYC) => {
 	const errors = {};
 
 	// Billing amount validation
-	if (values.billing_amount) {
+	if (!values.billing_amount) {
+		errors.billing_amount = 'Billing amount is required';
+	} else {
 		if (!/^\d+(\.\d{1,2})?$/.test(values.billing_amount)) {
 			errors.billing_amount = 'Please enter a valid amount (e.g., 100 or 100.50)';
 		} else if (parseFloat(values.billing_amount) <= 0) {
@@ -216,7 +218,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 			if (response.data.status === 200) {
 				const packageOptions = response.data.data.map(pkg => ({
 					value: pkg.id,
-					label: `${pkg.plan} - ₹${pkg.finalPrice}`,
+					label: `${pkg.plan} - ₹${pkg.finalPrice} - ${pkg.days} Days`,
 					...pkg
 				}));
 				setPackages(packageOptions);
@@ -718,11 +720,17 @@ const AddNewCustomerForm = ({prop, data}) => {
 				<Col md={12}>
 					<FormGroup>
 						<Label for="package">Select Package <span style={{color: "red"}}>*</span></Label>
-						<SelectBox 
-							options={packages} 
-							setSelcted={(value) => setFormData(prev => ({ ...prev, selectedPackage: value }))} 
-							initialValue={formData.selectedPackage}
-						/>
+											<SelectBox 
+						options={packages} 
+						setSelcted={(value) => {
+							setFormData(prev => ({ 
+								...prev, 
+								selectedPackage: value,
+								billing_amount: value ? value.finalPrice : ''
+							}));
+						}} 
+						initialValue={formData.selectedPackage}
+					/>
 					</FormGroup>
 				</Col>
 				{formData.selectedPackage && (
@@ -734,6 +742,8 @@ const AddNewCustomerForm = ({prop, data}) => {
 							<CardBody>
 								<p><strong>Plan:</strong> {formData.selectedPackage.plan}</p>
 								<p><strong>Connection Type:</strong> {formData.selectedPackage.connectionType}</p>
+								<p><strong>Days:</strong> {formData.selectedPackage.days}</p>
+								<p><strong>Price:</strong> ₹{formData.selectedPackage.finalPrice}</p>
 							</CardBody>
 						</Card>
 					</Col>
@@ -866,7 +876,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 							<h5>Billing Details</h5>
 							<hr />
 						</Col>
-						<Col md={4}>
+						{/* <Col md={4}>
 							<FormGroup>
 								<Label for="bill_date">Bill Date</Label>
 								<Field
@@ -875,7 +885,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 									name="bill_date"
 								/>
 							</FormGroup>
-						</Col>
+						</Col> */}
 						<Col md={4}>
 							<FormGroup>
 								<Label for="billing_amount">Billing Amount <span style={{color: "red"}}>*</span></Label>
@@ -883,19 +893,24 @@ const AddNewCustomerForm = ({prop, data}) => {
 									as={Input}
 									type="number"
 									name="billing_amount"
-									placeholder="Enter billing amount"
+									placeholder="Select a package to auto-fill billing amount"
 									min="0"
 									step="0.01"
-									onKeyPress={(e) => {
-										// Allow numbers, decimal point, and backspace
-										const charCode = e.which || e.keyCode;
-										const charStr = String.fromCharCode(charCode);
-										if (!/^[0-9.]$/.test(charStr) && charCode !== 8) {
-											e.preventDefault();
-										}
+									disabled={true}
+									value={formData.billing_amount}
+									style={{
+										backgroundColor: '#f8f9fa',
+										cursor: 'not-allowed',
+										fontWeight: 'bold',
+										color: '#495057'
 									}}
 								/>
 								<ErrorMessage name="billing_amount" component="span" className="validationError" />
+								{formData.selectedPackage && (
+									<small className="text-muted">
+										Auto-filled from selected plan: {formData.selectedPackage.plan}
+									</small>
+								)}
 							</FormGroup>
 						</Col>
 						<Col md={4}>

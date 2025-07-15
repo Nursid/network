@@ -35,7 +35,7 @@ db.DepartmentsModel=require("./AuthModels/DepartmentsModel")(sequelize, DataType
 db.DesignationModel=require("./AuthModels/DesignationModel")(sequelize, DataTypes);
 db.InventoryModel=require("./inventories")(sequelize,DataTypes);
 db.AllotedItemsModel=require("./AllotedItemsModel")(sequelize,DataTypes);
-db.Account= require("./AccountModel")(sequelize,DataTypes);
+db.AccountModel= require("./AccountModel")(sequelize,DataTypes);
 db.TimeSlotModel = require("./TimeSlotModel")(sequelize, DataTypes)
 db.TicketModel = require("./TicketModel")(sequelize, DataTypes)
 db.FlowModel = require("./FlowModel")(sequelize, DataTypes)
@@ -48,7 +48,12 @@ db.PlanModel = require("./ServiceModal/PlanModel")(sequelize, DataTypes)
 db.TicketHead = require("./ServiceModal/TicketHead")(sequelize, DataTypes)
 db.SalaryModel = require("./SalaryModel/SalaryModel")(sequelize, DataTypes)
 
+// Customer related models
+db.CustomerReminder = require("./CustomerReminderModel")(sequelize, DataTypes)
+db.CustomerComplaint = require("./CustomerComplaintModel")(sequelize, DataTypes)
+db.CustomerWhatsAppLog = require("./CustomerWhatsAppLogModel")(sequelize, DataTypes)
 
+// Associations
 db.SupervisorAttendance.belongsTo(db.EmployeeModel, { foreignKey: 'emp_id', targetKey: 'emp_id' });
 db.ServiceProviderAttendance.belongsTo(db.ServiceProviderModel, { foreignKey: 'servp_id', targetKey: 'id'});
 

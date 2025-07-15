@@ -1,7 +1,7 @@
 const db = require("../model/index")
 const {Sequelize} = require('sequelize');
 const Op = Sequelize.Op;
-const AccountModel = db.Account
+const AccountModel = db.AccountModel
 const moment = require('moment')
 
 const ListingAccount = async (req, res) => {

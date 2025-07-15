@@ -4,7 +4,9 @@ const db = require("../../model/index");
 const CustomerModel = db.CustomerModel;
 const ServiceProviderModel = db.ServiceProviderModel
 const EmployeeModel = db.EmployeeModel
-const FlowModel = db.FlowModel
+const AccountModel = db.AccountModel
+const generateCustomerID = require("../misc/customeridgenerator");
+const generateVoucherNo = require("../misc/voucherGenerator");
 require("dotenv").config;
 const {isEmail, isMobileNumber, isOptValid} = require("../utils");
 
@@ -40,6 +42,9 @@ const SignupUser = async (req, res) => {
 	}
 
 
+	// Generate customer ID first
+	const customerId = await generateCustomerID();
+
 	// Prepare data for CustomerModel (detailed customer info)
 	const customer_data = {
 		// Basic Information
@@ -47,6 +52,7 @@ const SignupUser = async (req, res) => {
 		username: data.username,
 		email: data.email || null,
 		gender: data.gender || null,
+		customer_id: customerId, // Add generated customer ID
 		
 		// Address Information
 		address: data.address,
@@ -80,6 +86,7 @@ const SignupUser = async (req, res) => {
 		bill_date: data.bill_date || null,
 		billing_amount: data.billing_amount ? parseFloat(data.billing_amount) : null,
 		payment_method: data.payment_method || null,
+		balance: data.billing_amount ? parseFloat(data.billing_amount) : 0,
 		
 		// Legacy billing fields (for backward compatibility)
 		cash: data.cash ? parseFloat(data.cash) : null,
@@ -152,11 +159,45 @@ const SignupUser = async (req, res) => {
 			});
 		}
 
+		// Create account transaction if billing amount is provided
+		if (data.billing_amount && parseFloat(data.billing_amount) > 0) {
+			try {
+				const voucherNo = await generateVoucherNo();
+				const currentDate = new Date();
+				
+				// Create account transaction
+				const accountData = {
+					date: currentDate,
+					cust_id: customerId,
+					cust_name: data.name,
+					vc_no: voucherNo,
+					address: data.address,
+					amount: parseFloat(data.billing_amount),
+					payment_mode: data.payment_method,
+					balance: parseFloat(data.billing_amount),
+					trans_id: `TXN${Date.now()}${Math.floor(Math.random() * 1000)}`,
+					partner_emp_id: null,
+					auto_renew: false,
+					recharge_status: 'completed'
+				};
+
+				const accountRecord = await AccountModel.create(accountData);
+				
+				if (!accountRecord) {
+					console.error('Failed to create account transaction');
+				}
+			} catch (accountError) {
+				console.error('Error creating account transaction:', accountError);
+				// Continue with customer creation even if account transaction fails
+			}
+		}
+
 		// Return success response with customer details
 		return res.status(200).json({
 			status: true, 
 			data: {
 				id: customerRecord.id,
+				customer_id: customerId,
 				name: data.name,
 				username: data.username,
 				mobile: data.mobile,
@@ -559,7 +600,10 @@ const FilterCustomers = async (req, res) => {
 		}
 		
 		if (custId && custId !== 'all' && custId !== '' && custId.value !== '') {
-			whereClause.id = custId;
+			whereClause[Op.or] = [
+				{ customer_id: { [Op.like]: `%${custId}%` } },
+				{ id: custId }
+			];
 		}
 		
 		// Date range filter
@@ -671,7 +715,8 @@ const GetCustomerFilter = async (req, res) => {
                     { area: { [Op.like]: `%${searchTerm}%` } },
                     { block: { [Op.like]: `%${searchTerm}%` } },
                     { apartment: { [Op.like]: `%${searchTerm}%` } },
-					{ username: { [Op.like]: `%${searchTerm}%` } }
+					{ username: { [Op.like]: `%${searchTerm}%` } },
+					{ customer_id: { [Op.like]: `%${searchTerm}%` } }
                 ];
             }
         } 
@@ -706,8 +751,6 @@ const GetCustomerFilter = async (req, res) => {
 }
 
 
-
-
 module.exports = {
 	SignupUser,
 	LoginUser,
@@ -720,5 +763,5 @@ module.exports = {
 	GetupdateBlockStatus,
 	FilterCustomers,
 	AllCustomerFilterByFlow,
-	GetCustomerFilter
+	GetCustomerFilter,
 };

@@ -1,7 +1,7 @@
 import { GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import React, { Fragment, useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom/dist';
-import AddNewCustomerForm from './Froms/AddNewCustomerForm';
+import AddNewCustomerForm from './Forms/AddNewCustomerForm';
 import ModalComponent from '../../Elements/ModalComponent';
 import AdminDataTable from '../../Elements/AdminDataTable';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,6 +23,7 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import SearchIcon from '@mui/icons-material/Search';
+import HistoryIcon from '@mui/icons-material/History';
 import { 
     Button, 
     Tooltip, 
@@ -42,9 +43,13 @@ import {
     Chip,
     Badge
 } from '@mui/material';
-import UpdateCustomerForm from './Froms/UpdateCustomerForm';
+import UpdateCustomerForm from './Forms/UpdateCustomerForm';
 import CustomerView from './View/CustomerView';
 import AdminNavItems from '../../Elements/AdminNavItems';
+import SetReminderForm from './Forms/SetReminderForm';
+import PaymentForm from './Forms/PaymentForm';
+import ComplaintForm from './Forms/ComplaintForm';
+import WhatsAppForm from './Forms/WhatsAppForm';
 
 
 const ManageCustomer = () => {
@@ -56,31 +61,6 @@ const ManageCustomer = () => {
     const [showFilters, setShowFilters] = useState(!isMobile)
     const [globalSearch, setGlobalSearch] = useState('')
 
-    // Area options for locality filter
-    const areaOptions = [
-        "Tigri",
-        "Tigri Village", 
-        "Tigri Extn.",
-        "Tigri Camp",
-        "Karnal Farm Tigri",
-        "DDA Flat Tigri",
-        "Khanpur",
-        "Khanpur Extn.",
-        "Shiv Park",
-        "Duggal Colony",
-        "Devli Road",
-        "Devli Extension",
-        "Krishna Park",
-        "Jawahar Park",
-        "Raju Park",
-        "Durga Vihar",
-        "Bandh Road Sangam Vihar",
-        "Sangam Vihar",
-        "Madangir",
-        "Dakshinpuri",
-        "BSF Campus",
-        "RPS Colony"
-    ]
 
     const apartment_options = [
       { value: "Shiv Shakti Apartment", label: "Shiv Shakti Apartment" },
@@ -145,7 +125,7 @@ const ManageCustomer = () => {
         setShowFilters(!isMobile)
     }, [isMobile])
 
-    const GetDeleteByID = (user_id) => {
+    const GetDeleteByID = (id) => {
         Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -156,7 +136,7 @@ const ManageCustomer = () => {
             confirmButtonText: 'Yes, delete it!'
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const response = await axios.get(API_URL + '/customer/delete/' + user_id)
+                const response = await axios.get(API_URL + '/customer/delete/' + id)
                 if (response.status === 200) {
                     Swal.fire(
                         'Deleted!',
@@ -190,40 +170,116 @@ const ManageCustomer = () => {
     }
 
     // Handler functions for new actions
-    const handleAddRemainder = (customerId) => {
-        // TODO: Implement add remainder functionality
-        console.log('Add remainder for customer:', customerId);
-        Swal.fire('Info', 'Add Remainder functionality to be implemented', 'info');
+    const handleAddRemainder = (customerId, customerData) => {
+        setSelectedCustomer({ id: customerId, ...customerData });
+        setReminderModal(true);
     }
 
-    const handlePaymentEntry = (customerId) => {
-        // TODO: Implement payment entry functionality
-        console.log('Payment entry for customer:', customerId);
-        Swal.fire('Info', 'Payment Entry functionality to be implemented', 'info');
+    const handleReminderSubmit = async (formData) => {
+        setFormLoading(true);
+        try {
+            const response = await axios.post(`${API_URL}/customer/${selectedCustomer.id}/reminder`, formData);
+            if (response.data.status) {
+                Swal.fire('Success', 'Reminder set successfully!', 'success');
+                setReminderModal(false);
+            } else {
+                Swal.fire('Error', response.data.message || 'Failed to set reminder', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Failed to set reminder', 'error');
+            console.error('Error setting reminder:', error);
+        } finally {
+            setFormLoading(false);
+        }
     }
 
-    const handleRecharge = (customerId) => {
-        // TODO: Implement recharge functionality
-        console.log('Recharge for customer:', customerId);
-        Swal.fire('Info', 'Recharge functionality to be implemented', 'info');
+    const handlePaymentEntry = (customerId, customerData) => {
+        setSelectedCustomer({ id: customerId, ...customerData });
+        setPaymentModal(true);
     }
 
-    const handleBillTransaction = (customerId) => {
-        // TODO: Implement bill/transaction functionality
-        console.log('Bill/Transaction for customer:', customerId);
-        Swal.fire('Info', 'Bill/Transaction functionality to be implemented', 'info');
+    const handlePaymentSubmit = async (formData) => {
+        setFormLoading(true);
+        try {
+            const response = await axios.post(`${API_URL}/customer/${selectedCustomer.id}/payment`, formData);
+            if (response.data.status) {
+                Swal.fire('Success', 'Payment processed successfully!', 'success');
+                setPaymentModal(false);
+                // Refresh data
+                if (isFiltered) {
+                    const filterData = {}
+                    Object.keys(filters).forEach(key => {
+                        if (filters[key] && filters[key] !== '') {
+                            filterData[key] = filters[key]
+                        }
+                    })
+                    if (Object.keys(filterData).length > 0) {
+                        dispatch(FilterCustomers(filterData))
+                    }
+                } else {
+                    dispatch(GetAllCustomers())
+                }
+            } else {
+                Swal.fire('Error', response.data.message || 'Failed to process payment', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Failed to process payment', 'error');
+            console.error('Error processing payment:', error);
+        } finally {
+            setFormLoading(false);
+        }
     }
 
-    const handleComplain = (customerId) => {
-        // TODO: Implement complain functionality
-        console.log('Complain for customer:', customerId);
-        Swal.fire('Info', 'Complain functionality to be implemented', 'info');
+    const handleComplain = (customerId, customerData) => {
+        setSelectedCustomer({ id: customerId, ...customerData });
+        setComplaintModal(true);
     }
 
-    const handleWhatsAppMessage = (customerId, customerName, mobile) => {
-        // TODO: Implement WhatsApp message functionality
-        console.log('Send WhatsApp message to customer:', customerId, customerName, mobile);
-        Swal.fire('Info', 'WhatsApp Message functionality to be implemented', 'info');
+    const handleComplaintSubmit = async (formData) => {
+        setFormLoading(true);
+        try {
+            const response = await axios.post(`${API_URL}/customer/${selectedCustomer.id}/complaint`, formData);
+            if (response.data.status) {
+                Swal.fire('Success', 'Complaint registered successfully!', 'success');
+                setComplaintModal(false);
+            } else {
+                Swal.fire('Error', response.data.message || 'Failed to register complaint', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Failed to register complaint', 'error');
+            console.error('Error registering complaint:', error);
+        } finally {
+            setFormLoading(false);
+        }
+    }
+
+    const handleWhatsAppMessage = (customerId, customerData) => {
+        setSelectedCustomer({ id: customerId, ...customerData });
+        setWhatsappModal(true);
+    }
+
+    const handleWhatsAppSubmit = async (formData) => {
+        setFormLoading(true);
+        try {
+            const response = await axios.post(`${API_URL}/customer/${selectedCustomer.id}/whatsapp`, formData);
+            if (response.data.status) {
+                Swal.fire('Success', 'WhatsApp message sent successfully!', 'success');
+                setWhatsappModal(false);
+            } else {
+                Swal.fire('Error', response.data.message || 'Failed to send message', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Failed to send WhatsApp message', 'error');
+            console.error('Error sending WhatsApp message:', error);
+        } finally {
+            setFormLoading(false);
+        }
+    }
+
+
+
+    const handleBillTransaction = async (customerId) => {
+       console.log(customerId)
     }
 
     
@@ -270,86 +326,6 @@ const ManageCustomer = () => {
         }
         return NewData
     }
-
-        // Handle filter changes
-    // const handleFilterChange = (field, value) => {
-    //     setFilters(prev => ({
-    //         ...prev,
-    //         [field]: value
-    //     }))
-    // }
-
-
-
-    const [blockStatus, setBlockStatus] = useState({});
-
-
-    const handleToggleBlock = (userId) => {
-
-        const newBlockStatus = !blockStatus[userId]; 
-
-        const actionText = newBlockStatus ? 'Un-Block' : 'Block';
-        
-        Swal.fire({
-            title: 'Are you sure?',
-            text: `You won't be able to ${actionText}!`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: `Yes, ${actionText} it!`
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                // Toggle the block status
-        // Make API call to update block status on the server
-        axios.post(`${API_URL}/customer/block/${userId}`, { is_block: newBlockStatus })
-            .then(response => {
-                if (response.status === 200) {
-                    Swal.fire(
-                        `${actionText} Successful`,
-                        `User has been ${actionText}ed.`,
-                        'success'
-                    );
-                    // Update local state if API call is successful
-                                       setBlockStatus(prevBlockStatus => ({
-                        ...prevBlockStatus,
-                        [userId]: newBlockStatus,
-                    }));
-                    
-                    // Refresh data after successful update
-                    if (isFiltered) {
-                        // Re-apply current filters
-                        const filterData = {}
-                        Object.keys(filters).forEach(key => {
-                            if (filters[key] && filters[key]!== '') {
-                                filterData[key] = filters[key]
-                            }
-                        })
-                        if (Object.keys(filterData).length > 0) {
-                            dispatch(FilterCustomers(filterData))
-                        }
-                    } else {
-                        dispatch(GetAllCustomers())
-                    }
-                } else {
-                    // Handle error if API call fails
-                    Swal.fire({
-                        title: 'failed to delete try again',
-                        icon: "error",
-                    })
-                    console.error('Failed to update block status');
-                }
-            })
-            .catch(error => {
-                console.error('Error updating block status:', error);
-            });
-
-               
-            }
-        })
-       
-    };
-
     // Fetch plans for broadband filter
     const fetchPlans = async () => {
         try {
@@ -367,10 +343,6 @@ const ManageCustomer = () => {
         fetchPlans()
     }, [])
 
-
-
-
-
     const GetUpdateCustomer=(data)=>{
         setUpdate(data)
         ToggleUpdateCustomer();
@@ -381,13 +353,22 @@ const ManageCustomer = () => {
         setViewModel(!viewModal)
     }
 
+    const handleViewLogs = (customerId, customerName) => {
+        console.log(customerId, customerName)
+    }
+
     const column = [
         { 
-            field: "id", 
+            field: "customer_id", 
             headerName: "Cust. ID", 
             minWidth: isMobile ? 80 : 100, 
             editable: false,
-            flex: isMobile ? 0 : undefined
+            flex: isMobile ? 0 : undefined,
+            renderCell: (params) => (
+                <span style={{ fontWeight: 'bold', color: '#1976d2' }}>
+                    {params.row.customer_id || `ID-${params.row.id}`}
+                </span>
+            )
         },
         { 
             field: "name", 
@@ -442,18 +423,6 @@ const ManageCustomer = () => {
             )
         },
         { 
-            field: "balance", 
-            headerName: "Balance", 
-            minWidth: isMobile ? 80 : 100, 
-            editable: false,
-            hide: isSmallMobile,
-            renderCell: (params) => (
-                <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>
-                    ₹{params.row.balance || 0}
-                </span>
-            )
-        },
-        { 
             field: "last_payment", 
             headerName: "Last Payment", 
             minWidth: isMobile ? 100 : 120, 
@@ -462,6 +431,30 @@ const ManageCustomer = () => {
             renderCell: (params) => (
                 <span style={{ fontSize: '11px' }}>
                     {params.row.bill_date ? moment(params.row.bill_date).format("DD-MM-YYYY") : ''}
+                </span>
+            )
+        },
+        { 
+            field: "edit", 
+            headerName: "Edit", 
+            minWidth: isMobile ? 100 : 120, 
+            editable: false,
+            hide: isSmallMobile,
+            renderCell: (params) => (
+                <span style={{ fontSize: '11px' }}>
+                    <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#2196f3', 
+                                    color: 'white',
+                                    width: '40px',
+                                    height: '40px',
+                                    minWidth: '40px'
+                                }}
+                                onClick={() => GetUpdateCustomer(params.row)}
+                            >
+                                <BorderColorIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
                 </span>
             )
         },
@@ -503,22 +496,7 @@ const ManageCustomer = () => {
                             </IconButton>
                         </Tooltip>
 
-                        <Tooltip title="Edit" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#2196f3', 
-                                    color: 'white',
-                                    width: '24px',
-                                    height: '24px',
-                                    minWidth: '24px'
-                                }}
-                                onClick={() => GetUpdateCustomer(params.row)}
-                            >
-                                <BorderColorIcon style={{ fontSize: '14px' }} />
-                            </IconButton>
-                        </Tooltip>
-
+                     
                         <Tooltip title="Delete" arrow>
                             <IconButton 
                                 size="small" 
@@ -529,13 +507,13 @@ const ManageCustomer = () => {
                                     height: '24px',
                                     minWidth: '24px'
                                 }}
-                                onClick={() => GetDeleteByID(params.row.user_id)}
+                                onClick={() => GetDeleteByID(params.row.id)}
                             >
                                 <DeleteForeverIcon style={{ fontSize: '14px' }} />
                             </IconButton>
                         </Tooltip>
 
-                        <Tooltip title="Block/Unblock" arrow>
+                        {/* <Tooltip title="Block/Unblock" arrow>
                             <IconButton 
                                 size="small" 
                                 style={{ 
@@ -549,7 +527,7 @@ const ManageCustomer = () => {
                             >
                                 <BlockIcon style={{ fontSize: '14px' }} />
                             </IconButton>
-                        </Tooltip>
+                        </Tooltip> */}
 
                         <Tooltip title="Remainder" arrow>
                             <IconButton 
@@ -561,9 +539,24 @@ const ManageCustomer = () => {
                                     height: '24px',
                                     minWidth: '24px'
                                 }}
-                                onClick={() => handleAddRemainder(params.row.user_id)}
+                                onClick={() => handleAddRemainder(params.row.id, params.row)}
                             >
                                 <NotificationsIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Recharge/Payment" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#607d8b', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => handlePaymentEntry(params.row.id, params.row)}
+                            >
+                                <PaymentIcon style={{ fontSize: '14px' }} />
                             </IconButton>
                         </Tooltip>
                     </div>
@@ -575,37 +568,7 @@ const ManageCustomer = () => {
                         alignItems: 'center',
                         justifyContent: 'center'
                     }}>
-                        <Tooltip title="Payment" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#607d8b', 
-                                    color: 'white',
-                                    width: '24px',
-                                    height: '24px',
-                                    minWidth: '24px'
-                                }}
-                                onClick={() => handlePaymentEntry(params.row.user_id)}
-                            >
-                                <PaymentIcon style={{ fontSize: '14px' }} />
-                            </IconButton>
-                        </Tooltip>
-
-                        <Tooltip title="Recharge" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#795548', 
-                                    color: 'white',
-                                    width: '24px',
-                                    height: '24px',
-                                    minWidth: '24px'
-                                }}
-                                onClick={() => handleRecharge(params.row.user_id)}
-                            >
-                                <BatteryChargingFullIcon style={{ fontSize: '14px' }} />
-                            </IconButton>
-                        </Tooltip>
+                       
 
                         <Tooltip title="Bills" arrow>
                             <IconButton 
@@ -633,7 +596,7 @@ const ManageCustomer = () => {
                                     height: '24px',
                                     minWidth: '24px'
                                 }}
-                                onClick={() => handleComplain(params.row.user_id)}
+                                onClick={() => handleComplain(params.row.id, params.row)}
                             >
                                 <ReportProblemIcon style={{ fontSize: '14px' }} />
                             </IconButton>
@@ -649,9 +612,25 @@ const ManageCustomer = () => {
                                     height: '24px',
                                     minWidth: '24px'
                                 }}
-                                onClick={() => handleWhatsAppMessage(params.row.user_id, params.row.name, params.row.mobile)}
+                                onClick={() => handleWhatsAppMessage(params.row.id, params.row)}
                             >
                                 <WhatsAppIcon style={{ fontSize: '14px' }} />
+                            </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Logs" arrow>
+                            <IconButton 
+                                size="small" 
+                                style={{ 
+                                    backgroundColor: '#37474f', 
+                                    color: 'white',
+                                    width: '24px',
+                                    height: '24px',
+                                    minWidth: '24px'
+                                }}
+                                onClick={() => handleViewLogs(params.row.id, params.row.name)}
+                            >
+                                <HistoryIcon style={{ fontSize: '14px' }} />
                             </IconButton>
                         </Tooltip>
                     </div>
@@ -679,6 +658,13 @@ const ManageCustomer = () => {
     // Add service provider controller 
     const [addCustomer, setAddCustomer] = useState(false)
     const [updateCustomer, setUpdateCustomer]=useState(false)
+    const [reminderModal, setReminderModal] = useState(false)
+    const [paymentModal, setPaymentModal] = useState(false)
+    const [complaintModal, setComplaintModal] = useState(false)
+    const [whatsappModal, setWhatsappModal] = useState(false)
+    const [selectedCustomer, setSelectedCustomer] = useState(null)
+    const [formLoading, setFormLoading] = useState(false)
+    
     const ToggleAddCustomer = () => setAddCustomer(!addCustomer)
     const ToggleUpdateCustomer = () => setUpdateCustomer(!updateCustomer)
 
@@ -693,8 +679,7 @@ const ManageCustomer = () => {
                 width: '100%',
                 marginLeft: 0,
                 height: '100vh',
-                overflowY: 'auto',
-                overflowX: 'hidden',
+                overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
                 backgroundColor: '#f5f5f5',
@@ -706,8 +691,7 @@ const ManageCustomer = () => {
             width: `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
             marginLeft: sidebarCollapsed ? '80px' : '280px',
             height: '100vh',
-            overflowY: 'auto',
-            overflowX: 'hidden',
+            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: '#f5f5f5',
@@ -822,6 +806,39 @@ const handleClearFilters = () => {
             />
 
             <ModalComponent modal={updateCustomer} toggle={ToggleUpdateCustomer} data={<UpdateCustomerForm  prop={ToggleUpdateCustomer } updateData={update} />} modalTitle={"Update Customer"} size={"xl"} scrollable={true} />
+
+            {/* New Modal Components */}
+            <SetReminderForm 
+                open={reminderModal}
+                onClose={() => setReminderModal(false)}
+                onSubmit={handleReminderSubmit}
+                loading={formLoading}
+                customerData={selectedCustomer}
+            />
+
+            <PaymentForm 
+                open={paymentModal}
+                onClose={() => setPaymentModal(false)}
+                onSubmit={handlePaymentSubmit}
+                loading={formLoading}
+                customerData={selectedCustomer}
+            />
+
+            <ComplaintForm 
+                open={complaintModal}
+                onClose={() => setComplaintModal(false)}
+                onSubmit={handleComplaintSubmit}
+                loading={formLoading}
+                customerData={selectedCustomer}
+            />
+
+            <WhatsAppForm 
+                open={whatsappModal}
+                onClose={() => setWhatsappModal(false)}
+                onSubmit={handleWhatsAppSubmit}
+                loading={formLoading}
+                customerData={selectedCustomer}
+            />
            
 <div className="d-flex" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f5f5f5' }}>
         {/* Left Sidebar - Hidden on mobile */}
@@ -984,12 +1001,21 @@ const handleClearFilters = () => {
           </Paper>
 
           {/* Main Content */}
+          <div style={{ 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            minHeight: 0, 
+            overflowY: 'auto',
+            paddingRight: '5px' 
+          }}>
             {/* Search and Filter Section */}
             <Paper 
               elevation={1} 
               style={{
                 margin: isMobile ? '0 10px 5px 10px' : '0 10px 5px 10px',
-                borderRadius: '6px'
+                borderRadius: '6px',
+                flexShrink: 0
               }}
             >
               <Box sx={{ p: 1 }}>
@@ -1258,17 +1284,19 @@ const handleClearFilters = () => {
             </Paper>
                   
             {/* Data Table */}
-            <Paper>
-              <Box sx={{ p: 1 }}>
-                <div>
+            <Paper style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+              <Box sx={{ p: 1, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                <div style={{ flex: 1, minHeight: 0 }}>
                   <AdminDataTable
                     rows={DataWithID(isFiltered ? filteredData.data : data.data)} 
                     columns={column} 
                     CustomToolbar={CustomToolbar} 
+                    width="100%"
                   />
                 </div>
               </Box>
             </Paper>
+          </div>
           </div>
         </div>
         </Fragment>

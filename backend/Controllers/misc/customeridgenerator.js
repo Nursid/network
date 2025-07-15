@@ -1,26 +1,17 @@
-// const CustomerID = require("../../Models/misc/customerId");
-
-const db= require("../../model/index")
-const CustomerID = db.CustomerID
+const db = require("../../model/index");
+const CustomerModel = db.CustomerModel;
 
 const generateCustomerID = async () => {
+    let nextSeq = 11001;
+    const lastCustomer = await CustomerModel.findOne({
+        order: [['customer_id', 'DESC']]
+    });
 
-    let SeqData;
-    SeqData = await CustomerID.findOneAndUpdate(
-        {},
-        { $inc: { seq: 1 } },
-        { new: true }
-    );
-
-    if (!SeqData) {
-        SeqData = await new CustomerID({
-            id: "HM",
-            seq: 11000
-        }).save()
+    if (lastCustomer && lastCustomer.customer_id) {
+        nextSeq = lastCustomer.customer_id + 1;
     }
-    SeqData.seq++;
-    return `HM${SeqData.seq.toString().padStart(4, '0')}`;
-}
 
-module.exports = generateCustomerID
+    return nextSeq;
+};
 
+module.exports = generateCustomerID;

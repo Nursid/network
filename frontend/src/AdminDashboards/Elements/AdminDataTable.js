@@ -14,6 +14,8 @@ const AdminDataTable = ({ rows, columns, CustomToolbar, ...args }) => {
             m="0px 0 0 0"
             height="100%"
             sx={{
+                height: '100%',
+                width: '100%',
                 "& .MuiDataGrid-root": {
                     border: "none",
                 },
@@ -64,10 +66,13 @@ const AdminDataTable = ({ rows, columns, CustomToolbar, ...args }) => {
                 components={{ Toolbar: CustomToolbar }}
                 getRowClassName={getRowClassName}
                 getRowHeight={() => 80}
+                autoHeight={false}
                 sx={{
                   [`& .${gridClasses.cell}`]: {
                     py: 1,
                   },
+                  height: '100%',
+                  width: '100%',
                 }}
             />
         </Box>

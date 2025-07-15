@@ -47,4 +47,5 @@ router.put('/getupdate/:user_id', upload.fields([
 ]), customerRouter.GetUpdateTheCustomer);
 router.post('/block/:id', customerRouter.GetupdateBlockStatus);
 
+
 module.exports = router;
