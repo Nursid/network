@@ -5,17 +5,258 @@ const CustomerModel = db.CustomerModel;
 const ServiceProviderModel = db.ServiceProviderModel
 const EmployeeModel = db.EmployeeModel
 const AccountModel = db.AccountModel
+const PlanModel = db.PlanModel
+const CustomerPlanHistory = db.CustomerPlanHistory
 const generateCustomerID = require("../misc/customeridgenerator");
 const generateVoucherNo = require("../misc/voucherGenerator");
 require("dotenv").config;
 const {isEmail, isMobileNumber, isOptValid} = require("../utils");
 
+// const SignupUser = async (req, res) => {
+// 	const data = req.body;
+// 	console.log('Received customer data:', data);
+
+// 	// Handle file uploads
+// 	if(req.files){
+// 		const files = req.files;
+// 		data.image = files.image ? files.image[0].path : '';
+// 		data.frontAadharImage = files.frontAadharImage ? files.frontAadharImage[0].path : '';
+// 		data.backAadharImage = files.backAadharImage ? files.backAadharImage[0].path : '';
+// 		data.panImage = files.panImage ? files.panImage[0].path : '';
+// 		data.otherIdImage = files.otherIdImage ? files.otherIdImage[0].path : '';
+// 		data.signature = files.signature ? files.signature[0].path : '';
+// 	}
+
+// 	// Validate required fields
+// 	if (!data.name || !data.username || !data.mobile || !data.address) {
+// 		return res.status(400).json({
+// 			status: false, 
+// 			message: 'Required fields missing: name, username, mobile, and address are required'
+// 		});
+// 	}
+
+// 	// Validate mobile number format
+// 	if (!/^\d{10}$/.test(data.mobile)) {
+// 		return res.status(400).json({
+// 			status: false, 
+// 			message: 'Mobile number must be exactly 10 digits'
+// 		});
+// 	}
+
+
+// 	// Generate customer ID first
+// 	const customerId = await generateCustomerID();
+
+// 	// Prepare data for CustomerModel (detailed customer info)
+// 	const customer_data = {
+// 		// Basic Information
+// 		name: data.name,
+// 		username: data.username,
+// 		email: data.email || null,
+// 		gender: data.gender || null,
+// 		customer_id: customerId, // Add generated customer ID
+		
+// 		// Address Information
+// 		address: data.address,
+// 		t_address: data.t_address || null,
+// 		area: data.area || null,
+// 		block: data.block || null,
+// 		apartment: data.apartment || null,
+		
+// 		// Contact Information
+// 		mobile: data.mobile,
+// 		whatsapp_no: data.whatsapp_no || null,
+// 		alternate_no: data.alternate_no || null,
+		
+// 		// Personal Information
+// 		dob: data.dob || null,
+// 		doa: data.doa || null,
+		
+// 		// KYC Information
+// 		aadhar_no: data.aadhar_no || null,
+// 		other_id: data.other_id || null,
+// 		pan_no: data.pan_no ? data.pan_no.toUpperCase() : null,
+		
+// 		// Package Information
+// 		selectedPackage: data.selectedPackage ? parseInt(data.selectedPackage) : null,
+// 		packageDetails: data.packageDetails || null,
+		
+// 		// Inventory Items (will be stored as JSON string)
+// 		selectedItems: data.selectedItems || null,
+		
+// 		// Billing Information
+// 		bill_date: data.bill_date || null,
+// 		billing_amount: data.billing_amount ? parseFloat(data.billing_amount) : null,
+// 		payment_method: data.payment_method || null,
+// 		balance: data.billing_amount ? parseFloat(data.billing_amount) : 0,
+		
+// 		// Legacy billing fields (for backward compatibility)
+// 		cash: data.cash ? parseFloat(data.cash) : null,
+// 		online: data.online ? parseFloat(data.online) : null,
+		
+// 		// Image/Document Fields
+// 		image: data.image || null,
+// 		frontAadharImage: data.frontAadharImage || null,
+// 		backAadharImage: data.backAadharImage || null,
+// 		panImage: data.panImage || null,
+// 		otherIdImage: data.otherIdImage || null,
+// 		signature: data.signature || null,
+		
+// 		// Status fields
+// 		status: 'active',
+// 		customerType: 'individual',
+// 		registrationDate: new Date()
+// 	};
+
+// 	try {
+// 		// Check if user already exists as Service Provider
+// 		const isServiceProvider = await ServiceProviderModel.findOne({
+// 			where: {
+// 				mobile_no: data.mobile
+// 			}
+// 		});
+
+// 		if (isServiceProvider) {
+// 			return res.status(200).json({
+// 				status: false, 
+// 				message: 'Mobile number already registered as Service Provider!'
+// 			});
+// 		}
+
+// 		// Check if user already exists as Employee/Supervisor
+// 		const isSupervisor = await EmployeeModel.findOne({
+// 			where: {
+// 				mobile_no: data.mobile
+// 			}
+// 		});
+
+// 		if (isSupervisor) {
+// 			return res.status(200).json({
+// 				status: false, 
+// 				message: 'Mobile number already registered as Employee!'
+// 			});
+// 		}
+
+// 		// Check if customer already exists
+// 		const isCustomer = await CustomerModel.findOne({
+// 			where: {
+// 				mobile: data.mobile
+// 			}
+// 		});
+
+// 		if (isCustomer) {
+// 			return res.status(200).json({
+// 				status: false, 
+// 				message: 'Mobile number already registered as Customer!'
+// 			});
+// 		}
+
+// 		// Create detailed customer record
+// 		const customerRecord = await CustomerModel.create(customer_data);
+
+// 		if (!customerRecord) {
+// 			return res.status(200).json({
+// 				status: false, 
+// 				message: 'Failed to create customer details!'
+// 			});
+// 		}
+
+// 		// Create account transaction if billing amount is provided
+// 		if (data.billing_amount && parseFloat(data.billing_amount) > 0) {
+// 			try {
+// 				const voucherNo = await generateVoucherNo();
+// 				const currentDate = new Date();
+				
+// 				// Create account transaction
+// 				const accountData = {
+// 					date: currentDate,
+// 					cust_id: customerId,
+// 					cust_name: data.name,
+// 					vc_no: voucherNo,
+// 					address: data.address,
+// 					amount: parseFloat(data.billing_amount),
+// 					payment_mode: data.payment_method,
+// 					balance: parseFloat(data.billing_amount),
+// 					trans_id: `TXN${Date.now()}${Math.floor(Math.random() * 1000)}`,
+// 					partner_emp_id: null,
+// 					auto_renew: false,
+// 					recharge_status: 'completed'
+// 				};
+
+// 				const accountRecord = await AccountModel.create(accountData);
+				
+// 				if (!accountRecord) {
+// 					console.error('Failed to create account transaction');
+// 				}
+// 			} catch (accountError) {
+// 				console.error('Error creating account transaction:', accountError);
+// 				// Continue with customer creation even if account transaction fails
+// 			}
+// 		}
+
+// 		// Return success response with customer details
+// 		return res.status(200).json({
+// 			status: true, 
+// 			data: {
+// 				id: customerRecord.id,
+// 				customer_id: customerId,
+// 				name: data.name,
+// 				username: data.username,
+// 				mobile: data.mobile,
+// 				email: data.email,
+// 				gender: data.gender,
+// 				address: data.address,
+// 				t_address: data.t_address,
+// 				area: data.area,
+// 				block: data.block,
+// 				apartment: data.apartment,
+// 				whatsapp_no: data.whatsapp_no,
+// 				alternate_no: data.alternate_no,
+// 				dob: data.dob,
+// 				doa: data.doa,
+// 				aadhar_no: data.aadhar_no,
+// 				other_id: data.other_id,
+// 				pan_no: data.pan_no,
+// 				selectedPackage: data.selectedPackage,
+// 				packageDetails: data.packageDetails,
+// 			}, 
+// 			message: "Customer Added Successfully!"
+// 		});
+
+// 	} catch (error) {
+// 		console.error('Error creating customer:', error);
+		
+// 		// Handle specific database errors
+// 		if (error.name === 'SequelizeValidationError') {
+// 			const validationErrors = error.errors.map(err => err.message);
+// 			return res.status(400).json({
+// 				status: false, 
+// 				message: 'Validation Error', 
+// 				errors: validationErrors
+// 			});
+// 		}
+
+// 		if (error.name === 'SequelizeUniqueConstraintError') {
+// 			return res.status(400).json({
+// 				status: false, 
+// 				message: 'Username or mobile number already exists!'
+// 			});
+// 		}
+
+// 		return res.status(500).json({
+// 			status: false, 
+// 			message: 'Internal Server Error',
+// 			error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+// 		});
+// 	}
+// };
+
+
 const SignupUser = async (req, res) => {
 	const data = req.body;
 	console.log('Received customer data:', data);
 
-	// Handle file uploads
-	if(req.files){
+	if (req.files) {
 		const files = req.files;
 		data.image = files.image ? files.image[0].path : '';
 		data.frontAadharImage = files.frontAadharImage ? files.frontAadharImage[0].path : '';
@@ -25,147 +266,108 @@ const SignupUser = async (req, res) => {
 		data.signature = files.signature ? files.signature[0].path : '';
 	}
 
-	// Validate required fields
 	if (!data.name || !data.username || !data.mobile || !data.address) {
 		return res.status(400).json({
-			status: false, 
+			status: false,
 			message: 'Required fields missing: name, username, mobile, and address are required'
 		});
 	}
 
-	// Validate mobile number format
 	if (!/^\d{10}$/.test(data.mobile)) {
 		return res.status(400).json({
-			status: false, 
+			status: false,
 			message: 'Mobile number must be exactly 10 digits'
 		});
 	}
 
-
-	// Generate customer ID first
 	const customerId = await generateCustomerID();
 
-	// Prepare data for CustomerModel (detailed customer info)
+	// 1️⃣ Fetch Plan Duration & Calculate Expiry Date
+	let planDuration = 0;
+	let expiryDate = null;
+
+	if (data.selectedPackage) {
+		try {
+			const selectedPlan = await PlanModel.findByPk(data.selectedPackage);
+			if (selectedPlan) {
+				planDuration = selectedPlan.days || 0;
+				const baseDate = new Date(data.bill_date || new Date());
+				baseDate.setDate(baseDate.getDate() + planDuration);
+				expiryDate = baseDate;
+			}
+		} catch (err) {
+			console.error("Error fetching plan info:", err);
+		}
+	}
+
 	const customer_data = {
-		// Basic Information
 		name: data.name,
 		username: data.username,
 		email: data.email || null,
 		gender: data.gender || null,
-		customer_id: customerId, // Add generated customer ID
-		
-		// Address Information
+		customer_id: customerId,
 		address: data.address,
 		t_address: data.t_address || null,
 		area: data.area || null,
 		block: data.block || null,
 		apartment: data.apartment || null,
-		
-		// Contact Information
 		mobile: data.mobile,
 		whatsapp_no: data.whatsapp_no || null,
 		alternate_no: data.alternate_no || null,
-		
-		// Personal Information
 		dob: data.dob || null,
 		doa: data.doa || null,
-		
-		// KYC Information
 		aadhar_no: data.aadhar_no || null,
 		other_id: data.other_id || null,
 		pan_no: data.pan_no ? data.pan_no.toUpperCase() : null,
-		
-		// Package Information
 		selectedPackage: data.selectedPackage ? parseInt(data.selectedPackage) : null,
 		packageDetails: data.packageDetails || null,
-		
-		// Inventory Items (will be stored as JSON string)
 		selectedItems: data.selectedItems || null,
-		
-		// Billing Information
-		bill_date: data.bill_date || null,
+		bill_date: new Date(),
 		billing_amount: data.billing_amount ? parseFloat(data.billing_amount) : null,
 		payment_method: data.payment_method || null,
 		balance: data.billing_amount ? parseFloat(data.billing_amount) : 0,
-		
-		// Legacy billing fields (for backward compatibility)
 		cash: data.cash ? parseFloat(data.cash) : null,
 		online: data.online ? parseFloat(data.online) : null,
-		
-		// Image/Document Fields
 		image: data.image || null,
 		frontAadharImage: data.frontAadharImage || null,
 		backAadharImage: data.backAadharImage || null,
 		panImage: data.panImage || null,
 		otherIdImage: data.otherIdImage || null,
 		signature: data.signature || null,
-		
-		// Status fields
 		status: 'active',
 		customerType: 'individual',
-		registrationDate: new Date()
+		registrationDate: new Date(),
+		expiry_date: expiryDate // 👈 NEW
 	};
 
 	try {
-		// Check if user already exists as Service Provider
-		const isServiceProvider = await ServiceProviderModel.findOne({
-			where: {
-				mobile_no: data.mobile
-			}
-		});
-
+		const isServiceProvider = await ServiceProviderModel.findOne({ where: { mobile_no: data.mobile } });
 		if (isServiceProvider) {
-			return res.status(200).json({
-				status: false, 
-				message: 'Mobile number already registered as Service Provider!'
-			});
+			return res.status(200).json({ status: false, message: 'Mobile number already registered as Service Provider!' });
 		}
 
-		// Check if user already exists as Employee/Supervisor
-		const isSupervisor = await EmployeeModel.findOne({
-			where: {
-				mobile_no: data.mobile
-			}
-		});
-
+		const isSupervisor = await EmployeeModel.findOne({ where: { mobile_no: data.mobile } });
 		if (isSupervisor) {
-			return res.status(200).json({
-				status: false, 
-				message: 'Mobile number already registered as Employee!'
-			});
+			return res.status(200).json({ status: false, message: 'Mobile number already registered as Employee!' });
 		}
 
-		// Check if customer already exists
-		const isCustomer = await CustomerModel.findOne({
-			where: {
-				mobile: data.mobile
-			}
-		});
-
+		const isCustomer = await CustomerModel.findOne({ where: { mobile: data.mobile } });
 		if (isCustomer) {
-			return res.status(200).json({
-				status: false, 
-				message: 'Mobile number already registered as Customer!'
-			});
+			return res.status(200).json({ status: false, message: 'Mobile number already registered as Customer!' });
 		}
 
-		// Create detailed customer record
 		const customerRecord = await CustomerModel.create(customer_data);
 
 		if (!customerRecord) {
-			return res.status(200).json({
-				status: false, 
-				message: 'Failed to create customer details!'
-			});
+			return res.status(200).json({ status: false, message: 'Failed to create customer details!' });
 		}
 
-		// Create account transaction if billing amount is provided
+		// 2️⃣ Create Account Entry with Recharge Details
 		if (data.billing_amount && parseFloat(data.billing_amount) > 0) {
 			try {
 				const voucherNo = await generateVoucherNo();
 				const currentDate = new Date();
-				
-				// Create account transaction
+
 				const accountData = {
 					date: currentDate,
 					cust_id: customerId,
@@ -175,26 +377,37 @@ const SignupUser = async (req, res) => {
 					amount: parseFloat(data.billing_amount),
 					payment_mode: data.payment_method,
 					balance: parseFloat(data.billing_amount),
-					trans_id: `TXN${Date.now()}${Math.floor(Math.random() * 1000)}`,
+					trans_id: null,
 					partner_emp_id: null,
 					auto_renew: false,
-					recharge_status: 'completed'
+					recharge_status: 'completed',
+					// 👇 NEW fields
+					recharge_days: planDuration || null,
+					valid_till: expiryDate || null
 				};
 
 				const accountRecord = await AccountModel.create(accountData);
-				
 				if (!accountRecord) {
 					console.error('Failed to create account transaction');
 				}
+
+				await CustomerPlanHistory.create({
+					customer_id: customerId,
+					plan_id: data.selectedPackage,
+					plan_name: data.selectedPackage ? parseInt(data.selectedPackage) : null,
+					amount: parseFloat(data.billing_amount),
+					recharge_date: new Date(),
+					valid_from: new Date(data.bill_date || new Date()),
+					valid_till: expiryDate,
+					recharge_days: planDuration,
+				});
 			} catch (accountError) {
 				console.error('Error creating account transaction:', accountError);
-				// Continue with customer creation even if account transaction fails
 			}
 		}
 
-		// Return success response with customer details
 		return res.status(200).json({
-			status: true, 
+			status: true,
 			data: {
 				id: customerRecord.id,
 				customer_id: customerId,
@@ -217,37 +430,39 @@ const SignupUser = async (req, res) => {
 				pan_no: data.pan_no,
 				selectedPackage: data.selectedPackage,
 				packageDetails: data.packageDetails,
-			}, 
+				expiry_date: expiryDate
+			},
 			message: "Customer Added Successfully!"
 		});
 
 	} catch (error) {
 		console.error('Error creating customer:', error);
-		
-		// Handle specific database errors
+
 		if (error.name === 'SequelizeValidationError') {
 			const validationErrors = error.errors.map(err => err.message);
 			return res.status(400).json({
-				status: false, 
-				message: 'Validation Error', 
+				status: false,
+				message: 'Validation Error',
 				errors: validationErrors
 			});
 		}
 
 		if (error.name === 'SequelizeUniqueConstraintError') {
 			return res.status(400).json({
-				status: false, 
+				status: false,
 				message: 'Username or mobile number already exists!'
 			});
 		}
 
 		return res.status(500).json({
-			status: false, 
+			status: false,
 			message: 'Internal Server Error',
 			error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
 		});
 	}
 };
+
+
 
 const LoginUser = async (req, res) => {
 	const {number, otp, otpid} = req.query;
@@ -291,6 +506,20 @@ const DeleteUsers = (req, res) => {
 const AllCustomer = async (req, res) => {
 	try {
 		const customers = await CustomerModel.findAll({
+			include: [
+				{
+					model: CustomerPlanHistory,
+					attributes: ['plan_name', 'amount', 'recharge_date', 'valid_from', 'valid_till', 'recharge_days'],
+					limit: 1,
+					order: [['recharge_date', 'DESC']]
+				},
+				{
+					model: AccountModel,
+					attributes: ['date', 'amount', 'payment_mode', 'balance', 'trans_id', 'partner_emp_id', 'auto_renew', 'recharge_status', 'recharge_days', 'valid_till'],
+					limit: 1,
+					order: [['date', 'DESC']]
+				}
+			],
 			order: [
 				['id', 'ASC']
 			]
@@ -298,10 +527,27 @@ const AllCustomer = async (req, res) => {
 
 		if (customers.length === 0) 
 			return res.status(404).json({error: true, message: "No user found"});
+
+		// Transform the data to match your expected format
+		const transformedCustomers = customers.map(customer => {
+			const customerData = customer.toJSON();
+			return {
+				...customerData,
+				customer_plan_history: customerData.customer_plan_histories && customerData.customer_plan_histories.length > 0 
+					? customerData.customer_plan_histories[0] 
+					: null,
+				account: customerData.accounts && customerData.accounts.length > 0 
+					? customerData.accounts[0] 
+					: null,
+				customer_plan_histories: undefined, // Remove the array
+				accounts: undefined // Remove the array
+			};
+		});
 		
-		res.status(200).json({status: 200, data: customers});
+		res.status(200).json({status: 200, data: transformedCustomers});
 	} catch (error) {
-		res.status(500).json(error);
+		console.error('AllCustomer error:', error);
+		res.status(500).json({error: true, message: error.message});
 	}
 };
 
@@ -751,6 +997,149 @@ const GetCustomerFilter = async (req, res) => {
 }
 
 
+const AddRePayment = async (req, res) => {
+	const {
+		customer_id,
+		amount,
+		payment_mode,
+		trans_id,
+		plan_id,
+		selectedPackage
+	} = req.body;
+
+	try {
+		// Validate required fields
+		if (!customer_id || !amount || !payment_mode || !plan_id) {
+			return res.status(400).json({
+				status: false,
+				message: "Missing required fields: customer_id, amount, or payment_mode"
+			});
+		}
+
+		const isCustomer = await CustomerModel.findOne({
+			where: {
+				customer_id: customer_id
+			}
+		});
+
+		if (!isCustomer) {
+			return res.status(400).json({
+				status: false,
+				message: "Customer not found"
+			});
+		}
+		
+
+		const selectedPlan = await PlanModel.findOne({
+			where: {
+				id: plan_id
+			}
+		});
+
+		// Calculate dates
+		const billDate = new Date();
+		const expiryDate = new Date(billDate.setDate(billDate.getDate() + parseInt(selectedPlan.days || 0)));
+
+		// Create account entry
+		const account = await AccountModel.create({
+			cust_id: customer_id,
+			amount,
+			payment_mode,
+			trans_id,
+			recharge_status: 'active',
+			recharge_days: selectedPlan.days,
+			valid_till: expiryDate,
+			cust_name: isCustomer.name,
+			date: new Date(),
+			address: isCustomer.address,
+			vc_no: isCustomer.vc_no,
+			balance: 0,
+			partner_emp_id: isCustomer.partner_emp_id,
+			auto_renew: isCustomer.auto_renew,
+			recharge_days: selectedPlan.days
+		});
+
+		// Optional: Add to plan history
+		if (plan_id && selectedPlan.days) {
+			const selectedPlan = await PlanModel.findByPk(plan_id);
+
+			await CustomerPlanHistory.create({
+				customer_id,
+				plan_id,
+				plan_name: selectedPlan?.plan || null,
+				amount,
+				recharge_date: new Date(),
+				valid_from: new Date(),
+				valid_till: expiryDate,
+				recharge_days: selectedPlan.days,
+				remarks: 'Recharge via API'
+			});
+		}
+
+		// Update customer details
+		await CustomerModel.update(
+			{
+				bill_date: new Date(),         // Last recharge date
+				amount: amount,                // Current recharge amount
+				valid_till: expiryDate,        // Expiry after recharge
+				plan_id: plan_id || null,       // Optional: Update plan
+				selected_package: selectedPackage || null
+			},
+			{ where: { customer_id: customer_id } }
+		);
+
+		return res.status(200).json({
+			status: true,
+			message: "Recharge recorded and customer updated",
+			data: account
+		});
+	} catch (error) {
+		console.error("AddRePayment error:", error);
+		return res.status(500).json({
+			status: false,
+			message: "Internal Server Error: " + error.message
+		});
+	}
+};
+
+const GetBillingDetails = async (req, res) => {
+
+	const {
+		customer_id
+	} = req.body;
+
+	try {
+		const isCustomer = await CustomerPlanHistory.findAll({
+			where: {
+				customer_id: customer_id
+			},
+			order: [['recharge_date', 'DESC']]
+		});
+
+		if (!isCustomer) {
+			return res.status(400).json({
+				status: false,
+				message: "Customer not found"
+			});
+		}
+
+		return res.status(200).json({
+			status: true,
+			message: "Billing details found",
+			data: isCustomer
+		});
+	} catch (error) {
+		console.error("GetBillingDetails error:", error);
+		return res.status(500).json({
+			status: false,
+			message: "Internal Server Error: " + error.message
+		});
+	}
+}
+
+
+
+
 module.exports = {
 	SignupUser,
 	LoginUser,
@@ -764,4 +1153,6 @@ module.exports = {
 	FilterCustomers,
 	AllCustomerFilterByFlow,
 	GetCustomerFilter,
+	AddRePayment,
+	GetBillingDetails
 };

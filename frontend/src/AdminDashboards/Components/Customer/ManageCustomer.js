@@ -49,8 +49,8 @@ import AdminNavItems from '../../Elements/AdminNavItems';
 import SetReminderForm from './Forms/SetReminderForm';
 import PaymentForm from './Forms/PaymentForm';
 import ComplaintForm from './Forms/ComplaintForm';
-import WhatsAppForm from './Forms/WhatsAppForm';
 
+import BillingDetails from './Forms/BillingDetails';
 
 const ManageCustomer = () => {
     const navigate = useNavigate()
@@ -60,6 +60,7 @@ const ManageCustomer = () => {
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
     const [showFilters, setShowFilters] = useState(!isMobile)
     const [globalSearch, setGlobalSearch] = useState('')
+    const [billingModal, setBillingModal] = useState(false)
 
 
     const apartment_options = [
@@ -201,7 +202,7 @@ const ManageCustomer = () => {
     const handlePaymentSubmit = async (formData) => {
         setFormLoading(true);
         try {
-            const response = await axios.post(`${API_URL}/customer/${selectedCustomer.id}/payment`, formData);
+            const response = await axios.post(`${API_URL}/customer/re-payment`, formData);
             if (response.data.status) {
                 Swal.fire('Success', 'Payment processed successfully!', 'success');
                 setPaymentModal(false);
@@ -230,23 +231,22 @@ const ManageCustomer = () => {
         }
     }
 
-    const handleComplain = (customerId, customerData) => {
-        setSelectedCustomer({ id: customerId, ...customerData });
-        setComplaintModal(true);
+    const handleComplain = (customerData) => {
+        console.log("customerData--",customerData)
+        setSelectedCustomer(customerData);
+        setComplaintModal(true);  
     }
 
     const handleComplaintSubmit = async (formData) => {
+        console.log("formData--",formData)
         setFormLoading(true);
         try {
-            const response = await axios.post(`${API_URL}/customer/${selectedCustomer.id}/complaint`, formData);
-            if (response.data.status) {
-                Swal.fire('Success', 'Complaint registered successfully!', 'success');
-                setComplaintModal(false);
-            } else {
-                Swal.fire('Error', response.data.message || 'Failed to register complaint', 'error');
-            }
+            const response = await axios.post(`${API_URL}/api/complain/add`, formData);
+
+            Swal.fire('Success', 'Complaint registered successfully!', 'success');
+            setComplaintModal(false);
         } catch (error) {
-            Swal.fire('Error', 'Failed to register complaint', 'error');
+            Swal.fire('Error', error.response.data.message || 'Failed to register complaint', 'error');
             console.error('Error registering complaint:', error);
         } finally {
             setFormLoading(false);
@@ -254,32 +254,77 @@ const ManageCustomer = () => {
     }
 
     const handleWhatsAppMessage = (customerId, customerData) => {
-        setSelectedCustomer({ id: customerId, ...customerData });
-        setWhatsappModal(true);
-    }
-
-    const handleWhatsAppSubmit = async (formData) => {
-        setFormLoading(true);
-        try {
-            const response = await axios.post(`${API_URL}/customer/${selectedCustomer.id}/whatsapp`, formData);
-            if (response.data.status) {
-                Swal.fire('Success', 'WhatsApp message sent successfully!', 'success');
-                setWhatsappModal(false);
-            } else {
-                Swal.fire('Error', response.data.message || 'Failed to send message', 'error');
-            }
-        } catch (error) {
-            Swal.fire('Error', 'Failed to send WhatsApp message', 'error');
-            console.error('Error sending WhatsApp message:', error);
-        } finally {
-            setFormLoading(false);
+        const phoneNumber = customerData.mobile || customerData.alternate_mobile;
+        
+        if (!phoneNumber) {
+            Swal.fire('Error', 'No phone number available for this customer', 'error');
+            return;
         }
+
+        // Show message type selection
+        Swal.fire({
+            title: 'Select Message Type',
+            html: `
+                <div style="text-align: left;">
+                    <p><strong>To:</strong> ${customerData.name}</p>
+                    <p><strong>Phone:</strong> ${phoneNumber}</p>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#25d366',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Payment Reminder',
+            cancelButtonText: 'Payment Confirmation',
+            showDenyButton: true,
+            denyButtonText: 'Cancel',
+            denyButtonColor: '#6c757d'
+        }).then((result) => {
+            if (result.isConfirmed || result.dismiss === Swal.DismissReason.cancel) {
+                let message, messageType;
+                
+                if (result.isConfirmed) {
+                    // Payment Reminder Message
+                    message = `Dear ${customerData.name},
+
+Your internet bill payment is due. Please make the payment to avoid service interruption.
+
+Amount: ₹${customerData.billing_amount || 'XXX'}
+Due Date: ${new Date().toLocaleDateString()}
+
+Thank you for choosing our service.`;
+                    messageType = 'Payment Reminder';
+                } else {
+                    // Payment Confirmation Message
+                    message = `Dear ${customerData.name},
+
+We have received your payment of ₹${customerData.billing_amount || 'XXX'}.
+
+Your service will continue uninterrupted. Thank you for your prompt payment.
+
+For any queries, please contact us.`;
+                    messageType = 'Payment Confirmation';
+                }
+
+                // Encode the message for WhatsApp URL
+                const encodedMessage = encodeURIComponent(message);
+                
+                // Create WhatsApp URL with the message
+                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+                
+                // Open WhatsApp in a new tab
+                window.open(whatsappUrl, '_blank');
+                
+                Swal.fire('Success', `WhatsApp opened with ${messageType} message!`, 'success');
+            }
+        });
     }
 
 
 
-    const handleBillTransaction = async (customerId) => {
-       console.log(customerId)
+    const handleBillingSubmit = async (customerData) => {
+      setSelectedCustomer(customerData);
+      setBillingModal(true);
     }
 
     
@@ -513,22 +558,6 @@ const ManageCustomer = () => {
                             </IconButton>
                         </Tooltip>
 
-                        {/* <Tooltip title="Block/Unblock" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#ff9800', 
-                                    color: 'white',
-                                    width: '24px',
-                                    height: '24px',
-                                    minWidth: '24px'
-                                }}
-                                onClick={() => handleToggleBlock(params.row.user_id)}
-                            >
-                                <BlockIcon style={{ fontSize: '14px' }} />
-                            </IconButton>
-                        </Tooltip> */}
-
                         <Tooltip title="Remainder" arrow>
                             <IconButton 
                                 size="small" 
@@ -570,7 +599,7 @@ const ManageCustomer = () => {
                     }}>
                        
 
-                        <Tooltip title="Bills" arrow>
+                        <Tooltip title="Billing Details" arrow>
                             <IconButton 
                                 size="small" 
                                 style={{ 
@@ -580,7 +609,7 @@ const ManageCustomer = () => {
                                     height: '24px',
                                     minWidth: '24px'
                                 }}
-                                onClick={() => handleBillTransaction(params.row.user_id)}
+                                onClick={() => handleBillingSubmit(params.row)}
                             >
                                 <ReceiptIcon style={{ fontSize: '14px' }} />
                             </IconButton>
@@ -596,13 +625,13 @@ const ManageCustomer = () => {
                                     height: '24px',
                                     minWidth: '24px'
                                 }}
-                                onClick={() => handleComplain(params.row.id, params.row)}
+                                onClick={() => handleComplain(params.row)}
                             >
                                 <ReportProblemIcon style={{ fontSize: '14px' }} />
                             </IconButton>
                         </Tooltip>
 
-                        <Tooltip title="WhatsApp" arrow>
+                        <Tooltip title="Send WhatsApp Message (Payment Reminder/Confirmation)" arrow>
                             <IconButton 
                                 size="small" 
                                 style={{ 
@@ -661,7 +690,7 @@ const ManageCustomer = () => {
     const [reminderModal, setReminderModal] = useState(false)
     const [paymentModal, setPaymentModal] = useState(false)
     const [complaintModal, setComplaintModal] = useState(false)
-    const [whatsappModal, setWhatsappModal] = useState(false)
+
     const [selectedCustomer, setSelectedCustomer] = useState(null)
     const [formLoading, setFormLoading] = useState(false)
     
@@ -832,10 +861,11 @@ const handleClearFilters = () => {
                 customerData={selectedCustomer}
             />
 
-            <WhatsAppForm 
-                open={whatsappModal}
-                onClose={() => setWhatsappModal(false)}
-                onSubmit={handleWhatsAppSubmit}
+
+            <BillingDetails 
+                open={billingModal}
+                onClose={() => setBillingModal(false)}
+                onSubmit={handleBillingSubmit}
                 loading={formLoading}
                 customerData={selectedCustomer}
             />

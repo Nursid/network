@@ -1,28 +1,39 @@
-const {
-    DataTypes
-} = require('sequelize');
+const { Sequelize, DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-    const CustomerComplaint = sequelize.define('CustomerComplaint', {
+    const CustomerComplaint = sequelize.define('customer_complaints', {
         id: {
             type: DataTypes.INTEGER,
+            primaryKey: true,
             autoIncrement: true,
-            primaryKey: true
+            allowNull: false
         },
         customerId: {
-            type: DataTypes.INTEGER,
-            allowNull: false
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         subject: {
             type: DataTypes.STRING,
             allowNull: false
         },
         description: {
-            type: DataTypes.TEXT
+            type: DataTypes.TEXT,
+            allowNull: false
         },
         status: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
+            type: DataTypes.ENUM('pending', 'in_progress', 'resolved', 'closed'),
+            defaultValue: 'pending',
+            allowNull: false
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW
         }
     }, {
         timestamps: true,

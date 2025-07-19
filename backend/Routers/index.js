@@ -6,6 +6,7 @@ const LocationModel = require("../Controllers/misc/LocationController")
 const ticketRouter = require('./TicketRouter')
 const ticketHeadRouter = require('./Services/TicketHeadRouter')
 const flowRouter = require('./FlowRouter')
+const complainRouter = require('./ComplainRouter')
 
 router.get('/account-listing',AccountController.ListingAccount);
 router.post('/add-balance',AccountController.AddBalance);
@@ -27,5 +28,9 @@ router.use('/ticket-head', ticketHeadRouter);
 
 /* Network API */
 router.use('/flow', flowRouter);
+
+/* Complain API */
+router.use('/complain', complainRouter);
+
 
 module.exports = router

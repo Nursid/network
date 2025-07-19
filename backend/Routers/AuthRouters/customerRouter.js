@@ -46,6 +46,7 @@ router.put('/getupdate/:user_id', upload.fields([
   { name: 'signature', maxCount: 1 }
 ]), customerRouter.GetUpdateTheCustomer);
 router.post('/block/:id', customerRouter.GetupdateBlockStatus);
-
+router.post('/re-payment', customerRouter.AddRePayment);
+router.post('/get-billing-details', customerRouter.GetBillingDetails);
 
 module.exports = router;

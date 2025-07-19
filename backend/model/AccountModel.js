@@ -51,6 +51,15 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
+        recharge_days: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          valid_till: {
+            type: DataTypes.DATEONLY,
+            allowNull: true,
+          }
+          
     }, {
         timestamps: true,
         tableName: 'accounts',

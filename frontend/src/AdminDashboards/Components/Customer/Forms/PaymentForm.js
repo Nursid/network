@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -10,28 +10,44 @@ import {
     MenuItem,
     FormControl,
     InputLabel,
-    Grid,
     Alert,
     Typography,
     Box,
     InputAdornment
 } from '@mui/material';
 import { CurrencyRupee, Payment, AccountBalance } from '@mui/icons-material';
+import { Row, Col, Card, CardBody, CardHeader, FormGroup, Label } from 'reactstrap';
+import axios from 'axios';
+import { API_URL } from '../../../../config';
+import SelectBox from '../../../Elements/SelectBox';
 
 const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = {} }) => {
     const [formData, setFormData] = useState({
-        transaction_type: 'payment',
+        customer_id: customerData?.customer_id || '',
         amount: '',
-        payment_method: 'cash',
-        transaction_id: '',
-        reference_id: '',
-        description: '',
-        bill_period_start: '',
-        bill_period_end: '',
-        due_date: ''
+        payment_mode: '',
+        trans_id: '',
+        plan_id: '',
+        selectedPackage: null
     });
     
     const [errors, setErrors] = useState({});
+    const [packages, setPackages] = useState([]);
+
+    // Update customer_id when customerData changes
+    useEffect(() => {
+        if (customerData?.customer_id) {
+            setFormData(prev => ({
+                ...prev,
+                customer_id: customerData.customer_id
+            }));
+        }
+    }, [customerData]);
+
+    // Fetch packages on component mount
+    useEffect(() => {
+        fetchPackages();
+    }, []);
 
     const handleChange = (field, value) => {
         setFormData(prev => ({
@@ -48,19 +64,39 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
         }
     };
 
+    const fetchPackages = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/plan/getall`);
+            if (response.data.status === 200) {
+                const packageOptions = response.data.data.map(pkg => ({
+                    value: pkg.id,
+                    label: `${pkg.plan} - ₹${pkg.finalPrice} - ${pkg.days} Days`,
+                    ...pkg
+                }));
+                setPackages(packageOptions);
+            }
+        } catch (error) {
+            console.error('Error fetching packages:', error);
+        }
+    };
+
     const validateForm = () => {
         const newErrors = {};
+        
+        if (!formData.customer_id) {
+            newErrors.customer_id = 'Customer ID is required';
+        }
         
         if (!formData.amount || parseFloat(formData.amount) <= 0) {
             newErrors.amount = 'Valid amount is required';
         }
         
-        if (!formData.payment_method) {
-            newErrors.payment_method = 'Payment method is required';
+        if (!formData.payment_mode) {
+            newErrors.payment_mode = 'Payment mode is required';
         }
         
-        if (formData.payment_method === 'online' && !formData.transaction_id) {
-            newErrors.transaction_id = 'Transaction ID is required for online payments';
+        if (formData.payment_mode && formData.payment_mode !== 'cash' && formData.payment_mode !== 'cheque' && !formData.trans_id) {
+            newErrors.trans_id = 'Transaction ID is required for this payment mode';
         }
         
         setErrors(newErrors);
@@ -72,8 +108,9 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
         
         const submitData = {
             ...formData,
+            customer_id: parseInt(formData.customer_id),
             amount: parseFloat(formData.amount),
-            processed_by: 1 // This should be the logged-in user ID
+            plan_id: formData.plan_id ? parseInt(formData.plan_id) : null,
         };
         
         onSubmit(submitData);
@@ -81,29 +118,18 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
 
     const handleClose = () => {
         setFormData({
-            transaction_type: 'payment',
+            customer_id: customerData?.customer_id || '',
             amount: '',
-            payment_method: 'cash',
-            transaction_id: '',
-            reference_id: '',
-            description: '',
-            bill_period_start: '',
-            bill_period_end: '',
-            due_date: ''
+            payment_mode: '',
+            trans_id: '',
+            plan_id: ''
         });
         setErrors({});
         onClose();
     };
 
     const getTransactionTypeIcon = () => {
-        switch (formData.transaction_type) {
-            case 'payment':
-                return <Payment />;
-            case 'recharge':
-                return <AccountBalance />;
-            default:
-                return <CurrencyRupee />;
-        }
+        return <AccountBalance />;
     };
 
     return (
@@ -129,43 +155,48 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
                 gap: 1
             }}>
                 {getTransactionTypeIcon()}
-                Payment & Recharge Processing
+                Customer Recharge Processing
             </DialogTitle>
             
             <DialogContent sx={{ mt: 2 }}>
-                {customerData?.name && (
-                    <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-                        <Typography variant="subtitle2" color="text.secondary">
-                            Customer: <strong>{customerData?.name}</strong>
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Current Balance: <strong style={{ color: customerData?.balance > 0 ? 'red' : 'green' }}>
-                                ₹{customerData?.balance || 0}
-                            </strong>
-                        </Typography>
-                    </Box>
-                )}
                 
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                        <FormControl fullWidth>
-                            <InputLabel>Transaction Type</InputLabel>
-                            <Select
-                                value={formData?.transaction_type}
-                                label="Transaction Type"
-                                onChange={(e) => handleChange('transaction_type', e.target.value)}
-                            >
-                                <MenuItem value="payment">Payment</MenuItem>
-                                <MenuItem value="recharge">Recharge</MenuItem>
-                                <MenuItem value="refund">Refund</MenuItem>
-                                <MenuItem value="adjustment">Adjustment</MenuItem>
-                                <MenuItem value="penalty">Penalty</MenuItem>
-                                <MenuItem value="discount">Discount</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    
-                    <Grid item xs={12} md={6}>
+                <Row>
+                    <Col md={12}>
+                        <FormGroup>
+                            <Label for="package">Select Package <span style={{color: "red"}}>*</span></Label>
+                            <SelectBox 
+                                options={packages} 
+                                setSelcted={(value) => {
+                                    setFormData(prev => ({ 
+                                        ...prev, 
+                                        selectedPackage: value,
+                                        amount: value ? value.finalPrice : '',
+                                        plan_id: value ? value.id : '',
+                                    }));
+                                }} 
+                                initialValue={formData.selectedPackage}
+                            />
+                        </FormGroup>
+                    </Col>
+                    {formData.selectedPackage && (
+                        <Col md={12}>
+                            <Card>
+                                <CardHeader>
+                                    <h5>Package Details</h5>
+                                </CardHeader>
+                                <CardBody>
+                                    <p><strong>Plan:</strong> {formData.selectedPackage.plan}</p>
+                                    <p><strong>Connection Type:</strong> {formData.selectedPackage.connectionType}</p>
+                                    <p><strong>Days:</strong> {formData.selectedPackage.days}</p>
+                                    <p><strong>Price:</strong> ₹{formData.selectedPackage.finalPrice}</p>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    )}
+                </Row>
+                
+                <Row className="mt-3">
+                    <Col xs={12} md={6}>
                         <TextField
                             fullWidth
                             label="Amount"
@@ -183,102 +214,42 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
                                 ),
                             }}
                         />
-                    </Grid>
+                    </Col>
                     
-                    <Grid item xs={12} md={6}>
+                    <Col xs={12} md={6}>
                         <FormControl fullWidth>
-                            <InputLabel>Payment Method</InputLabel>
+                            <InputLabel>Payment Mode</InputLabel>
                             <Select
-                                value={formData?.payment_method}
-                                label="Payment Method"
-                                onChange={(e) => handleChange('payment_method', e.target.value)}
-                                error={!!errors.payment_method}
+                                value={formData?.payment_mode}
+                                label="Payment Mode"
+                                onChange={(e) => handleChange('payment_mode', e.target.value)}
+                                error={!!errors.payment_mode}
+                                required
                             >
                                 <MenuItem value="cash">Cash</MenuItem>
                                 <MenuItem value="online">Online</MenuItem>
                                 <MenuItem value="upi">UPI</MenuItem>
-                                <MenuItem value="card">Card</MenuItem>
-                                <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
                                 <MenuItem value="cheque">Cheque</MenuItem>
                             </Select>
                         </FormControl>
-                    </Grid>
-                    
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            label="Transaction ID"
-                            value={formData?.transaction_id}
-                            onChange={(e) => handleChange('transaction_id', e.target.value)}
-                            error={!!errors.transaction_id}
-                            helperText={errors.transaction_id || 'Required for online payments'}
-                            placeholder="Enter transaction/reference ID"
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            label="Reference ID"
-                            value={formData?.reference_id}
-                            onChange={(e) => handleChange('reference_id', e.target.value)}
-                            placeholder="Internal reference (optional)"
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            label="Bill Period Start"
-                            type="date"
-                            value={formData?.bill_period_start}
-                            onChange={(e) => handleChange('bill_period_start', e.target.value)}
-                            InputLabelProps={{ shrink: true }}
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            label="Bill Period End"
-                            type="date"
-                            value={formData?.bill_period_end}
-                            onChange={(e) => handleChange('bill_period_end', e.target.value)}
-                            InputLabelProps={{ shrink: true }}
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            fullWidth
-                            label="Due Date"
-                            type="date"
-                            value={formData.due_date}
-                            onChange={(e) => handleChange('due_date', e.target.value)}
-                            InputLabelProps={{ shrink: true }}
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            label="Description"
-                            multiline
-                            rows={3}
-                            value={formData.description}
-                            onChange={(e) => handleChange('description', e.target.value)}
-                            placeholder="Enter payment details or notes..."
-                        />
-                    </Grid>
-                    
-                    {Object.keys(errors).length > 0 && (
-                        <Grid item xs={12}>
-                            <Alert severity="error">
-                                Please fix the errors above before submitting.
-                            </Alert>
-                        </Grid>
-                    )}
-                </Grid>
+                    </Col>
+                </Row>
+                
+                {formData.payment_mode && formData.payment_mode !== 'cash' && formData.payment_mode !== 'cheque' && (
+                    <Row className="mt-3">
+                        <Col xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Transaction ID"
+                                value={formData?.trans_id}
+                                onChange={(e) => handleChange('trans_id', e.target.value)}
+                                error={!!errors.trans_id}
+                                helperText={errors.trans_id || 'Required for this payment mode'}
+                                placeholder="Enter transaction/reference ID"
+                            />
+                        </Col>
+                    </Row>
+                )}
             </DialogContent>
             
             <DialogActions sx={{ p: 3, pt: 1 }}>
@@ -301,7 +272,7 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
                         }
                     }}
                 >
-                    {loading ? 'Processing...' : `Process ${formData.transaction_type}`}
+                    {loading ? 'Processing...' : 'Process Recharge'}
                 </Button>
             </DialogActions>
         </Dialog>

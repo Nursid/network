@@ -189,6 +189,10 @@ module.exports = (sequelize) => {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
         },
+        expiry_date: {
+            type: DataTypes.DATEONLY,
+            allowNull: true,
+          },         
     }, 
     {
         timestamps: true,

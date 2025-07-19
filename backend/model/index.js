@@ -47,15 +47,26 @@ db.ServiceProviderAttendance = require("./AttendanceModels/ServiceProviderAttend
 db.PlanModel = require("./ServiceModal/PlanModel")(sequelize, DataTypes)
 db.TicketHead = require("./ServiceModal/TicketHead")(sequelize, DataTypes)
 db.SalaryModel = require("./SalaryModel/SalaryModel")(sequelize, DataTypes)
+db.CustomerPlanHistory = require("./AuthModels/CustomerPlanHistory")(sequelize, DataTypes)
+db.CustomerComplaintModel = require("./CustomerComplaintModel")(sequelize, DataTypes)
 
-// Customer related models
-db.CustomerReminder = require("./CustomerReminderModel")(sequelize, DataTypes)
-db.CustomerComplaint = require("./CustomerComplaintModel")(sequelize, DataTypes)
-db.CustomerWhatsAppLog = require("./CustomerWhatsAppLogModel")(sequelize, DataTypes)
+// Fix associations - Customer has many plan histories and account entries
+db.CustomerModel.hasMany(db.CustomerPlanHistory, { foreignKey: 'customer_id', sourceKey: 'customer_id' });
+db.CustomerPlanHistory.belongsTo(db.CustomerModel, { foreignKey: 'customer_id', targetKey: 'customer_id' });
+
+db.CustomerModel.hasMany(db.AccountModel, { foreignKey: 'cust_id', sourceKey: 'customer_id' });
+db.AccountModel.belongsTo(db.CustomerModel, { foreignKey: 'cust_id', targetKey: 'customer_id' });
+
+// Customer Complaint associations
+db.CustomerModel.hasMany(db.CustomerComplaintModel, { foreignKey: 'customerId', sourceKey: 'customer_id' });
+db.CustomerComplaintModel.belongsTo(db.CustomerModel, { foreignKey: 'customerId', targetKey: 'customer_id' });
+
 
 // Associations
 db.SupervisorAttendance.belongsTo(db.EmployeeModel, { foreignKey: 'emp_id', targetKey: 'emp_id' });
 db.ServiceProviderAttendance.belongsTo(db.ServiceProviderModel, { foreignKey: 'servp_id', targetKey: 'id'});
+
+
 
 
 db.EmployeeModel.belongsTo(db.DepartmentsModel,{foreignKey: 'department_id'});

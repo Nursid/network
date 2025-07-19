@@ -26,12 +26,12 @@ import {
 } from '@mui/icons-material';
 
 const ComplaintForm = ({ open, onClose, onSubmit, loading = false, customerData = {} }) => {
+
+    console.log("customerData2--",customerData)
     const [formData, setFormData] = useState({
-        complaint_type: 'technical',
-        title: '',
-        description: '',
-        priority: 'medium',
-        assigned_to: null
+        customer_id: customerData?.customer_id,
+        subject: '',
+        description: ''
     });
     
     const [errors, setErrors] = useState({});
@@ -54,8 +54,8 @@ const ComplaintForm = ({ open, onClose, onSubmit, loading = false, customerData 
     const validateForm = () => {
         const newErrors = {};
         
-        if (!formData.title.trim()) {
-            newErrors.title = 'Title is required';
+        if (!formData.subject.trim()) {
+            newErrors.subject = 'Subject is required';
         }
         
         if (!formData.description.trim()) {
@@ -72,58 +72,23 @@ const ComplaintForm = ({ open, onClose, onSubmit, loading = false, customerData 
 
     const handleSubmit = () => {
         if (!validateForm()) return;
-        
-        const submitData = {
-            ...formData,
-            created_by: 1 // This should be the logged-in user ID
-        };
-        
-        onSubmit(submitData);
+        if(customerData?.customer_id){
+            formData.customer_id = customerData?.customer_id;
+            console.log("formData3--",formData)
+            onSubmit(formData);
+        } 
     };
 
     const handleClose = () => {
         setFormData({
-            complaint_type: 'technical',
-            title: '',
-            description: '',
-            priority: 'medium',
-            assigned_to: null
+            customer_id: customerData?.customer_id,
+            subject: '',
+            description: ''
         });
         setErrors({});
         onClose();
     };
 
-    const getComplaintTypeIcon = () => {
-        switch (formData.complaint_type) {
-            case 'technical':
-                return <BugReport />;
-            case 'billing':
-                return <Receipt />;
-            case 'service':
-                return <Build />;
-            case 'connectivity':
-                return <Wifi />;
-            case 'hardware':
-                return <Hardware />;
-            default:
-                return <ReportProblem />;
-        }
-    };
-
-    const getPriorityColor = (priority) => {
-        switch (priority) {
-            case 'low':
-                return 'success';
-            case 'medium':
-                return 'warning';
-            case 'high':
-                return 'error';
-            case 'urgent':
-                return 'error';
-            default:
-                return 'default';
-        }
-    };
 
     return (
         <Dialog 
@@ -167,90 +132,15 @@ const ComplaintForm = ({ open, onClose, onSubmit, loading = false, customerData 
                 )}
                 
                 <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                        <FormControl fullWidth>
-                            <InputLabel>Complaint Type</InputLabel>
-                            <Select
-                                value={formData?.complaint_type}
-                                label="Complaint Type"
-                                onChange={(e) => handleChange('complaint_type', e.target.value)}
-                            >
-                                <MenuItem value="technical">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <BugReport fontSize="small" />
-                                        Technical Issue
-                                    </Box>
-                                </MenuItem>
-                                <MenuItem value="billing">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Receipt fontSize="small" />
-                                        Billing Issue
-                                    </Box>
-                                </MenuItem>
-                                <MenuItem value="service">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Build fontSize="small" />
-                                        Service Issue
-                                    </Box>
-                                </MenuItem>
-                                <MenuItem value="connectivity">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Wifi fontSize="small" />
-                                        Connectivity Issue
-                                    </Box>
-                                </MenuItem>
-                                <MenuItem value="hardware">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Hardware fontSize="small" />
-                                        Hardware Issue
-                                    </Box>
-                                </MenuItem>
-                                <MenuItem value="other">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <ReportProblem fontSize="small" />
-                                        Other
-                                    </Box>
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    
-                    <Grid item xs={12} md={6}>
-                        <FormControl fullWidth>
-                            <InputLabel>Priority</InputLabel>
-                            <Select
-                                value={formData?.priority}
-                                label="Priority"
-                                onChange={(e) => handleChange('priority', e.target.value)}
-                            >
-                                <MenuItem value="low">
-                                    <Chip label="Low" color="success" size="small" sx={{ mr: 1 }} />
-                                    Low Priority
-                                </MenuItem>
-                                <MenuItem value="medium">
-                                    <Chip label="Medium" color="warning" size="small" sx={{ mr: 1 }} />
-                                    Medium Priority
-                                </MenuItem>
-                                <MenuItem value="high">
-                                    <Chip label="High" color="error" size="small" sx={{ mr: 1 }} />
-                                    High Priority
-                                </MenuItem>
-                                <MenuItem value="urgent">
-                                    <Chip label="Urgent" color="error" size="small" sx={{ mr: 1 }} />
-                                    Urgent Priority
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
                     
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
                             label="Complaint Title"
-                            value={formData?.title}
-                            onChange={(e) => handleChange('title', e.target.value)}
-                            error={!!errors.title}
-                            helperText={errors.title}
+                            value={formData?.subject}
+                            onChange={(e) => handleChange('subject', e.target.value)}
+                            error={!!errors.subject}
+                            helperText={errors.subject}
                             required
                             placeholder="Enter a brief title for the complaint"
                         />
@@ -270,28 +160,7 @@ const ComplaintForm = ({ open, onClose, onSubmit, loading = false, customerData 
                             placeholder="Describe the issue in detail. Include any error messages, when it started, and steps to reproduce..."
                         />
                     </Grid>
-                    
-                    <Grid item xs={12}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography variant="body2" color="text.secondary">
-                                Selected Type:
-                            </Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                {getComplaintTypeIcon()}
-                                <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-                                    {formData?.complaint_type}
-                                </Typography>
-                            </Box>
-                            <Typography variant="body2" color="text.secondary">
-                                Priority:
-                            </Typography>
-                            <Chip 
-                                label={formData?.priority.toUpperCase()} 
-                                color={getPriorityColor(formData?.priority)} 
-                                size="small" 
-                            />
-                        </Box>
-                    </Grid>
+                
                     
                     {Object.keys(errors).length > 0 && (
                         <Grid item xs={12}>
