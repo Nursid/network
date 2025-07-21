@@ -3,11 +3,11 @@ import "./AdminDashboard.css";
 import { GridToolbarDensitySelector, GridToolbarFilterButton, GridToolbarQuickFilter,GridToolbarColumnsButton } from "@mui/x-data-grid";
 import { GridToolbarContainer } from "@mui/x-data-grid";
 import { GridToolbarExport } from "@mui/x-data-grid";
-import AdminNavItems from "./Elements/AdminNavItems";
 import AdminDataTable from "./Elements/AdminDataTable";
 import { useUserRoleContext } from "../Context/RolesContext";
-import { useMediaQuery, Card, CardContent, Typography, Box, Button, Chip, Tabs, Tab } from '@mui/material';
+import { useMediaQuery, Card, CardContent, Typography, Box, Button, Chip, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import axios from 'axios';
+import AdminNavItems from "./Elements/AdminNavItems";
 import { API_URL } from '../config';
 import moment from 'moment';
 import { 
@@ -24,7 +24,13 @@ import {
   Schedule,
   CheckCircle,
   Warning,
-  Error
+  Error,
+  Visibility,
+  CalendarToday,
+  NetworkCheck,
+  Monitor,
+  AttachMoney,
+  ConfirmationNumber
 } from '@mui/icons-material';
 
 const AdminDashboard = () => {
@@ -54,6 +60,23 @@ const AdminDashboard = () => {
     pendingTickets: 0
   });
 
+  // Mock data for expiry reports
+  const [expiryReport, setExpiryReport] = useState([
+    { date: '2025-07-21', connections: 1, daysLeft: 0 },
+    { date: '2025-07-22', connections: 1, daysLeft: 1 },
+    { date: '2025-07-23', connections: 2, daysLeft: 2 },
+    { date: '2025-07-26', connections: 1, daysLeft: 5 },
+    { date: '2025-07-30', connections: 3, daysLeft: 9 }
+  ]);
+
+  const [expiredReport, setExpiredReport] = useState([
+    { date: '2025-07-20', connections: 1, daysPassed: -1 },
+    { date: '2025-07-16', connections: 1, daysPassed: -5 },
+    { date: '2025-07-15', connections: 3, daysPassed: -6 },
+    { date: '2025-07-11', connections: 1, daysPassed: -10 },
+    { date: '2025-07-05', connections: 3, daysPassed: -16 }
+  ]);
+
   // Fetch customers and tickets data
   useEffect(() => {
     const fetchData = async () => {
@@ -61,10 +84,12 @@ const AdminDashboard = () => {
         setLoading(true);
         
         // Fetch customers
-        const customerResponse = await axios.get(`${API_URL}/customer/all`);
+        const customerResponse = await axios.get(`${API_URL}/customer/getall`);
+        console.log(customerResponse);
         let customerData = [];
         if (customerResponse.data.status === 200) {
           customerData = customerResponse.data.data;
+          console.log("customerData--",customerData);
           setCustomers(customerData);
         }
 
@@ -527,135 +552,105 @@ const AdminDashboard = () => {
             width: isMobile ? '100%' : `calc(100% - ${sidebarCollapsed ? '80px' : '280px'})`,
             marginLeft: isMobile ? '0' : (sidebarCollapsed ? '80px' : '280px'),
             height: '100vh',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
+            overflow: 'auto',
             backgroundColor: '#f8f9fa',
             transition: 'width 0.3s ease, margin-left 0.3s ease',
-            padding: isMobile ? '70px 10px 10px 10px' : '0'
+            padding: isMobile ? '70px 10px 10px 10px' : '20px'
           }}
         >
-          {/* Header Section with Gradient Background */}
-          <div 
-            className="flex-shrink-0"
-            style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: '0 0 20px 20px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-              margin: isMobile ? '0' : '10px',
-              marginBottom: '20px'
-            }}
-          >
-            <div className={`d-flex align-items-center ${isMobile ? 'flex-column text-center' : 'justify-content-between'}`} style={{ padding: isMobile ? '20px 15px' : '24px' }}>
+          {/* Header Section */}
+          <div style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '12px',
+            padding: isMobile ? '20px 15px' : '24px',
+            marginBottom: '20px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+          }}>
+            <div className={`d-flex ${isMobile ? 'flex-column text-center' : 'justify-content-between align-items-center'}`}>
               <div className={isMobile ? 'mb-3' : ''}>
                 <h4 className='text-white mb-1' style={{ 
                   fontWeight: '600', 
                   fontSize: isMobile ? '1.25rem' : '1.5rem' 
                 }}>
-                  💰 Customer, Account & Ticket Management
+                  Hi Laxdeep System, Good evening
                 </h4>
                 <p className='text-white-50 mb-0' style={{ 
                   fontSize: isMobile ? '0.8rem' : '0.9rem' 
                 }}>
-                  Manage customers, track payments, monitor tickets and financial data
+                  Welcome to your service provider dashboard
                 </p>
               </div>
               
-              {/* Quick Action Buttons */}
+              {/* Header Actions */}
               {!isMobile && (
-                <div className="d-flex gap-2">
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<Add />}
-                    sx={{
-                      backgroundColor: 'rgba(255,255,255,0.2)',
-                      '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' },
+                <div className="d-flex gap-2 align-items-center">
+                  <select 
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      backgroundColor: 'rgba(255,255,255,0.1)',
                       color: 'white',
-                      textTransform: 'none',
-                      fontWeight: '500'
+                      fontSize: '0.875rem'
                     }}
                   >
-                    Add Customer
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                  </select>
+                  <Button
+                    variant="text"
+                    sx={{ color: 'white', minWidth: 'auto' }}
+                  >
+                    <span style={{ fontSize: '1.2rem' }}>🔔</span>
                   </Button>
                   <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<Support />}
-                    sx={{
-                      backgroundColor: 'rgba(255,255,255,0.2)',
-                      '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' },
-                      color: 'white',
-                      textTransform: 'none',
-                      fontWeight: '500'
-                    }}
+                    variant="text"
+                    sx={{ color: 'white', minWidth: 'auto' }}
                   >
-                    Create Ticket
+                    <span style={{ fontSize: '1.2rem' }}>👤</span>
                   </Button>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Financial Summary Cards */}
+          {/* Date Cards */}
           <div style={{ 
-            padding: isMobile ? '0 10px 10px 10px' : '0 16px 16px 16px',
             display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
             gap: '12px',
-            marginBottom: '16px'
+            marginBottom: '20px'
           }}>
             <Card sx={{ 
               background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
               color: 'white',
               boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)'
             }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <People sx={{ mr: 1, fontSize: '1.5rem' }} />
-                  <Typography variant="h4" sx={{ fontWeight: '700' }}>
-                    {financialSummary.totalCustomers}
-                  </Typography>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <CalendarToday sx={{ mr: 1, fontSize: '1.5rem' }} />
+                    <Typography variant="h6" sx={{ fontWeight: '600' }}>
+                      30 Jul 2025
+                    </Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Typography variant="h4" sx={{ fontWeight: '700' }}>3</Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9 }}>9 Days</Typography>
+                  </Box>
                 </Box>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Total Customers
-                </Typography>
-              </CardContent>
-            </Card>
-
-            <Card sx={{ 
-              background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)',
-              color: 'white',
-              boxShadow: '0 4px 12px rgba(33, 150, 243, 0.3)'
-            }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <AccountBalance sx={{ mr: 1, fontSize: '1.5rem' }} />
-                  <Typography variant="h4" sx={{ fontWeight: '700' }}>
-                    ₹{financialSummary.bankBalance.toLocaleString()}
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    <CalendarToday sx={{ fontSize: '0.875rem', mr: 0.5 }} />
+                    Expiry Date
                   </Typography>
+                  <Button
+                    variant="text"
+                    sx={{ color: 'white', minWidth: 'auto' }}
+                  >
+                    <Visibility sx={{ fontSize: '1rem' }} />
+                  </Button>
                 </Box>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Bank Balance
-                </Typography>
-              </CardContent>
-            </Card>
-
-            <Card sx={{ 
-              background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
-              color: 'white',
-              boxShadow: '0 4px 12px rgba(255, 152, 0, 0.3)'
-            }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <Support sx={{ mr: 1, fontSize: '1.5rem' }} />
-                  <Typography variant="h4" sx={{ fontWeight: '700' }}>
-                    {financialSummary.totalTickets}
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Total Tickets
-                </Typography>
               </CardContent>
             </Card>
 
@@ -664,114 +659,357 @@ const AdminDashboard = () => {
               color: 'white',
               boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3)'
             }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <Warning sx={{ mr: 1, fontSize: '1.5rem' }} />
-                  <Typography variant="h4" sx={{ fontWeight: '700' }}>
-                    {financialSummary.openTickets}
-                  </Typography>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <CalendarToday sx={{ mr: 1, fontSize: '1.5rem' }} />
+                    <Typography variant="h6" sx={{ fontWeight: '600' }}>
+                      05 Jul 2025
+                    </Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Typography variant="h4" sx={{ fontWeight: '700' }}>3</Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9 }}>-16 Days</Typography>
+                  </Box>
                 </Box>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Open Tickets
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    <CalendarToday sx={{ fontSize: '0.875rem', mr: 0.5 }} />
+                    Expired Date
+                  </Typography>
+                  <Button
+                    variant="text"
+                    sx={{ color: 'white', minWidth: 'auto' }}
+                  >
+                    <Visibility sx={{ fontSize: '1rem' }} />
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
           </div>
 
-          {/* Tabs Section */}
+          {/* KPI Cards */}
           <div style={{ 
-            padding: isMobile ? '0 10px 10px 10px' : '0 16px 16px 16px',
-            marginBottom: '16px'
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+            gap: '12px',
+            marginBottom: '20px'
           }}>
-            <Tabs 
-              value={activeTab} 
-              onChange={handleTabChange}
-              variant={isMobile ? "scrollable" : "fullWidth"}
-              scrollButtons={isMobile ? "auto" : false}
-              sx={{
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                padding: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-              }}
-            >
-              <Tab 
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <People sx={{ fontSize: '1rem' }} />
-                    <span>Customers</span>
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
+            }}>
+              <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1, 
+                    mr: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <People sx={{ color: 'white', fontSize: '1.5rem' }} />
                   </Box>
-                } 
-                sx={{ 
-                  textTransform: 'none',
-                  fontWeight: '500'
-                }}
-              />
-              <Tab 
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Support sx={{ fontSize: '1rem' }} />
-                    <span>Tickets</span>
+                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
+                    320
+                  </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+                  Subscribers Added - Broadband
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span style={{ color: '#666' }}>0 Today</span>
+                  <span style={{ color: '#28a745' }}>320 Current Month</span>
+                </Box>
+              </CardContent>
+            </Card>
+
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
+            }}>
+              <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1, 
+                    mr: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <NetworkCheck sx={{ color: 'white', fontSize: '1.5rem' }} />
                   </Box>
-                } 
-                sx={{ 
-                  textTransform: 'none',
-                  fontWeight: '500'
-                }}
-              />
-            </Tabs>
+                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
+                    537
+                  </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+                  Total Connections - Broadband
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span style={{ color: '#28a745' }}>102 Active</span>
+                  <span style={{ color: '#666' }}>435 Inactive</span>
+                </Box>
+              </CardContent>
+            </Card>
+
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
+            }}>
+              <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1, 
+                    mr: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <AttachMoney sx={{ color: 'white', fontSize: '1.5rem' }} />
+                  </Box>
+                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
+                    ₹1,231,206.00
+                  </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+                  Current Outstanding & Advance Payment
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span style={{ color: '#28a745' }}>Outstanding Balance</span>
+                  <span style={{ color: '#666' }}>₹1,700.00 Advance Payment</span>
+                </Box>
+              </CardContent>
+            </Card>
+
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
+            }}>
+              <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1, 
+                    mr: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <ConfirmationNumber sx={{ color: 'white', fontSize: '1.5rem' }} />
+                  </Box>
+                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
+                    0
+                  </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+                  Total Today's Ticket
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span style={{ color: '#666' }}>0 Open</span>
+                  <span style={{ color: '#28a745' }}>0 Closed</span>
+                  <span style={{ color: '#ff9800' }}>0 Canceled</span>
+                </Box>
+              </CardContent>
+            </Card>
+
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
+            }}>
+              <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1, 
+                    mr: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <AttachMoney sx={{ color: 'white', fontSize: '1.5rem' }} />
+                  </Box>
+                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
+                    0
+                  </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+                  Today Pending for Tally
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span style={{ color: '#666' }}>0 Digital Cable</span>
+                  <span style={{ color: '#666' }}>0 Broadband</span>
+                </Box>
+              </CardContent>
+            </Card>
+
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
+            }}>
+              <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1, 
+                    mr: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <AttachMoney sx={{ color: 'white', fontSize: '1.5rem' }} />
+                  </Box>
+                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
+                    670
+                  </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+                  Total Pending for Tally
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span style={{ color: '#666' }}>0 Digital Cable</span>
+                  <span style={{ color: '#666' }}>670 Broadband</span>
+                </Box>
+              </CardContent>
+            </Card>
           </div>
-          
-          {/* Data Table Section */}
-          <div className="flex-grow-1" style={{ 
-            padding: isMobile ? '0 5px 10px 5px' : '0 16px 16px 16px',
-            overflow: 'hidden' 
+
+          {/* Reports Section */}
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+            gap: '20px',
+            marginBottom: '20px'
           }}>
-            {activeTab === 0 ? (
-              <AdminDataTable
-                rows={DataWithID(customers)}
-                CustomToolbar={CustomToolbar}
-                columns={customerColumns}
-                pageSize={isMobile ? 10 : 25}
-                density={isMobile ? 'compact' : 'standard'}
-                loading={loading}
-                sx={{
-                  '& .MuiDataGrid-root': {
-                    fontSize: isMobile ? '0.75rem' : '0.875rem',
-                  },
-                  '& .MuiDataGrid-cell': {
-                    padding: isMobile ? '4px 8px' : '8px 16px',
-                  },
-                  '& .MuiDataGrid-columnHeader': {
-                    fontSize: isMobile ? '0.75rem' : '0.875rem',
-                    fontWeight: '600',
-                    padding: isMobile ? '4px 8px' : '8px 16px',
-                  }
-                }}
-              />
-            ) : (
-              <AdminDataTable
-                rows={DataWithID(tickets)}
-                CustomToolbar={CustomToolbar}
-                columns={ticketColumns}
-                pageSize={isMobile ? 10 : 25}
-                density={isMobile ? 'compact' : 'standard'}
-                loading={loading}
-                sx={{
-                  '& .MuiDataGrid-root': {
-                    fontSize: isMobile ? '0.75rem' : '0.875rem',
-                  },
-                  '& .MuiDataGrid-cell': {
-                    padding: isMobile ? '4px 8px' : '8px 16px',
-                  },
-                  '& .MuiDataGrid-columnHeader': {
-                    fontSize: isMobile ? '0.75rem' : '0.875rem',
-                    fontWeight: '600',
-                    padding: isMobile ? '4px 8px' : '8px 16px',
-                  }
-                }}
-              />
-            )}
+            {/* Expiry Report */}
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
+            }}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: '600', mb: 2, color: '#1976d2' }}>
+                  Expiry Report
+                </Typography>
+                <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: '600', fontSize: '0.75rem' }}>Expiry Date</TableCell>
+                        <TableCell sx={{ fontWeight: '600', fontSize: '0.75rem' }}>Connections</TableCell>
+                        <TableCell sx={{ fontWeight: '600', fontSize: '0.75rem' }}>Days Left</TableCell>
+                        <TableCell sx={{ fontWeight: '600', fontSize: '0.75rem' }}>Action</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {expiryReport.map((row, index) => (
+                        <TableRow key={index}>
+                          <TableCell sx={{ fontSize: '0.75rem' }}>
+                            {moment(row.date).format('DD MMM YYYY')}
+                          </TableCell>
+                          <TableCell sx={{ fontSize: '0.75rem' }}>
+                            {row.connections}
+                          </TableCell>
+                          <TableCell sx={{ fontSize: '0.75rem' }}>
+                            {row.daysLeft}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="text"
+                              size="small"
+                              sx={{ color: '#1976d2', minWidth: 'auto' }}
+                            >
+                              <Visibility sx={{ fontSize: '1rem' }} />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </CardContent>
+            </Card>
+
+            {/* Expired Report */}
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
+            }}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: '600', mb: 2, color: '#f44336' }}>
+                  Expired Report
+                </Typography>
+                <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: '600', fontSize: '0.75rem' }}>Expiry Date</TableCell>
+                        <TableCell sx={{ fontWeight: '600', fontSize: '0.75rem' }}>Connections</TableCell>
+                        <TableCell sx={{ fontWeight: '600', fontSize: '0.75rem' }}>Days Passed</TableCell>
+                        <TableCell sx={{ fontWeight: '600', fontSize: '0.75rem' }}>Action</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {expiredReport.map((row, index) => (
+                        <TableRow key={index}>
+                          <TableCell sx={{ fontSize: '0.75rem' }}>
+                            {moment(row.date).format('DD MMM YYYY')}
+                          </TableCell>
+                          <TableCell sx={{ fontSize: '0.75rem' }}>
+                            {row.connections}
+                          </TableCell>
+                          <TableCell sx={{ fontSize: '0.75rem' }}>
+                            {row.daysPassed}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="text"
+                              size="small"
+                              sx={{ color: '#1976d2', minWidth: 'auto' }}
+                            >
+                              <Visibility sx={{ fontSize: '1rem' }} />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Footer */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            padding: '20px 0',
+            borderTop: '1px solid #e0e0e0',
+            marginTop: '20px'
+          }}>
+            <Typography variant="body2" sx={{ color: '#666' }}>
+              Proudly Made in INDIA
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#666' }}>
+              Powered by <span style={{ color: '#1976d2', fontWeight: '600' }}>TELLYON</span>
+            </Typography>
           </div>
         </div>
       </div>
