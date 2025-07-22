@@ -24,6 +24,7 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import SearchIcon from '@mui/icons-material/Search';
 import HistoryIcon from '@mui/icons-material/History';
+import * as XLSX from 'xlsx';
 import { 
     Button, 
     Tooltip, 
@@ -456,7 +457,7 @@ For any queries, please contact us.`;
             hide: isSmallMobile
         },
         {   
-            field: "plan", 
+            field: "amount", 
             headerName: "Plan Amt.", 
             minWidth: isMobile ? 80 : 100, 
             editable: false,
@@ -693,6 +694,7 @@ For any queries, please contact us.`;
 
     const [selectedCustomer, setSelectedCustomer] = useState(null)
     const [formLoading, setFormLoading] = useState(false)
+    const [importLoading, setImportLoading] = useState(false)
     
     const ToggleAddCustomer = () => setAddCustomer(!addCustomer)
     const ToggleUpdateCustomer = () => setUpdateCustomer(!updateCustomer)
@@ -819,10 +821,149 @@ const handleClearFilters = () => {
   setIsFiltered(false);
 };
 
+const handleImport = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Start loading spinner
+  setImportLoading(true);
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const data = e.target.result;
+    const workbook = XLSX.read(data, { type: 'binary' });
+
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+    console.log(jsonData);
+    
+    // Validate that we have data
+    if (!jsonData || jsonData.length === 0) {
+      setImportLoading(false);
+      Swal.fire('Error', 'No data found in the Excel file. Please check your file format.', 'error');
+      return;
+    }
+    
+    // Validate required fields for at least the first row
+    const firstRow = jsonData[0];
+    if (!firstRow.name && !firstRow.customer_name) {
+      setImportLoading(false);
+      Swal.fire('Error', 'Excel file must contain a "name" or "customer_name" column.', 'error');
+      return;
+    }
+    
+    if (!firstRow.mobile && !firstRow.mobile_no) {
+      setImportLoading(false);
+      Swal.fire('Error', 'Excel file must contain a "mobile" or "mobile_no" column.', 'error');
+      return;
+    }
+    
+    // Send to API
+    try {
+      const response = await fetch(`${API_URL}/customer/import-bulk-customer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ customers: jsonData }),
+      });
+
+      const result = await response.json();
+      console.log(result);
+      
+      if (result.status) {
+        dispatch(GetAllCustomers());
+        Swal.fire('Success', `Successfully imported ${result.inserted} customers!`, 'success');
+      } else {
+        Swal.fire('Error', result.message || 'Failed to import customers', 'error');
+      }
+      
+    } catch (err) {
+      console.error("Error importing customers", err);
+      Swal.fire('Error', 'Failed to import customers. Please check your file format.', 'error');
+    } finally {
+      // Stop loading spinner
+      setImportLoading(false);
+    }
+  };
+
+  reader.onerror = () => {
+    setImportLoading(false);
+    Swal.fire('Error', 'Failed to read the file. Please try again.', 'error');
+  };
+
+  reader.readAsBinaryString(file);
+};
+
+const ImportBulkCustomer = () => {
+  // Trigger file input click
+  document.getElementById('upload-file').click();
+}
+
+
 
     return (
     <>
         <Fragment>
+        <input
+          type="file"
+          accept=".xlsx, .xls, .csv"
+          style={{ display: 'none' }}
+          id="upload-file"
+          onChange={handleImport} // ✅ This is now defined correctly
+        />
+        
+        {/* Import Loading Overlay */}
+        {importLoading && (
+          <Box
+            sx={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+            }}
+          >
+            <Paper
+              sx={{
+                p: 3,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                minWidth: 300,
+              }}
+            >
+              <Box
+                sx={{
+                  width: '40px',
+                  height: '40px',
+                  border: '4px solid #f3f3f3',
+                  borderTop: '4px solid #1976d2',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  '@keyframes spin': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' }
+                  }
+                }}
+              />
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                Importing Customers
+              </Typography>
+              <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary' }}>
+                Please wait while we process your file...
+              </Typography>
+            </Paper>
+          </Box>
+        )}
             <ModalComponent modal={addCustomer} toggle={ToggleAddCustomer} data={<AddNewCustomerForm  prop={ToggleAddCustomer } />} modalTitle={"Add New Customer"} size={"xl"} scrollable={true} />
 
             <ModalComponent
@@ -1005,8 +1146,8 @@ const handleClearFilters = () => {
                     Manage customers, connections, and billing
                   </Typography>
                 </div>
-                <div className="col-md-6 col-12">
-                  <Box sx={{ display: 'flex', gap: 0.5, justifyContent: isMobile ? 'center' : 'flex-end' }}>
+                <div className="col-md-6 col-12 d-flex justify-content-end">
+                  <Box sx={{ display: 'flex', gap: 0.5, justifyContent: isMobile ? 'center' : 'flex-end', marginRight: '10px' }}>
                     <Button
                       variant="contained"
                       onClick={ToggleAddCustomer}
@@ -1024,6 +1165,53 @@ const handleClearFilters = () => {
                     >
                       Add Connection
                     </Button>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 0.5, justifyContent: isMobile ? 'center' : 'flex-end' }}>
+                    <Button
+                      variant="contained"
+                      onClick={ImportBulkCustomer}
+                      disabled={importLoading}
+                      size="small"
+                      sx={{
+                        backgroundColor: importLoading ? '#ccc' : 'red',
+                        color: 'white',
+                        '&:hover': { 
+                          backgroundColor: importLoading ? '#ccc' : '#b71c1c', 
+                          color: 'white' 
+                        },
+                        borderRadius: '6px',
+                        textTransform: 'none',
+                        fontWeight: '500',
+                        fontSize: '0.8rem',
+                        height: '32px',
+                        padding: '4px 12px',
+                        minWidth: '80px'
+                      }}
+                    >
+                      {importLoading ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Box
+                            sx={{
+                              width: '12px',
+                              height: '12px',
+                              border: '2px solid #ffffff',
+                              borderTop: '2px solid transparent',
+                              borderRadius: '50%',
+                              animation: 'spin 1s linear infinite',
+                              '@keyframes spin': {
+                                '0%': { transform: 'rotate(0deg)' },
+                                '100%': { transform: 'rotate(360deg)' }
+                              }
+                            }}
+                          />
+                          Importing...
+                        </Box>
+                      ) : (
+                        'Import'
+                      )}
+                    </Button>
+                    
                   </Box>
                 </div>
               </div>

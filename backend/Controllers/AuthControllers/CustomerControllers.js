@@ -1080,7 +1080,7 @@ const AddRePayment = async (req, res) => {
 		await CustomerModel.update(
 			{
 				bill_date: new Date(),         // Last recharge date
-				amount: amount,                // Current recharge amount
+				billing_amount: amount,                // Current recharge amount
 				valid_till: expiryDate,        // Expiry after recharge
 				plan_id: plan_id || null,       // Optional: Update plan
 				selected_package: selectedPackage || null
@@ -1137,6 +1137,87 @@ const GetBillingDetails = async (req, res) => {
 	}
 }
 
+const importBulkCustomers = async (req, res) => {
+	const { customers } = req.body;
+  
+	if (!Array.isArray(customers) || customers.length === 0) {
+	  return res.status(400).json({ message: 'No customer data found' });
+	}
+  
+	try {
+	  // Process each customer to generate customer_id and set default values
+	  const processedCustomers = [];
+	  
+	  // Get the starting customer ID for bulk import
+	  let currentCustomerId = await generateCustomerID();
+	  
+	  for (const customer of customers) {
+		// Set default values and process the customer data
+		const processedCustomer = {
+		  ...customer,
+		  customer_id: currentCustomerId,
+		  status: customer.status || 'active',
+		  customerType: customer.customerType || 'individual',
+		  registrationDate: new Date(),
+		  bill_date: customer.bill_date ? new Date(customer.bill_date) : new Date(),
+		  billing_amount: customer.billing_amount ? parseFloat(customer.billing_amount) : 0,
+		  balance: customer.billing_amount ? parseFloat(customer.billing_amount) : 0,
+		  mobile: customer.mobile || customer.mobile_no || '',
+		  name: customer.name || customer.customer_name || '',
+		  address: customer.address || '',
+		  area: customer.area || '',
+		  block: customer.block || '',
+		  apartment: customer.apartment || '',
+		  email: customer.email || null,
+		  gender: customer.gender || null,
+		  whatsapp_no: customer.whatsapp_no || null,
+		  alternate_no: customer.alternate_no || null,
+		  dob: customer.dob || null,
+		  doa: customer.doa || null,
+		  aadhar_no: customer.aadhar_no || null,
+		  other_id: customer.other_id || null,
+		  pan_no: customer.pan_no ? customer.pan_no.toUpperCase() : null,
+		  selectedPackage: customer.selectedPackage ? parseInt(customer.selectedPackage) : null,
+		  packageDetails: customer.packageDetails || null,
+		  selectedItems: customer.selectedItems || null,
+		  payment_method: customer.payment_method || null,
+		  cash: customer.cash ? parseFloat(customer.cash) : null,
+		  online: customer.online ? parseFloat(customer.online) : null,
+		  image: customer.image || null,
+		  frontAadharImage: customer.frontAadharImage || null,
+		  backAadharImage: customer.backAadharImage || null,
+		  panImage: customer.panImage || null,
+		  otherIdImage: customer.otherIdImage || null,
+		  signature: customer.signature || null,
+		  username: customer.username || customer.mobile || customer.mobile_no || '',
+		  t_address: customer.t_address || null,
+		  expiry_date: customer.expiry_date ? new Date(customer.expiry_date) : null
+		};
+		
+				processedCustomers.push(processedCustomer);
+		
+		// Increment customer ID for next customer
+		currentCustomerId++;
+	  }
+	  
+	  console.log(processedCustomers)
+	  
+	  // Use bulk insert with processed customers
+	  const inserted = await CustomerModel.bulkCreate(processedCustomers);
+	  res.status(200).json({ 
+		status: true,
+		message: 'Customers imported successfully', 
+		inserted: inserted.length
+	  });
+	} catch (error) {
+	  console.error('Import error:', error);
+	  res.status(500).json({ 
+		status: false,
+		message: 'Failed to import customers', 
+		error: error.message 
+	  });
+	}
+  };
 
 
 
@@ -1154,5 +1235,6 @@ module.exports = {
 	AllCustomerFilterByFlow,
 	GetCustomerFilter,
 	AddRePayment,
-	GetBillingDetails
+	GetBillingDetails,
+	importBulkCustomers
 };

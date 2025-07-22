@@ -48,5 +48,7 @@ router.put('/getupdate/:user_id', upload.fields([
 router.post('/block/:id', customerRouter.GetupdateBlockStatus);
 router.post('/re-payment', customerRouter.AddRePayment);
 router.post('/get-billing-details', customerRouter.GetBillingDetails);
+router.post('/import-bulk-customer', customerRouter.importBulkCustomers);
+
 
 module.exports = router;
