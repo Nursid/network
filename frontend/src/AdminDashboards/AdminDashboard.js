@@ -198,338 +198,11 @@ const AdminDashboard = () => {
     };
   };
 
-  const DataWithID = (data) => {
-    const NewData = [];
-    if (data !== undefined) {
-      for (let item of data) {
-        NewData.push({
-          ...item,
-          _id: data.indexOf(item),
-        });
-      }
-    } else {
-      NewData.push({ id: 0 });
-    }
-    return NewData;
-  }; 
 
-  const CustomToolbar = () => {
-    return (
-      <GridToolbarContainer>
-        <GridToolbarQuickFilter />
-        {!isMobile && (
-          <>
-            <GridToolbarColumnsButton />
-            <GridToolbarFilterButton />
-            <GridToolbarExport />
-            <GridToolbarDensitySelector />
-          </>
-        )}
-      </GridToolbarContainer>
-    );
-  };
+  console.log("financialSummary--",financialSummary);
 
-  const customerColumns = [
-    { 
-      field: "_id", 
-      headerName: "ID",
-      minWidth: isSmallMobile ? 40 : 150,
-      hide: isSmallMobile,
-      editable: false 
-    },
-    { 
-      field: "customer_id", 
-      headerName: isMobile ? "Cust ID" : "Customer ID",
-      minWidth: isMobile ? 80 : 120,
-      flex: isMobile ? 0 : 0,
-      editable: false,
-      renderCell: (params) => (
-        <span style={{ 
-          color: '#1976d2', 
-          fontWeight: '600',
-          fontSize: isMobile ? '0.75rem' : '0.875rem'
-        }}>
-          {params.value || `ID-${params.row.id}`}
-        </span>
-      )
-    },
-    { 
-      field: "name", 
-      headerName: isMobile ? "Customer" : "Customer Name",
-      minWidth: isMobile ? 120 : 150,
-      flex: isMobile ? 1 : 0,
-      editable: false 
-    },
-    { 
-      field: "mobile", 
-      headerName: isMobile ? "Mobile" : "Mobile No",
-      minWidth: isMobile ? 100 : 120,
-      editable: false,
-      renderCell: (params) => (
-        <span style={{ 
-          color: '#007bff', 
-          fontWeight: '500',
-          fontSize: isMobile ? '0.75rem' : '0.875rem'
-        }}>
-          {params.value}
-        </span>
-      )
-    },
-    { 
-      field: "billing_amount", 
-      headerName: isMobile ? "Amount" : "Billing Amount", 
-      minWidth: isMobile ? 80 : 120,
-      editable: false,
-      hide: isSmallMobile,
-      renderCell: (params) => (
-        <span style={{ 
-          color: '#28a745', 
-          fontWeight: '600',
-          fontSize: isMobile ? '0.75rem' : '0.875rem'
-        }}>
-          ₹{params.value || 0}
-        </span>
-      )
-    },
-    { 
-      field: "balance", 
-      headerName: isMobile ? "Balance" : "Account Balance", 
-      minWidth: isMobile ? 80 : 120,
-      editable: false,
-      hide: isSmallMobile,
-      renderCell: (params) => (
-        <span style={{ 
-          color: params.value > 0 ? '#dc3545' : '#28a745', 
-          fontWeight: '600',
-          fontSize: isMobile ? '0.75rem' : '0.875rem'
-        }}>
-          ₹{params.value || 0}
-        </span>
-      )
-    },
-    { 
-      field: "account", 
-      headerName: isMobile ? "Last Pay" : "Last Payment", 
-      minWidth: isMobile ? 100 : 120,
-      editable: false,
-      hide: isMobile,
-      renderCell: (params) => {
-        const account = params.row.account;
-        return (
-          <div style={{ fontSize: '0.75rem' }}>
-            {account ? (
-              <>
-                <div style={{ fontWeight: '500', color: '#28a745' }}>
-                  ₹{account.amount || 0}
-                </div>
-                <div style={{ color: '#666', fontSize: '0.7rem' }}>
-                  {account.date ? moment(account.date).format("DD-MM-YYYY") : ''}
-                </div>
-              </>
-            ) : (
-              <span style={{ color: '#999' }}>No payment</span>
-            )}
-          </div>
-        );
-      }
-    },
-    { 
-      field: "payment_method", 
-      headerName: isMobile ? "Method" : "Payment Method",
-      minWidth: isMobile ? 80 : 120,
-      editable: false,
-      hide: isSmallMobile,
-      renderCell: (params) => (
-        <span style={{ 
-          backgroundColor: params.value === 'Online' ? '#28a745' : 
-                         params.value === 'Cash' ? '#ffc107' : '#6c757d',
-          color: 'white',
-          padding: '2px 8px',
-          borderRadius: '12px',
-          fontSize: '0.7rem',
-          fontWeight: '500'
-        }}>
-          {params.value || 'N/A'}
-        </span>
-      )
-    },
-    { 
-      field: "status", 
-      headerName: "Status",
-      minWidth: isMobile ? 80 : 100,
-      editable: false,
-      renderCell: (params) => (
-        <span style={{ 
-          backgroundColor: params.value === 'active' ? '#28a745' : '#dc3545',
-          color: 'white',
-          padding: '2px 8px',
-          borderRadius: '12px',
-          fontSize: '0.7rem',
-          fontWeight: '500'
-        }}>
-          {params.value || 'inactive'}
-        </span>
-      )
-    },
-    { 
-      field: "address", 
-      headerName: "Address", 
-      minWidth: isMobile ? 100 : 200,
-      editable: false,
-      hide: isMobile,
-      renderCell: (params) => (
-        <div style={{ 
-          whiteSpace: "pre-line",
-          fontSize: isMobile ? '0.7rem' : '0.8rem',
-          lineHeight: '1.3',
-          maxWidth: '200px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}>
-          {params.row.address}
-          {params.row.area && <span>, {params.row.area}</span>}
-          {params.row.block && <span>, Block {params.row.block}</span>}
-        </div>
-      )
-    },
-  ];
 
-  const ticketColumns = [
-    { 
-      field: "_id", 
-      headerName: "ID",
-      minWidth: isSmallMobile ? 40 : 80,
-      hide: isSmallMobile,
-      editable: false 
-    },
-    { 
-      field: "title", 
-      headerName: "Ticket Title",
-      minWidth: isMobile ? 120 : 200,
-      flex: isMobile ? 1 : 0,
-      editable: false,
-      renderCell: (params) => (
-        <div style={{ 
-          fontWeight: '600',
-          fontSize: isMobile ? '0.75rem' : '0.875rem',
-          color: '#1976d2'
-        }}>
-          {params.value}
-        </div>
-      )
-    },
-    { 
-      field: "ticketType", 
-      headerName: isMobile ? "Type" : "Ticket Type",
-      minWidth: isMobile ? 80 : 120,
-      editable: false,
-      renderCell: (params) => (
-        <span style={{ 
-          backgroundColor: params.value === 'complaint' ? '#f44336' : 
-                         params.value === 'collection' ? '#2196f3' : '#ff9800',
-          color: 'white',
-          padding: '2px 8px',
-          borderRadius: '12px',
-          fontSize: '0.7rem',
-          fontWeight: '500'
-        }}>
-          {params.value}
-        </span>
-      )
-    },
-    { 
-      field: "customer", 
-      headerName: "Customer",
-      minWidth: isMobile ? 100 : 150,
-      editable: false,
-      renderCell: (params) => (
-        <div style={{ fontSize: '0.75rem' }}>
-          <div style={{ fontWeight: '500' }}>
-            {params.row.customer?.name || 'N/A'}
-          </div>
-          <div style={{ color: '#666', fontSize: '0.7rem' }}>
-            {params.row.mobileNo}
-          </div>
-        </div>
-      )
-    },
-    { 
-      field: "date", 
-      headerName: isMobile ? "Date" : "Created Date",
-      minWidth: isMobile ? 80 : 120,
-      editable: false,
-      hide: isSmallMobile,
-      renderCell: (params) => (
-        <span style={{ fontSize: '0.75rem' }}>
-          {params.value ? moment(params.value).format("DD-MM-YYYY") : ''}
-        </span>
-      )
-    },
-    { 
-      field: "status", 
-      headerName: "Status",
-      minWidth: isMobile ? 80 : 100,
-      editable: false,
-      renderCell: (params) => {
-        const getStatusColor = (status) => {
-          switch(status) {
-            case 'open': return '#2196f3';
-            case 'pending': return '#ff9800';
-            case 'resolved': return '#4caf50';
-            case 'closed': return '#9e9e9e';
-            default: return '#6c757d';
-          }
-        };
-        
-        return (
-          <span style={{ 
-            backgroundColor: getStatusColor(params.value),
-            color: 'white',
-            padding: '2px 8px',
-            borderRadius: '12px',
-            fontSize: '0.7rem',
-            fontWeight: '500'
-          }}>
-            {params.value || 'pending'}
-          </span>
-        );
-      }
-    },
-    { 
-      field: "technician", 
-      headerName: isMobile ? "Tech" : "Technician",
-      minWidth: isMobile ? 80 : 120,
-      editable: false,
-      hide: isSmallMobile,
-      renderCell: (params) => (
-        <span style={{ 
-          color: params.value ? '#28a745' : '#999',
-          fontWeight: params.value ? '500' : 'normal',
-          fontSize: '0.75rem'
-        }}>
-          {params.value ? params.row.service_provider?.name || 'Assigned' : 'Unassigned'}
-        </span>
-      )
-    },
-    { 
-      field: "details", 
-      headerName: "Details",
-      minWidth: isMobile ? 100 : 200,
-      editable: false,
-      hide: isMobile,
-      renderCell: (params) => (
-        <div style={{ 
-          fontSize: '0.75rem',
-          maxWidth: '180px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap'
-        }}>
-          {params.value}
-        </div>
-      )
-    },
-  ];
+
 
   const handleSidebarToggle = (isCollapsed) => {
     setSidebarCollapsed(isCollapsed);
@@ -572,7 +245,7 @@ const AdminDashboard = () => {
                   fontWeight: '600', 
                   fontSize: isMobile ? '1.25rem' : '1.5rem' 
                 }}>
-                  Hi Laxdeep System, Good evening
+                  Hi Laxdeep System, 
                 </h4>
                 <p className='text-white-50 mb-0' style={{ 
                   fontSize: isMobile ? '0.8rem' : '0.9rem' 
@@ -614,282 +287,139 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Date Cards */}
+          {/* Financial Summary Cards */}
           <div style={{ 
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
             gap: '12px',
             marginBottom: '20px'
           }}>
+            {/* Today's Due Amount Card */}
             <Card sx={{ 
-              background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-              color: 'white',
-              boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)'
+              background: 'white',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
             }}>
-              <CardContent sx={{ p: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <CalendarToday sx={{ mr: 1, fontSize: '1.5rem' }} />
-                    <Typography variant="h6" sx={{ fontWeight: '600' }}>
-                      30 Jul 2025
+                    <Box sx={{ 
+                      backgroundColor: '#1976d2', 
+                      borderRadius: '50%', 
+                      p: 1, 
+                      mr: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '40px',
+                      height: '40px'
+                    }}>
+                      <Typography sx={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>₹</Typography>
+                    </Box>
+                    <Typography variant="h4" sx={{ fontWeight: '700', color: '#333' }}>
+                      ₹0.00
                     </Typography>
                   </Box>
-                  <Box sx={{ textAlign: 'right' }}>
-                    <Typography variant="h4" sx={{ fontWeight: '700' }}>3</Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>9 Days</Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
-                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                    <CalendarToday sx={{ fontSize: '0.875rem', mr: 0.5 }} />
-                    Expiry Date
+                  <Typography variant="body2" sx={{ color: '#666', fontSize: '0.875rem' }}>
+                    25 Jul
                   </Typography>
-                  <Button
-                    variant="text"
-                    sx={{ color: 'white', minWidth: 'auto' }}
-                  >
-                    <Visibility sx={{ fontSize: '1rem' }} />
-                  </Button>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#666', mb: 2, fontSize: '0.875rem' }}>
+                  Total Due Amount For Today
+                </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ color: '#666', fontSize: '0.875rem' }}>
+                      Amount Collected
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: '600', fontSize: '0.875rem' }}>
+                      {financialSummary.todayPayments}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ color: '#28a745', fontSize: '0.875rem' }}>
+                      Online Collection
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: '600', fontSize: '0.875rem' }}>
+                      {financialSummary.todayPayments}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ color: '#ff9800', fontSize: '0.875rem' }}>
+                      Offline Collection
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: '600', fontSize: '0.875rem' }}>
+                      {financialSummary.todayPayments}
+                    </Typography>
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
 
+            {/* Monthly Due Amount Card */}
             <Card sx={{ 
-              background: 'linear-gradient(135deg, #F44336 0%, #D32F2F 100%)',
-              color: 'white',
-              boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3)'
+              background: 'white',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              borderRadius: '8px'
             }}>
-              <CardContent sx={{ p: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <CalendarToday sx={{ mr: 1, fontSize: '1.5rem' }} />
-                    <Typography variant="h6" sx={{ fontWeight: '600' }}>
-                      05 Jul 2025
+                    <Box sx={{ 
+                      backgroundColor: '#1976d2', 
+                      borderRadius: '50%', 
+                      p: 1, 
+                      mr: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '40px',
+                      height: '40px'
+                    }}>
+                      <Typography sx={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>₹</Typography>
+                    </Box>
+                    <Typography variant="h4" sx={{ fontWeight: '700', color: '#333' }}>
+                      {financialSummary.monthlyRevenue}
                     </Typography>
                   </Box>
-                  <Box sx={{ textAlign: 'right' }}>
-                    <Typography variant="h4" sx={{ fontWeight: '700' }}>3</Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>-16 Days</Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
-                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                    <CalendarToday sx={{ fontSize: '0.875rem', mr: 0.5 }} />
-                    Expired Date
+                  <Typography variant="body2" sx={{ color: '#666', fontSize: '0.875rem' }}>
+                    25 Jul
                   </Typography>
-                  <Button
-                    variant="text"
-                    sx={{ color: 'white', minWidth: 'auto' }}
-                  >
-                    <Visibility sx={{ fontSize: '1rem' }} />
-                  </Button>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#666', mb: 2, fontSize: '0.875rem' }}>
+                  Total Due Amount For The Month
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ color: '#666', fontSize: '0.875rem' }}>
+                      Amount Collected
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: '600', fontSize: '0.875rem' }}>
+                      {financialSummary.monthlyRevenue}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ color: '#28a745', fontSize: '0.875rem' }}>
+                      Online Collection
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: '600', fontSize: '0.875rem' }}>
+                      {financialSummary.monthlyRevenue}
+                    </Typography>
+                  </Box>  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ color: '#ff9800', fontSize: '0.875rem' }}>
+                      Offline Collection
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: '600', fontSize: '0.875rem' }}>
+                      {financialSummary.monthlyRevenue}
+                    </Typography> 
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
           </div>
 
-          {/* KPI Cards */}
-          <div style={{ 
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-            gap: '12px',
-            marginBottom: '20px'
-          }}>
-            <Card sx={{ 
-              background: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              borderRadius: '8px'
-            }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <Box sx={{ 
-                    backgroundColor: '#1976d2', 
-                    borderRadius: '50%', 
-                    p: 1, 
-                    mr: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <People sx={{ color: 'white', fontSize: '1.5rem' }} />
-                  </Box>
-                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
-                    320
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-                  Subscribers Added - Broadband
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                  <span style={{ color: '#666' }}>0 Today</span>
-                  <span style={{ color: '#28a745' }}>320 Current Month</span>
-                </Box>
-              </CardContent>
-            </Card>
-
-            <Card sx={{ 
-              background: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              borderRadius: '8px'
-            }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <Box sx={{ 
-                    backgroundColor: '#1976d2', 
-                    borderRadius: '50%', 
-                    p: 1, 
-                    mr: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <NetworkCheck sx={{ color: 'white', fontSize: '1.5rem' }} />
-                  </Box>
-                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
-                    537
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-                  Total Connections - Broadband
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                  <span style={{ color: '#28a745' }}>102 Active</span>
-                  <span style={{ color: '#666' }}>435 Inactive</span>
-                </Box>
-              </CardContent>
-            </Card>
-
-            <Card sx={{ 
-              background: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              borderRadius: '8px'
-            }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <Box sx={{ 
-                    backgroundColor: '#1976d2', 
-                    borderRadius: '50%', 
-                    p: 1, 
-                    mr: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <AttachMoney sx={{ color: 'white', fontSize: '1.5rem' }} />
-                  </Box>
-                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
-                    ₹1,231,206.00
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-                  Current Outstanding & Advance Payment
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                  <span style={{ color: '#28a745' }}>Outstanding Balance</span>
-                  <span style={{ color: '#666' }}>₹1,700.00 Advance Payment</span>
-                </Box>
-              </CardContent>
-            </Card>
-
-            <Card sx={{ 
-              background: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              borderRadius: '8px'
-            }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <Box sx={{ 
-                    backgroundColor: '#1976d2', 
-                    borderRadius: '50%', 
-                    p: 1, 
-                    mr: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <ConfirmationNumber sx={{ color: 'white', fontSize: '1.5rem' }} />
-                  </Box>
-                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
-                    0
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-                  Total Today's Ticket
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                  <span style={{ color: '#666' }}>0 Open</span>
-                  <span style={{ color: '#28a745' }}>0 Closed</span>
-                  <span style={{ color: '#ff9800' }}>0 Canceled</span>
-                </Box>
-              </CardContent>
-            </Card>
-
-            <Card sx={{ 
-              background: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              borderRadius: '8px'
-            }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <Box sx={{ 
-                    backgroundColor: '#1976d2', 
-                    borderRadius: '50%', 
-                    p: 1, 
-                    mr: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <AttachMoney sx={{ color: 'white', fontSize: '1.5rem' }} />
-                  </Box>
-                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
-                    0
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-                  Today Pending for Tally
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                  <span style={{ color: '#666' }}>0 Digital Cable</span>
-                  <span style={{ color: '#666' }}>0 Broadband</span>
-                </Box>
-              </CardContent>
-            </Card>
-
-            <Card sx={{ 
-              background: 'white',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              borderRadius: '8px'
-            }}>
-              <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <Box sx={{ 
-                    backgroundColor: '#1976d2', 
-                    borderRadius: '50%', 
-                    p: 1, 
-                    mr: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <AttachMoney sx={{ color: 'white', fontSize: '1.5rem' }} />
-                  </Box>
-                  <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2' }}>
-                    670
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-                  Total Pending for Tally
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                  <span style={{ color: '#666' }}>0 Digital Cable</span>
-                  <span style={{ color: '#666' }}>670 Broadband</span>
-                </Box>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Reports Section */}
+     {/* Reports Section */}
           <div style={{ 
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
@@ -995,8 +525,215 @@ const AdminDashboard = () => {
             </Card>
           </div>
 
+          {/* KPI Cards */}
+                    <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '16px',
+            marginBottom: '20px',
+            width: '100%'
+          }}>
+            {/* Subscribers Card */}
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px',
+              border: '2px solid #e0e0e0',
+              width: '100%'
+            }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1.5, 
+                    mr: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid #e0e0e0'
+                  }}>
+                    <People sx={{ color: 'white', fontSize: '1.5rem' }} />
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2', mb: 0.5 }}>
+                      {financialSummary.totalCustomers}
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: '#666', fontWeight: '500' }}>
+                      Subscribers Added - Broadband
+                    </Typography>
+                  </Box>
+                </Box>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="flex-fill text-center border p-3  text-secondary">
+                  <div className="justify-content-center align-items-center" style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ color: '#666' }}>{financialSummary.todayCustomers} </span>
+                    <span style={{ color: '#666' }}>Today</span>
+                    </div>
+                  </div>
+                  <div className="flex-fill text-center border p-3 text-secondary ">  
+                      <div className="justify-content-center align-items-center" style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ color: '#28a745' }}>{financialSummary.currentMonthCustomers} </span>
+                      <span style={{ color: '#28a745' }}>Current Month</span>
+                    </div>
+                  </div>  
+                </div>
+
+              </CardContent>
+            </Card>
+
+            {/* Total Connections Card */}
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px',
+              border: '2px solid #e0e0e0',
+              width: '100%'
+            }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1.5, 
+                    mr: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid #e0e0e0'
+                  }}>
+                    <NetworkCheck sx={{ color: 'white', fontSize: '1.5rem' }} />
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2', mb: 0.5 }}>
+                      {financialSummary.totalConnections}
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: '#666', fontWeight: '500' }}>
+                      Total Connections - Broadband
+                    </Typography>
+                  </Box>
+                </Box>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="flex-fill text-center border p-3  text-secondary">
+                  <div className="justify-content-center align-items-center" style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ color: '#28a745' }}>{financialSummary.activeCustomers} </span>
+                    <span style={{ color: '#666' }}>Active</span>
+                    </div>
+                  </div>
+                  <div className="flex-fill text-center border p-3 text-secondary ">  
+                      <div className="justify-content-center align-items-center" style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ color: '#28a745' }}>{financialSummary.inactiveCustomers} </span>
+                      <span style={{ color: '#28a745' }}>Inactive</span>
+                    </div>
+                  </div>  
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Outstanding Payment Card */}
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px',
+              border: '2px solid #e0e0e0',
+              width: '100%'
+            }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1.5, 
+                    mr: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid #e0e0e0'
+                  }}>
+                    <AttachMoney sx={{ color: 'white', fontSize: '1.5rem' }} />
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2', mb: 0.5 }}>
+                      {financialSummary.outstandingBalance}
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: '#666', fontWeight: '500' }}>
+                      Current Outstanding & Advance Payment
+                    </Typography>
+                  </Box>
+                </Box>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="flex-fill text-center border p-3  text-secondary">
+                  <div className="justify-content-center align-items-center" style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ color: '#666' }}>{financialSummary.outstandingBalance} </span>
+                    <span style={{ color: '#666' }}>Outstanding Balance</span>
+                    </div>
+                  </div>
+                  <div className="flex-fill text-center border p-3 text-secondary ">  
+                      <div className="justify-content-center align-items-center" style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ color: '#28a745' }}>{financialSummary.advancePayment} </span>
+                      <span style={{ color: '#28a745' }}>Advance Payment</span>
+                    </div>
+                  </div>  
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Today's Tickets Card */}
+            <Card sx={{ 
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              borderRadius: '8px',
+              border: '2px solid #e0e0e0',
+              width: '100%'
+            }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Box sx={{ 
+                    backgroundColor: '#1976d2', 
+                    borderRadius: '50%', 
+                    p: 1.5, 
+                    mr: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid #e0e0e0'
+                  }}>
+                    <ConfirmationNumber sx={{ color: 'white', fontSize: '1.5rem' }} />
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h4" sx={{ fontWeight: '700', color: '#1976d2', mb: 0.5 }}>
+                      0
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: '#666', fontWeight: '500' }}>
+                      Total Today's Ticket
+                    </Typography>
+                  </Box>
+                </Box>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="flex-fill text-center border p-3  text-secondary">
+                  <div className="justify-content-center align-items-center" style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ color: '#666' }}>{financialSummary.openTickets} </span>
+                    <span style={{ color: '#666' }}>Open</span>
+                    </div>
+                  </div>
+                  <div className="flex-fill text-center border p-3 text-secondary ">  
+                      <div className="justify-content-center align-items-center" style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ color: '#28a745' }}>{financialSummary.closedTickets} </span>
+                      <span style={{ color: '#28a745' }}>Closed</span>
+                    </div>
+                  </div>  
+                  <div className="flex-fill text-center border p-3 text-secondary ">  
+                      <div className="justify-content-center align-items-center" style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ color: '#28a745' }}>{financialSummary.canceledTickets} </span>
+                      <span style={{ color: '#28a745' }}>Canceled</span>
+                    </div>
+                  </div>  
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           {/* Footer */}
-          <div style={{ 
+          {/* <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center',
@@ -1010,7 +747,7 @@ const AdminDashboard = () => {
             <Typography variant="body2" sx={{ color: '#666' }}>
               Powered by <span style={{ color: '#1976d2', fontWeight: '600' }}>TELLYON</span>
             </Typography>
-          </div>
+          </div> */}
         </div>
       </div>
     </Fragment>
