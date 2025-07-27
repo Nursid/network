@@ -28,7 +28,7 @@ import { useAuth } from '../../../../Context/userAuthContext';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
-// Custom validation function for basic info
+// Custom validation function for basic info (Step 1)
 const validateBasicInfo = (values) => {
 	const errors = {};
 
@@ -55,10 +55,10 @@ const validateBasicInfo = (values) => {
 		errors.address = 'Address must be less than 200 characters';
 	}
 
-	// Temporary address validation
-	if (values.t_address) {
-		if (values.t_address.length > 200) {
-			errors.t_address = 'Temporary address must be less than 200 characters';
+	// Installation address validation
+	if (values.installation_address) {
+		if (values.installation_address.length > 200) {
+			errors.installation_address = 'Installation address must be less than 200 characters';
 		}
 	}
 
@@ -79,31 +79,6 @@ const validateBasicInfo = (values) => {
 		errors.alternate_no = 'Alternate number must be exactly 10 digits';
 	}
 
-	// Date of birth validation
-	if (values.dob) {
-		const today = new Date();
-		const birthDate = new Date(values.dob);
-		const age = today.getFullYear() - birthDate.getFullYear();
-		
-		if (birthDate > today) {
-			errors.dob = 'Date of birth cannot be in the future';
-		} else if (age < 18) {
-			errors.dob = 'Customer must be at least 18 years old';
-		} else if (age > 120) {
-			errors.dob = 'Please enter a valid date of birth';
-		}
-	}
-
-	// Date of anniversary validation
-	if (values.doa) {
-		const today = new Date();
-		const anniversaryDate = new Date(values.doa);
-		
-		if (anniversaryDate > today) {
-			errors.doa = 'Anniversary date cannot be in the future';
-		}
-	}
-
 	// Email validation
 	if (values.email) {
 		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
@@ -116,37 +91,71 @@ const validateBasicInfo = (values) => {
 	return errors;
 };
 
-// Billing and KYC validation function
-const validateBillingKYC = (values, showKYC) => {
+// Billing validation function (Step 4)
+const validateBilling = (values) => {
 	const errors = {};
 
 	// Billing amount validation
-	if (!values.billing_amount) {
-		errors.billing_amount = 'Billing amount is required';
-	} else {
-		if (!/^\d+(\.\d{1,2})?$/.test(values.billing_amount)) {
-			errors.billing_amount = 'Please enter a valid amount (e.g., 100 or 100.50)';
-		} else if (parseFloat(values.billing_amount) <= 0) {
-			errors.billing_amount = 'Billing amount must be greater than 0';
-		} else if (parseFloat(values.billing_amount) > 999999.99) {
-			errors.billing_amount = 'Billing amount cannot exceed 999999.99';
+	// if (!values.billing_amount) {
+	// 	errors.billing_amount = 'Billing amount is required';
+	// } else {
+	// 	const amount = parseFloat(values.billing_amount);
+	// 	if (isNaN(amount)) {
+	// 		errors.billing_amount = 'Please enter a valid amount';
+	// 	} else if (amount <= 0) {
+	// 		errors.billing_amount = 'Billing amount must be greater than 0';
+	// 	} else if (amount > 999999.99) {
+	// 		errors.billing_amount = 'Billing amount cannot exceed 999999.99';
+	// 	}
+	// }
+
+	// Billing cycle validation
+	if (values.billing_cycle) {
+		const cycle = parseInt(values.billing_cycle);
+		if (isNaN(cycle)) {
+			errors.billing_cycle = 'Billing cycle must be a number';
+		} else if (cycle <= 0) {
+			errors.billing_cycle = 'Billing cycle must be greater than 0';
 		}
 	}
 
-	// KYC validations (only if KYC section is enabled)
-	if (showKYC) {
-		// Aadhar number validation
-		if (values.aadhar_no) {
-			if (!/^\d{12}$/.test(values.aadhar_no)) {
-				errors.aadhar_no = 'Aadhar number must be exactly 12 digits';
-			}
+	// Other charges validation
+	if (values.other_charges) {
+		const charges = parseFloat(values.other_charges);
+		if (isNaN(charges)) {
+			errors.other_charges = 'Please enter a valid amount';
+		} else if (charges < 0) {
+			errors.other_charges = 'Other charges cannot be negative';
 		}
+	}
 
-		// PAN number validation
-		if (values.pan_no) {
-			if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(values.pan_no.toUpperCase())) {
-				errors.pan_no = 'Invalid PAN format (e.g., ABCDE1234F)';
-			}
+	// Previous dues validation
+	if (values.previous_dues) {
+		const dues = parseFloat(values.previous_dues);
+		if (isNaN(dues)) {
+			errors.previous_dues = 'Please enter a valid amount';
+		} else if (dues < 0) {
+			errors.previous_dues = 'Previous dues cannot be negative';
+		}
+	}
+
+	// Received amount validation
+	if (values.received_amount) {
+		const received = parseFloat(values.received_amount);
+		if (isNaN(received)) {
+			errors.received_amount = 'Please enter a valid amount';
+		} else if (received < 0) {
+			errors.received_amount = 'Received amount cannot be negative';
+		}
+	}
+
+	// Discount validation
+	if (values.discount) {
+		const discount = parseFloat(values.discount);
+		if (isNaN(discount)) {
+			errors.discount = 'Please enter a valid amount';
+		} else if (discount < 0) {
+			errors.discount = 'Discount cannot be negative';
 		}
 	}
 
@@ -161,34 +170,52 @@ const AddNewCustomerForm = ({prop, data}) => {
 	
 	// Form data state
 	const [formData, setFormData] = useState({
-		// Basic Info
+		// Step 1: Basic Information
 		name: '',
 		username: '',
+		gender: null,
 		address: '',
-		t_address: '',
+		installation_address: '',
 		mobile: '',
 		whatsapp_no: '',
 		alternate_no: '',
+		area: null,
+		block: null,
+		apartment: null,
+		email: '',
+		
+		// Step 2: Package Selection
+		selected_package: null,
+		other_services: null,
+		
+		// Step 3: Inventory Items & KYC Records
+		inventory_items: [],
 		dob: '',
 		doa: '',
-		email: '',
-		// Package Info
-		selectedPackage: null,
-		packageDetails: '',
-		// Inventory Items
-		selectedItems: [],
-		// Billing Info
-		bill_date: '',
+		aadhar_card: null,
+		pan_card: null,
+		photo: null,
+		
+		// Step 4: Billing Details
 		billing_amount: '',
+		billing_cycle: 1,
+		other_charges: '',
+		previous_dues: '',
+		start_date: '',
+		end_date: '',
+		received_amount: 0,
+		received_date: '',
+		discount: '',
+		collected_by: null,
 		payment_method: null,
-		// KYC Info
-		aadhar_no: '',
-		other_id: '',
-		pan_no: '',
 	});
 
 	// File uploads state
-	const [image, setImage] = useState(null)
+	const [photo, setPhoto] = useState(null);
+	const [aadharCard, setAadharCard] = useState(null);
+	const [panCard, setPanCard] = useState(null);
+	// Legacy file states for backward compatibility
+	const [image, setImage] = useState(null);
 	const [frontAadharImage, setFrontAadharImage] = useState(null);
 	const [backAadharImage, setBackAadharImage] = useState(null);
 	const [panImage, setPanImage] = useState(null);
@@ -196,20 +223,23 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const [signature, setSignature] = useState(null);
 	
 	// Selection states
-	const [gender, setGender] = useState(null)
-	const [appartment, setAppartment] = useState('')
-	const [block, setBlock] = useState('')
-	const [area, setArea] = useState('')
-	const [showKYC, setShowKYC] = useState(false);
+	const [gender, setGender] = useState(null);
+	const [apartment, setApartment] = useState(null);
+	const [block, setBlock] = useState(null);
+	const [area, setArea] = useState(null);
+	const [otherServices, setOtherServices] = useState(null);
+	const [collectedBy, setCollectedBy] = useState(null);
 
 	// Data states
 	const [packages, setPackages] = useState([]);
 	const [inventoryItems, setInventoryItems] = useState([]);
+	const [employees, setEmployees] = useState([]);
 
 	// Fetch packages and inventory on component mount
 	useEffect(() => {
 		fetchPackages();
 		fetchInventoryItems();
+		fetchEmployees();
 	}, []);
 
 	const fetchPackages = async () => {
@@ -241,6 +271,23 @@ const AddNewCustomerForm = ({prop, data}) => {
 			}
 		} catch (error) {
 			console.error('Error fetching inventory:', error);
+		}
+	};
+
+	const fetchEmployees = async () => {
+		try {
+			const response = await axios.get(`${API_URL}/employee/getall`);
+
+			console.log("response---->", response);
+			if (response.status === 200) {
+				const employeeOptions = response.data.data.map(emp => ({
+					value: emp.id,
+					label: `${emp.name} (${emp.mobile_no})`
+				}));
+				setEmployees(employeeOptions);
+			}
+		} catch (error) {
+			console.error('Error fetching employees:', error);
 		}
 	};
 
@@ -365,21 +412,21 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const handleInventoryItemAdd = () => {
 		setFormData(prev => ({
 			...prev,
-			selectedItems: [...prev.selectedItems, { item: null, quantity: 1 }]
+			inventory_items: [...prev.inventory_items, { item: null, quantity: 1 }]
 		}));
 	};
 
 	const handleInventoryItemRemove = (index) => {
 		setFormData(prev => ({
 			...prev,
-			selectedItems: prev.selectedItems.filter((_, i) => i !== index)
+			inventory_items: prev.inventory_items.filter((_, i) => i !== index)
 		}));
 	};
 
 	const handleInventoryItemChange = (index, field, value) => {
 		setFormData(prev => ({
 			...prev,
-			selectedItems: prev.selectedItems.map((item, i) => {
+			inventory_items: prev.inventory_items.map((item, i) => {
 				if (i === index) {
 					if (field === 'quantity') {
 						// Get the available quantity for the selected item
@@ -397,10 +444,19 @@ const AddNewCustomerForm = ({prop, data}) => {
 
 	const createCustomer = async (values) => {
         SetIsLoading(true);
+		
+		// Update formData with the latest values from Step 4
+		const updatedFormData = {
+			...formData,
+			...values
+		};
 		  
 		const finalData = {
-			...formData,
-			...values,
+			...updatedFormData,
+			photo: photo,
+			aadhar_card: aadharCard,
+			pan_card: panCard,
+			// Legacy file fields for backward compatibility
 			image: image,
 			frontAadharImage: frontAadharImage,
 			backAadharImage: backAadharImage,
@@ -410,10 +466,12 @@ const AddNewCustomerForm = ({prop, data}) => {
 			gender: gender?.value || null,
 			block: block?.value || null,
 			area: area?.value || null,
-			apartment: appartment?.value || null,
+			apartment: apartment?.value || null,
+			other_services: otherServices?.value || null,
+			collected_by: collectedBy?.value || null,
 			payment_method: formData.payment_method?.value || null,
-			selectedPackage: formData.selectedPackage?.value || null,
-			selectedItems: JSON.stringify(formData.selectedItems)
+			selected_package: formData.selected_package?.value || null,
+			inventory_items: JSON.stringify(formData.inventory_items)
 		};
 
 		const formDataToSend = new FormData();
@@ -425,17 +483,25 @@ const AddNewCustomerForm = ({prop, data}) => {
 		}
 
 		try {
+			console.log('Submitting customer data:', finalData);
 			const apiUrl = `${API_URL}/customer/signup`;
 			const response = await axios.post(apiUrl, formDataToSend);
+			
+			console.log('Response from server:', response.data);
 			
 			if (response.data.status === true) {
 				// Reset form and state
 				setFormData({
-					name: '', username: '', address: '', t_address: '', mobile: '',
-					whatsapp_no: '', alternate_no: '', dob: '', doa: '', email: '',
-					selectedPackage: null, packageDetails: '', selectedItems: [],
-					bill_date: '', billing_amount: '', payment_method: null, aadhar_no: '', other_id: '', pan_no: '',
+					name: '', username: '', gender: null, address: '', installation_address: '', mobile: '',
+					whatsapp_no: '', alternate_no: '', area: null, block: null, apartment: null, email: '',
+					selected_package: null, other_services: null, inventory_items: [], dob: '', doa: '',
+					aadhar_card: null, pan_card: null, photo: null, billing_amount: '', billing_cycle: 1,
+					other_charges: '', previous_dues: '', start_date: '', end_date: '', received_amount: 0,
+					received_date: '', discount: '', collected_by: null, payment_method: null,
 				});
+				setPhoto(null);
+				setAadharCard(null);
+				setPanCard(null);
 				setImage(null);
 				setFrontAadharImage(null);
 				setBackAadharImage(null);
@@ -445,9 +511,10 @@ const AddNewCustomerForm = ({prop, data}) => {
 				setGender(null);
 				setBlock(null);
 				setArea(null);
-				setAppartment(null);
+				setApartment(null);
+				setOtherServices(null);
+				setCollectedBy(null);
 				setCurrentStep(1);
-				setShowKYC(false);
 				
 				prop();
 				Swal.fire('Successfully!', 'Your Customer has been Added.', 'success');
@@ -528,12 +595,10 @@ const AddNewCustomerForm = ({prop, data}) => {
 				name: formData.name,
 				username: formData.username,
 				address: formData.address,
-				t_address: formData.t_address,
+				installation_address: formData.installation_address,
 				mobile: formData.mobile,
 				whatsapp_no: formData.whatsapp_no,
 				alternate_no: formData.alternate_no,
-				dob: formData.dob,
-				doa: formData.doa,
 				email: formData.email,
 			}}
 			validate={validateBasicInfo}
@@ -544,12 +609,12 @@ const AddNewCustomerForm = ({prop, data}) => {
 					<Row>
 						<Col md={6}>
 							<FormGroup>
-								<Label for="name">Name <span style={{color: "red"}}>*</span></Label>
+								<Label for="name">Customer Name <span style={{color: "red"}}>*</span></Label>
 								<Field
 									as={Input}
 									name="name"
-									placeholder="Name"
-									maxLength="50"
+									placeholder="Enter Customer Name"
+									maxLength="200"
 									onKeyPress={handleKeyPress}
 								/>
 								<ErrorMessage name="name" component="span" className="validationError" />
@@ -557,11 +622,11 @@ const AddNewCustomerForm = ({prop, data}) => {
 						</Col>
 						<Col md={6}>
 							<FormGroup>
-								<Label for="username">Username <span style={{color: "red"}}>*</span></Label>
+								<Label for="username">Username / ID <span style={{color: "red"}}>*</span></Label>
 								<Field
 									as={Input}
 									name="username"
-									placeholder="Username"
+									placeholder="Enter Username"
 									maxLength="50"
 								/>
 								<ErrorMessage name="username" component="span" className="validationError" />
@@ -575,26 +640,26 @@ const AddNewCustomerForm = ({prop, data}) => {
 						</Col>
 						<Col md={6}>
 							<FormGroup>
-								<Label for="address">Address <span style={{color: "red"}}>*</span></Label>
+								<Label for="address">Current Address <span style={{color: "red"}}>*</span></Label>
 								<Field
 									as={Input}
 									type="textarea"
 									name="address"
-									placeholder="Enter Address"
+									placeholder="Enter Current Address"
 								/>
 								<ErrorMessage name="address" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
 						<Col md={6}>
 							<FormGroup>
-								<Label for="t_address">Temporary Address</Label>
+								<Label for="installation_address">Installation's Address</Label>
 								<Field
 									as={Input}
 									type="textarea"
-									name="t_address"
-									placeholder="Enter Temporary Address"
+									name="installation_address"
+									placeholder="Enter Installation Address"
 								/>
-								<ErrorMessage name="t_address" component="span" className="validationError" />
+								<ErrorMessage name="installation_address" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
 						<Col md={6}>
@@ -641,28 +706,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 						</Col>
 						<Col md={6}>
 							<FormGroup>
-								<Label for="dob">Date of Birth</Label>
-								<Field
-									as={Input}
-									type="date"
-									name="dob"
-								/>
-								<ErrorMessage name="dob" component="span" className="validationError" />
-							</FormGroup>
-						</Col>
-						<Col md={6}>
-							<FormGroup>
-								<Label for="doa">Date of Anniversary</Label>
-								<Field
-									as={Input}
-									type="date"
-									name="doa"
-								/>
-								<ErrorMessage name="doa" component="span" className="validationError" />
-							</FormGroup>
-						</Col>
-						<Col md={6}>
-							<FormGroup>
 								<Label for="area">Area</Label>
 								<SelectBox options={area_option} setSelcted={setArea} initialValue={area}/>
 							</FormGroup>
@@ -676,7 +719,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 						<Col md={6}>
 							<FormGroup>
 								<Label for="apartment">Apartment</Label>
-								<SelectBox options={apartment_options} setSelcted={setAppartment} initialValue={appartment}/>
+								<SelectBox options={apartment_options} setSelcted={setApartment} initialValue={apartment}/>
 							</FormGroup>
 						</Col>
 						<Col md={6}>
@@ -689,17 +732,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 									placeholder="Enter Email"
 								/>
 								<ErrorMessage name="email" component="span" className="validationError" />
-							</FormGroup>
-						</Col>
-						<Col md={6}>	
-							<FormGroup>
-								<Label for="image">Upload Image</Label>
-								<Input 
-								type="file" 
-								name="image" 
-								accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
-								onChange={(e) => handleImageChange(e, setImage)} 
-							/>
 							</FormGroup>
 						</Col>
 					</Row>
@@ -717,33 +749,44 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const renderPackageStep = () => (
 		<div>
 			<Row>
-				<Col md={12}>
+				<Col md={6}>
 					<FormGroup>
-						<Label for="package">Select Package <span style={{color: "red"}}>*</span></Label>
-											<SelectBox 
-						options={packages} 
-						setSelcted={(value) => {
-							setFormData(prev => ({ 
-								...prev, 
-								selectedPackage: value,
-								billing_amount: value ? value.finalPrice : ''
-							}));
-						}} 
-						initialValue={formData.selectedPackage}
-					/>
+						<Label for="selected_package">Select Package</Label>
+						<SelectBox 
+							options={packages} 
+							setSelcted={(value) => {
+								console.log('Package selected:', value);
+								setFormData(prev => ({ 
+									...prev, 
+									selected_package: value,
+									billing_amount: value ? value.finalPrice : ''
+								}));
+							}} 
+							initialValue={formData.selected_package}
+						/>
 					</FormGroup>
 				</Col>
-				{formData.selectedPackage && (
+				<Col md={6}>
+					<FormGroup>
+						<Label for="other_services">Select Other Services</Label>
+						<SelectBox 
+							options={packages} 
+							setSelcted={setOtherServices} 
+							initialValue={otherServices}
+						/>
+					</FormGroup>
+				</Col>
+				{formData.selected_package && (
 					<Col md={12}>
 						<Card>
 							<CardHeader>
 								<h5>Package Details</h5>
 							</CardHeader>
 							<CardBody>
-								<p><strong>Plan:</strong> {formData.selectedPackage.plan}</p>
-								<p><strong>Connection Type:</strong> {formData.selectedPackage.connectionType}</p>
-								<p><strong>Days:</strong> {formData.selectedPackage.days}</p>
-								<p><strong>Price:</strong> ₹{formData.selectedPackage.finalPrice}</p>
+								<p><strong>Plan:</strong> {formData.selected_package.plan}</p>
+								<p><strong>Connection Type:</strong> {formData.selected_package.connectionType}</p>
+								<p><strong>Days:</strong> {formData.selected_package.days}</p>
+								<p><strong>Price:</strong> ₹{formData.selected_package.finalPrice}</p>
 							</CardBody>
 						</Card>
 					</Col>
@@ -756,7 +799,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 				<Button 
 					color="primary" 
 					onClick={() => handleNext({})}
-					disabled={!formData.selectedPackage}
 				>
 					Next <ALlIcon.FaArrowRight className="ml-2" />
 				</Button>
@@ -764,128 +806,202 @@ const AddNewCustomerForm = ({prop, data}) => {
 		</div>
 	);
 
-	// Step 3: Inventory Items
-	const renderInventoryStep = () => (
-		<div>
-			<Row>
-				<Col md={12}>
-					<div className="d-flex justify-content-between align-items-center mb-3">
-						<h5>Select Inventory Items</h5>
-						<Button color="success" size="sm" onClick={handleInventoryItemAdd}>
-							<ALlIcon.FaPlus className="mr-2" /> Add Item
-						</Button>
-					</div>
-				</Col>
-			</Row>
-			{formData.selectedItems.map((item, index) => (
-				<Row key={index} className="mb-3 p-3 border rounded">
-					<Col md={5}>
-						<FormGroup>
-							<Label>Item</Label>
-							<SelectBox 
-								options={inventoryItems}
-								setSelcted={(value) => handleInventoryItemChange(index, 'item', value)}
-								initialValue={item.item}
-							/>
-						</FormGroup>
-					</Col>
-					<Col md={3}>
-						<FormGroup>
-							<Label>Quantity</Label>
-							<Input
-								type="number"
-								min="1"
-								max={item.item ? item.item.qty : 1}
-								value={item.quantity}
-								onChange={(e) => handleInventoryItemChange(index, 'quantity', parseInt(e.target.value))}
-								invalid={item.item && item.quantity > item.item.qty}
-							/>
-							{item.item && item.quantity > item.item.qty && (
-								<div className="invalid-feedback d-block">
-									Quantity cannot exceed available stock ({item.item.qty})
-								</div>
-							)}
-						</FormGroup>
-					</Col>
-					<Col md={3}>
-						<FormGroup>
-							<Label>Available</Label>
-							<Input
-								type="text"
-								value={item.item ? item.item.qty : ''}
-								disabled
-							/>
-						</FormGroup>
-					</Col>
-					<Col md={1}>
-						<FormGroup>
-							<Label>&nbsp;</Label>
-							<Button 
-								color="danger" 
-								size="sm" 
-								onClick={() => handleInventoryItemRemove(index)}
-								className="d-block"
-							>
-								<ALlIcon.FaTrash />
-							</Button>
-						</FormGroup>
-					</Col>
-				</Row>
-			))}
-			{formData.selectedItems.length === 0 && (
-				<Row>
-					<Col md={12}>
-						<div className="text-center p-4 border rounded bg-light">
-							<p className="mb-0">No inventory items selected. Click "Add Item" to add items.</p>
-						</div>
-					</Col>
-				</Row>
-			)}
-			<div className="d-flex justify-content-between mt-4">
-				<Button color="secondary" onClick={handlePrevious}>
-					<ALlIcon.FaArrowLeft className="mr-2" /> Previous
-				</Button>
-				<Button 
-					color="primary" 
-					onClick={() => handleNext({})}
-					disabled={formData.selectedItems.some(item => item.item && item.quantity > item.item.qty)}
-				>
-					Next <ALlIcon.FaArrowRight className="ml-2" />
-				</Button>
-			</div>
-		</div>
-	);
-
-	// Step 4: Billing & KYC Details
-	const renderBillingKYCStep = () => (
+	// Step 3: Inventory Items & KYC Records
+	const renderInventoryKYCStep = () => (
 		<Formik
 			initialValues={{
-				bill_date: formData.bill_date,
-				billing_amount: formData.billing_amount,
-				aadhar_no: formData.aadhar_no,
-				other_id: formData.other_id,
-				pan_no: formData.pan_no,
+				dob: formData.dob,
+				doa: formData.doa,
 			}}
-			validate={(values) => validateBillingKYC(values, showKYC)}
-			onSubmit={createCustomer}
+			onSubmit={handleNext}
+		>
+			{({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
+				<Form>
+					<Row>
+						<Col md={12}>
+							<h5>Inventory Items</h5>
+							<p className="text-muted">Assign required hardware or inventory items (e.g., router, modem).</p>
+							<div className="d-flex justify-content-between align-items-center mb-3">
+								<Button color="success" size="sm" onClick={handleInventoryItemAdd}>
+									<ALlIcon.FaPlus className="mr-2" /> Add Item
+								</Button>
+							</div>
+						</Col>
+					</Row>
+					{formData.inventory_items.map((item, index) => (
+						<Row key={index} className="mb-3 p-3 border rounded">
+							<Col md={5}>
+								<FormGroup>
+									<Label>Item</Label>
+									<SelectBox 
+										options={inventoryItems}
+										setSelcted={(value) => handleInventoryItemChange(index, 'item', value)}
+										initialValue={item.item}
+									/>
+								</FormGroup>
+							</Col>
+							<Col md={3}>
+								<FormGroup>
+									<Label>Quantity</Label>
+									<Input
+										type="number"
+										min="1"
+										max={item.item ? item.item.qty : 1}
+										value={item.quantity}
+										onChange={(e) => handleInventoryItemChange(index, 'quantity', parseInt(e.target.value))}
+										invalid={item.item && item.quantity > item.item.qty}
+									/>
+									{item.item && item.quantity > item.item.qty && (
+										<div className="invalid-feedback d-block">
+											Quantity cannot exceed available stock ({item.item.qty})
+										</div>
+									)}
+								</FormGroup>
+							</Col>
+							<Col md={3}>
+								<FormGroup>
+									<Label>Available</Label>
+									<Input
+										type="text"
+										value={item.item ? item.item.qty : ''}
+										disabled
+									/>
+								</FormGroup>
+							</Col>
+							<Col md={1}>
+								<FormGroup>
+									<Label>&nbsp;</Label>
+									<Button 
+										color="danger" 
+										size="sm" 
+										onClick={() => handleInventoryItemRemove(index)}
+										className="d-block"
+									>
+										<ALlIcon.FaTrash />
+									</Button>
+								</FormGroup>
+							</Col>
+						</Row>
+					))}
+					{formData.inventory_items.length === 0 && (
+						<Row>
+							<Col md={12}>
+								<div className="text-center p-4 border rounded bg-light">
+									<p className="mb-0">No inventory items selected. Click "Add Item" to add items.</p>
+								</div>
+							</Col>
+						</Row>
+					)}
+					
+					<Row className="mt-4">
+						<Col md={12}>
+							<h5>KYC Records</h5>
+							<p className="text-muted">Click 'KYC' for Customer Verification.</p>
+						</Col>
+						<Col md={6}>
+							<FormGroup>
+								<Label for="dob">Date of Birth</Label>
+								<Field
+									as={Input}
+									type="date"
+									name="dob"
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={6}>
+							<FormGroup>
+								<Label for="doa">Date of Anniversary</Label>
+								<Field
+									as={Input}
+									type="date"
+									name="doa"
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={6}>
+							<FormGroup>
+								<Label for="aadhar_card">Aadhar Card</Label>
+								<Input 
+									type="file" 
+									name="aadhar_card" 
+									accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
+									onChange={(e) => handleImageChange(e, setAadharCard)} 
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={6}>
+							<FormGroup>
+								<Label for="pan_card">PAN Card</Label>
+								<Input 
+									type="file" 
+									name="pan_card" 
+									accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
+									onChange={(e) => handleImageChange(e, setPanCard)} 
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={6}>
+							<FormGroup>
+								<Label for="photo">Photo</Label>
+								<Input 
+									type="file" 
+									name="photo" 
+									accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
+									onChange={(e) => handleImageChange(e, setPhoto)} 
+								/>
+							</FormGroup>
+						</Col>
+					</Row>
+					<div className="d-flex justify-content-between mt-4">
+						<Button color="secondary" onClick={handlePrevious}>
+							<ALlIcon.FaArrowLeft className="mr-2" /> Previous
+						</Button>
+						<Button 
+							color="primary" 
+							onClick={() => handleNext(values)}
+							disabled={formData.inventory_items.some(item => item.item && item.quantity > item.item.qty)}
+						>
+							Next <ALlIcon.FaArrowRight className="ml-2" />
+						</Button>
+					</div>
+				</Form>
+			)}
+		</Formik>
+	);
+
+	// Step 4: Billing Details
+	const renderBillingStep = () => (
+		<Formik
+			initialValues={{
+				billing_amount: formData.billing_amount,
+				billing_cycle: formData.billing_cycle,
+				other_charges: formData.other_charges,
+				previous_dues: formData.previous_dues,
+				start_date: formData.start_date,
+				end_date: formData.end_date,
+				received_amount: formData.received_amount,
+				received_date: formData.received_date,
+				discount: formData.discount,
+			}}
+			validate={(values) => {
+				const errors = validateBilling(values);
+				console.log('Validation errors:', errors);
+				return errors;
+			}}
+			onSubmit={(values, { setSubmitting }) => {
+				console.log('Form submitted with values:', values);
+				console.log('Form errors:', validateBilling(values));
+				createCustomer(values);
+				setSubmitting(false);
+			}}
 		>
 			{({ values, errors, touched, handleChange, handleBlur, isSubmitting, setFieldValue }) => (
 				<Form>
 					<Row>
 						<Col md={12}>
 							<h5>Billing Details</h5>
-							<hr />
+							<p className="text-muted">Collect payment and optionally KYC documentation.</p>
 						</Col>
-						{/* <Col md={4}>
-							<FormGroup>
-								<Label for="bill_date">Bill Date</Label>
-								<Field
-									as={Input}
-									type="date"
-									name="bill_date"
-								/>
-							</FormGroup>
-						</Col> */}
 						<Col md={4}>
 							<FormGroup>
 								<Label for="billing_amount">Billing Amount <span style={{color: "red"}}>*</span></Label>
@@ -893,27 +1009,141 @@ const AddNewCustomerForm = ({prop, data}) => {
 									as={Input}
 									type="number"
 									name="billing_amount"
-									placeholder="Select a package to auto-fill billing amount"
+									placeholder="Auto-filled based on selected plan"
 									min="0"
 									step="0.01"
-									disabled={true}
-									value={formData.billing_amount}
-									style={{
-										backgroundColor: '#f8f9fa',
-										cursor: 'not-allowed',
-										fontWeight: 'bold',
-										color: '#495057'
+									value={formData.billing_amount || ''}
+									onChange={(e) => {
+										setFieldValue('billing_amount', e.target.value);
+										setFormData(prev => ({ ...prev, billing_amount: e.target.value }));
 									}}
 								/>
 								<ErrorMessage name="billing_amount" component="span" className="validationError" />
-								{formData.selectedPackage && (
+								{formData.selected_package && (
 									<small className="text-muted">
-										Auto-filled from selected plan: {formData.selectedPackage.plan}
+										Auto-filled from selected plan: {formData.selected_package.plan}
 									</small>
 								)}
 							</FormGroup>
 						</Col>
 						<Col md={4}>
+							<FormGroup>
+								<Label for="billing_cycle">Billing Cycle</Label>
+								<Field
+									as={Input}
+									type="number"
+									name="billing_cycle"
+									placeholder="By default 1"
+									min="1"
+									value={formData.billing_cycle}
+									onChange={(e) => {
+										setFieldValue('billing_cycle', e.target.value);
+										setFormData(prev => ({ ...prev, billing_cycle: parseInt(e.target.value) || 1 }));
+									}}
+								/>
+								<ErrorMessage name="billing_cycle" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="other_charges">Other Charges If Any</Label>
+								<Field
+									as={Input}
+									type="number"
+									name="other_charges"
+									placeholder="Installation and inventory charges"
+									min="0"
+									step="0.01"
+								/>
+								<ErrorMessage name="other_charges" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="previous_dues">Previous Dues</Label>
+								<Field
+									as={Input}
+									type="number"
+									name="previous_dues"
+									placeholder="Field to Update Previous Dues"
+									min="0"
+									step="0.01"
+								/>
+								<ErrorMessage name="previous_dues" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="start_date">Start Date</Label>
+								<Field
+									as={Input}
+									type="date"
+									name="start_date"
+									placeholder="Optional to be filled"
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="end_date">End Date</Label>
+								<Field
+									as={Input}
+									type="date"
+									name="end_date"
+									placeholder="Optional to be filled"
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="received_amount">Received Amount</Label>
+								<Field
+									as={Input}
+									type="number"
+									name="received_amount"
+									placeholder="By default, 0 if not received"
+									min="0"
+									step="0.01"
+								/>
+								<ErrorMessage name="received_amount" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="received_date">Received Date</Label>
+								<Field
+									as={Input}
+									type="date"
+									name="received_date"
+									placeholder="No transaction should be record if No."
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="discount">Discount</Label>
+								<Field
+									as={Input}
+									type="number"
+									name="discount"
+									placeholder="Should deduct from total billing"
+									min="0"
+									step="0.01"
+								/>
+								<ErrorMessage name="discount" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+						<Col md={6}>
+							<FormGroup>
+								<Label for="collected_by">Collected By</Label>
+								<SelectBox 
+									options={employees} 
+									setSelcted={setCollectedBy} 
+									initialValue={collectedBy}
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={6}>
 							<FormGroup>
 								<Label for="payment_method">Payment Method</Label>
 								<SelectBox 
@@ -923,124 +1153,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 								/>
 							</FormGroup>
 						</Col>
-						<Col md={12}>
-							<FormGroup>
-								<FormControlLabel
-									control={
-										<Checkbox
-											checked={showKYC}
-											onChange={(e) => setShowKYC(e.target.checked)}
-											color="primary"
-										/>
-									}
-									label="Add KYC Details (Aadhar, PAN, etc.)"
-								/>
-							</FormGroup>
-						</Col>
-						{showKYC && (
-							<>
-								<Col md={12}>
-									<h5>KYC Details</h5>
-									<hr />
-								</Col>
-								<Col md={6}>
-									<FormGroup>
-										<Label for="aadhar_no">Aadhar No.</Label>
-										<Field
-											as={Input}
-											type="text"
-											name="aadhar_no"
-											placeholder="Enter Aadhar No."
-											maxLength="12"
-											onKeyPress={handleNumericKeyPress}
-										/>
-										<ErrorMessage name="aadhar_no" component="span" className="validationError" />
-									</FormGroup>
-								</Col>
-								<Col md={6}>
-									<FormGroup>
-										<Label for="other_id">Other ID</Label>
-										<Field
-											as={Input}
-											type="text"
-											name="other_id"
-											placeholder="Enter Other ID"
-										/>
-									</FormGroup>
-								</Col>
-								<Col md={6}>
-									<FormGroup>
-										<Label for="pan_no">PAN No.</Label>
-										<Field
-											as={Input}
-											type="text"
-											name="pan_no"
-											placeholder="Enter PAN No. (e.g., ABCDE1234F)"
-											maxLength="10"
-											onKeyPress={handlePanKeyPress}
-											onChange={(e) => handlePanChange(e, setFieldValue)}
-											style={{ textTransform: 'uppercase' }}
-										/>
-										<ErrorMessage name="pan_no" component="span" className="validationError" />
-									</FormGroup>
-								</Col>
-								<Col md={6}>
-									<FormGroup>
-										<Label for="front_aadhar_image">Front Aadhar Image</Label>
-										<Input 
-										type="file" 
-										name="front_aadhar_image" 
-										accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
-										onChange={(e) => handleImageChange(e, setFrontAadharImage)} 
-									/>
-									</FormGroup>
-								</Col>
-								<Col md={6}>
-									<FormGroup>
-										<Label for="back_aadhar_image">Back Aadhar Image</Label>
-										<Input 
-										type="file" 
-										name="back_aadhar_image" 
-										accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
-										onChange={(e) => handleImageChange(e, setBackAadharImage)} 
-									/>
-									</FormGroup>
-								</Col>
-								<Col md={6}>
-									<FormGroup>
-										<Label for="pan_image">PAN Image</Label>
-										<Input 
-										type="file" 
-										name="pan_image" 
-										accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
-										onChange={(e) => handleImageChange(e, setPanImage)} 
-									/>
-									</FormGroup>
-								</Col>
-								<Col md={6}>
-									<FormGroup>
-										<Label for="other_id_image">Other ID Image</Label>
-										<Input 
-										type="file" 
-										name="other_id_image" 
-										accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
-										onChange={(e) => handleImageChange(e, setOtherIdImage)} 
-									/>
-									</FormGroup>
-								</Col>
-								<Col md={6}>
-									<FormGroup>
-										<Label for="signature">Signature</Label>
-										<Input 
-										type="file" 
-										name="signature" 
-										accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
-										onChange={(e) => handleImageChange(e, setSignature)} 
-									/>
-									</FormGroup>
-								</Col>
-							</>
-						)}
 					</Row>
 					<div className="d-flex justify-content-between">
 						<Button color="secondary" onClick={handlePrevious}>
@@ -1050,6 +1162,11 @@ const AddNewCustomerForm = ({prop, data}) => {
 							type="submit"
 							color="success"
 							disabled={isLoading || isSubmitting}
+							onClick={() => {
+								console.log('Submit button clicked');
+								console.log('Form errors:', errors);
+								console.log('Form touched:', touched);
+							}}
 						>
 							{isLoading && <BounceLoader size={20} color="#fff" className="mr-2" />}
 							Submit <ALlIcon.FaCheck className="ml-2" />
@@ -1064,8 +1181,8 @@ const AddNewCustomerForm = ({prop, data}) => {
 		switch(currentStep) {
 			case 1: return renderBasicInfoStep();
 			case 2: return renderPackageStep();
-			case 3: return renderInventoryStep();
-			case 4: return renderBillingKYCStep();
+			case 3: return renderInventoryKYCStep();
+			case 4: return renderBillingStep();
 			default: return renderBasicInfoStep();
 		}
 	};

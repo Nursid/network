@@ -5,7 +5,7 @@ const DepartmentModel = db.DepartmentsModel
 const DesignationModel = db.DesignationModel
 const Empservices = db.Empservices
 const ServiceProviderModel = db.ServiceProviderModel
-const NewCustomerModel = db.NewCustomerModel
+const CustomerModel = db.CustomerModel
 const jwt = require("jsonwebtoken");
 const {isEmail, isMobileNumber, isOptValid} = require("../utils");
 const SupervisorAvailability = db.SupervisorAvailability;
@@ -24,6 +24,7 @@ const AddEmployee = async (req, res) => {
 		data.image = image ? image[0].filename : null;
 		}
 		
+		console.log(data.mobile_no);
 		// Check if user with the provided mobile number already exists
 		const isUser = await EmployeeModel.findOne({
 			where: {
@@ -45,9 +46,9 @@ const AddEmployee = async (req, res) => {
 			return res.status(200).json({status:false, message: 'Mobile No. Already Exists in Service Provider!'});
 		}
 
-		const isCustomer = await NewCustomerModel.findOne({
+		const isCustomer = await CustomerModel.findOne({
 			where:{
-				mobileno: data.mobile_no
+				mobile: data.mobile_no
 			}
 		});
 
@@ -216,80 +217,18 @@ const DeleteAllEmployeeData = async (req, res) => {
 
 const GetAllEmployeeData = async (req, res) => {
 
-	const data = req.query;
-
 	try {
 		const result = await EmployeeModel.findAll({
-			attributes: [
-				"id",
-				"name",
-				"emp_id",
-				"name",
-				"about",
-				"image",
-				"mobile_no",
-				"aadhar_no",
-				"pan_no",
-				"alterno",
-				"address",
-				"doj",
-				"salary",
-				"week_off",
-				"duty_hours",
-				"createdAt",
-				"is_block",
-				"v_name",
-				"v_date",
-				"f_name",
-				"f_mobile",
-				"m_name",
-				"m_mobile",
-				"gender",
-				"email"
-			],
-			include: [
-				{
-					model: DepartmentModel,
-					attributes: ["name", "id"]
-				}, {
-					model: DesignationModel,
-					attributes: ['name', "id"]
-				}, {
-
-					model: Empservices,
-					attributes: ['service_name']
-				},
-			],
 			order: [
 				['id', 'DESC']
 			]
 		});
 
+		if (!result) {
+			return res.status(200).json({error: false, data: []});
+			}		
 
-		if (!data || !data.date || !data.time_range) {
-			return res.status(200).json({error: false, data: result});
-		}
-
-
-		const Available = await SupervisorAvailability.findAll({
-			attributes: ['emp_id'],
-			where: {
-			  date: data.date,
-			  [data.time_range]: "p"
-			}
-		  });
-		  
-		  const availableEmpIds = Available.map(entry => entry.dataValues.emp_id);
-		  const serviceProvider = result
-				.filter(entry => entry.dataValues.is_block !== 1)
-				.map(entry => entry.dataValues);
-	
-		const filterData = serviceProvider.filter(item => availableEmpIds.includes(item.emp_id.toString()));
-
-		if (filterData.length === 0){
-			return res.status(202).json({error: true, message: "No Data Found"});
-		}
-	return	res.status(200).json({error: false, data: filterData});
+		return res.status(200).json({error: false, data: result});
 
 	} catch (error) {
 		return res.status(500).json({error});
@@ -339,9 +278,9 @@ const UpdateTheEmployeeData = async (req, res) => {
 			return res.status(200).json({status:false, message: 'Mobile No. Already Exists in Service Provider!'});
 		}
 
-		const isCustomer = await NewCustomerModel.findOne({
+		const isCustomer = await CustomerModel.findOne({
 			where:{
-				mobileno: data.mobile_no
+				mobile: data.mobile_no
 			}
 		});
 

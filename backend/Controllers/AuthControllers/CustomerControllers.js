@@ -12,252 +12,18 @@ const generateVoucherNo = require("../misc/voucherGenerator");
 require("dotenv").config;
 const {isEmail, isMobileNumber, isOptValid} = require("../utils");
 
-// const SignupUser = async (req, res) => {
-// 	const data = req.body;
-// 	console.log('Received customer data:', data);
-
-// 	// Handle file uploads
-// 	if(req.files){
-// 		const files = req.files;
-// 		data.image = files.image ? files.image[0].path : '';
-// 		data.frontAadharImage = files.frontAadharImage ? files.frontAadharImage[0].path : '';
-// 		data.backAadharImage = files.backAadharImage ? files.backAadharImage[0].path : '';
-// 		data.panImage = files.panImage ? files.panImage[0].path : '';
-// 		data.otherIdImage = files.otherIdImage ? files.otherIdImage[0].path : '';
-// 		data.signature = files.signature ? files.signature[0].path : '';
-// 	}
-
-// 	// Validate required fields
-// 	if (!data.name || !data.username || !data.mobile || !data.address) {
-// 		return res.status(400).json({
-// 			status: false, 
-// 			message: 'Required fields missing: name, username, mobile, and address are required'
-// 		});
-// 	}
-
-// 	// Validate mobile number format
-// 	if (!/^\d{10}$/.test(data.mobile)) {
-// 		return res.status(400).json({
-// 			status: false, 
-// 			message: 'Mobile number must be exactly 10 digits'
-// 		});
-// 	}
-
-
-// 	// Generate customer ID first
-// 	const customerId = await generateCustomerID();
-
-// 	// Prepare data for CustomerModel (detailed customer info)
-// 	const customer_data = {
-// 		// Basic Information
-// 		name: data.name,
-// 		username: data.username,
-// 		email: data.email || null,
-// 		gender: data.gender || null,
-// 		customer_id: customerId, // Add generated customer ID
-		
-// 		// Address Information
-// 		address: data.address,
-// 		t_address: data.t_address || null,
-// 		area: data.area || null,
-// 		block: data.block || null,
-// 		apartment: data.apartment || null,
-		
-// 		// Contact Information
-// 		mobile: data.mobile,
-// 		whatsapp_no: data.whatsapp_no || null,
-// 		alternate_no: data.alternate_no || null,
-		
-// 		// Personal Information
-// 		dob: data.dob || null,
-// 		doa: data.doa || null,
-		
-// 		// KYC Information
-// 		aadhar_no: data.aadhar_no || null,
-// 		other_id: data.other_id || null,
-// 		pan_no: data.pan_no ? data.pan_no.toUpperCase() : null,
-		
-// 		// Package Information
-// 		selectedPackage: data.selectedPackage ? parseInt(data.selectedPackage) : null,
-// 		packageDetails: data.packageDetails || null,
-		
-// 		// Inventory Items (will be stored as JSON string)
-// 		selectedItems: data.selectedItems || null,
-		
-// 		// Billing Information
-// 		bill_date: data.bill_date || null,
-// 		billing_amount: data.billing_amount ? parseFloat(data.billing_amount) : null,
-// 		payment_method: data.payment_method || null,
-// 		balance: data.billing_amount ? parseFloat(data.billing_amount) : 0,
-		
-// 		// Legacy billing fields (for backward compatibility)
-// 		cash: data.cash ? parseFloat(data.cash) : null,
-// 		online: data.online ? parseFloat(data.online) : null,
-		
-// 		// Image/Document Fields
-// 		image: data.image || null,
-// 		frontAadharImage: data.frontAadharImage || null,
-// 		backAadharImage: data.backAadharImage || null,
-// 		panImage: data.panImage || null,
-// 		otherIdImage: data.otherIdImage || null,
-// 		signature: data.signature || null,
-		
-// 		// Status fields
-// 		status: 'active',
-// 		customerType: 'individual',
-// 		registrationDate: new Date()
-// 	};
-
-// 	try {
-// 		// Check if user already exists as Service Provider
-// 		const isServiceProvider = await ServiceProviderModel.findOne({
-// 			where: {
-// 				mobile_no: data.mobile
-// 			}
-// 		});
-
-// 		if (isServiceProvider) {
-// 			return res.status(200).json({
-// 				status: false, 
-// 				message: 'Mobile number already registered as Service Provider!'
-// 			});
-// 		}
-
-// 		// Check if user already exists as Employee/Supervisor
-// 		const isSupervisor = await EmployeeModel.findOne({
-// 			where: {
-// 				mobile_no: data.mobile
-// 			}
-// 		});
-
-// 		if (isSupervisor) {
-// 			return res.status(200).json({
-// 				status: false, 
-// 				message: 'Mobile number already registered as Employee!'
-// 			});
-// 		}
-
-// 		// Check if customer already exists
-// 		const isCustomer = await CustomerModel.findOne({
-// 			where: {
-// 				mobile: data.mobile
-// 			}
-// 		});
-
-// 		if (isCustomer) {
-// 			return res.status(200).json({
-// 				status: false, 
-// 				message: 'Mobile number already registered as Customer!'
-// 			});
-// 		}
-
-// 		// Create detailed customer record
-// 		const customerRecord = await CustomerModel.create(customer_data);
-
-// 		if (!customerRecord) {
-// 			return res.status(200).json({
-// 				status: false, 
-// 				message: 'Failed to create customer details!'
-// 			});
-// 		}
-
-// 		// Create account transaction if billing amount is provided
-// 		if (data.billing_amount && parseFloat(data.billing_amount) > 0) {
-// 			try {
-// 				const voucherNo = await generateVoucherNo();
-// 				const currentDate = new Date();
-				
-// 				// Create account transaction
-// 				const accountData = {
-// 					date: currentDate,
-// 					cust_id: customerId,
-// 					cust_name: data.name,
-// 					vc_no: voucherNo,
-// 					address: data.address,
-// 					amount: parseFloat(data.billing_amount),
-// 					payment_mode: data.payment_method,
-// 					balance: parseFloat(data.billing_amount),
-// 					trans_id: `TXN${Date.now()}${Math.floor(Math.random() * 1000)}`,
-// 					partner_emp_id: null,
-// 					auto_renew: false,
-// 					recharge_status: 'completed'
-// 				};
-
-// 				const accountRecord = await AccountModel.create(accountData);
-				
-// 				if (!accountRecord) {
-// 					console.error('Failed to create account transaction');
-// 				}
-// 			} catch (accountError) {
-// 				console.error('Error creating account transaction:', accountError);
-// 				// Continue with customer creation even if account transaction fails
-// 			}
-// 		}
-
-// 		// Return success response with customer details
-// 		return res.status(200).json({
-// 			status: true, 
-// 			data: {
-// 				id: customerRecord.id,
-// 				customer_id: customerId,
-// 				name: data.name,
-// 				username: data.username,
-// 				mobile: data.mobile,
-// 				email: data.email,
-// 				gender: data.gender,
-// 				address: data.address,
-// 				t_address: data.t_address,
-// 				area: data.area,
-// 				block: data.block,
-// 				apartment: data.apartment,
-// 				whatsapp_no: data.whatsapp_no,
-// 				alternate_no: data.alternate_no,
-// 				dob: data.dob,
-// 				doa: data.doa,
-// 				aadhar_no: data.aadhar_no,
-// 				other_id: data.other_id,
-// 				pan_no: data.pan_no,
-// 				selectedPackage: data.selectedPackage,
-// 				packageDetails: data.packageDetails,
-// 			}, 
-// 			message: "Customer Added Successfully!"
-// 		});
-
-// 	} catch (error) {
-// 		console.error('Error creating customer:', error);
-		
-// 		// Handle specific database errors
-// 		if (error.name === 'SequelizeValidationError') {
-// 			const validationErrors = error.errors.map(err => err.message);
-// 			return res.status(400).json({
-// 				status: false, 
-// 				message: 'Validation Error', 
-// 				errors: validationErrors
-// 			});
-// 		}
-
-// 		if (error.name === 'SequelizeUniqueConstraintError') {
-// 			return res.status(400).json({
-// 				status: false, 
-// 				message: 'Username or mobile number already exists!'
-// 			});
-// 		}
-
-// 		return res.status(500).json({
-// 			status: false, 
-// 			message: 'Internal Server Error',
-// 			error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
-// 		});
-// 	}
-// };
-
 
 const SignupUser = async (req, res) => {
 	const data = req.body;
 	console.log('Received customer data:', data);
 
+	// Handle file uploads
 	if (req.files) {
 		const files = req.files;
+		data.photo = files.photo ? files.photo[0].path : '';
+		data.aadhar_card = files.aadhar_card ? files.aadhar_card[0].path : '';
+		data.pan_card = files.pan_card ? files.pan_card[0].path : '';
+		// Legacy file fields for backward compatibility
 		data.image = files.image ? files.image[0].path : '';
 		data.frontAadharImage = files.frontAadharImage ? files.frontAadharImage[0].path : '';
 		data.backAadharImage = files.backAadharImage ? files.backAadharImage[0].path : '';
@@ -266,6 +32,7 @@ const SignupUser = async (req, res) => {
 		data.signature = files.signature ? files.signature[0].path : '';
 	}
 
+	// Validate required fields from Step 1
 	if (!data.name || !data.username || !data.mobile || !data.address) {
 		return res.status(400).json({
 			status: false,
@@ -273,6 +40,7 @@ const SignupUser = async (req, res) => {
 		});
 	}
 
+	// Validate mobile number format
 	if (!/^\d{10}$/.test(data.mobile)) {
 		return res.status(400).json({
 			status: false,
@@ -280,19 +48,60 @@ const SignupUser = async (req, res) => {
 		});
 	}
 
+	// Validate WhatsApp number if provided
+	if (data.whatsapp_no && !/^\d{10}$/.test(data.whatsapp_no)) {
+		return res.status(400).json({
+			status: false,
+			message: 'WhatsApp number must be exactly 10 digits'
+		});
+	}
+
+	// Validate alternate number if provided
+	if (data.alternate_no && !/^\d{10}$/.test(data.alternate_no)) {
+		return res.status(400).json({
+			status: false,
+			message: 'Alternate number must be exactly 10 digits'
+		});
+	}
+
+	// Validate email if provided
+	if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+		return res.status(400).json({
+			status: false,
+			message: 'Invalid email format'
+		});
+	}
+
+	// Validate PAN number if provided
+	if (data.pan_no && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(data.pan_no.toUpperCase())) {
+		return res.status(400).json({
+			status: false,
+			message: 'Invalid PAN format (e.g., ABCDE1234F)'
+		});
+	}
+
+	// Validate Aadhar number if provided
+	if (data.aadhar_no && !/^\d{12}$/.test(data.aadhar_no)) {
+		return res.status(400).json({
+			status: false,
+			message: 'Aadhar number must be exactly 12 digits'
+		});
+	}
+
 	const customerId = await generateCustomerID();
 
-	// 1️⃣ Fetch Plan Duration & Calculate Expiry Date
+	// Calculate billing cycle and expiry date
 	let planDuration = 0;
 	let expiryDate = null;
+	let billingCycle = data.billing_cycle || 1;
 
-	if (data.selectedPackage) {
+	if (data.selected_package) {
 		try {
-			const selectedPlan = await PlanModel.findByPk(data.selectedPackage);
+			const selectedPlan = await PlanModel.findByPk(data.selected_package);
 			if (selectedPlan) {
 				planDuration = selectedPlan.days || 0;
-				const baseDate = new Date(data.bill_date || new Date());
-				baseDate.setDate(baseDate.getDate() + planDuration);
+				const baseDate = new Date(data.start_date || new Date());
+				baseDate.setDate(baseDate.getDate() + (planDuration * billingCycle));
 				expiryDate = baseDate;
 			}
 		} catch (err) {
@@ -300,47 +109,86 @@ const SignupUser = async (req, res) => {
 		}
 	}
 
+	// Calculate total amount
+	let totalAmount = parseFloat(data.billing_amount) || 0;
+	if (data.other_charges) {
+		totalAmount += parseFloat(data.other_charges);
+	}
+	if (data.previous_dues) {
+		totalAmount += parseFloat(data.previous_dues);
+	}
+	if (data.discount) {
+		totalAmount -= parseFloat(data.discount);
+	}
+
 	const customer_data = {
+		// Step 1: Basic Information
 		name: data.name,
 		username: data.username,
-		email: data.email || null,
 		gender: data.gender || null,
-		customer_id: customerId,
 		address: data.address,
-		t_address: data.t_address || null,
-		area: data.area || null,
-		block: data.block || null,
-		apartment: data.apartment || null,
+		installation_address: data.installation_address || null,
 		mobile: data.mobile,
 		whatsapp_no: data.whatsapp_no || null,
 		alternate_no: data.alternate_no || null,
+		area: data.area || null,
+		block: data.block || null,
+		apartment: data.apartment || null,
+		email: data.email || null,
+		
+		// Step 2: Package Selection
+		selected_package: data.selected_package ? parseInt(data.selected_package) : null,
+		other_services: data.other_services || null,
+		
+		// Step 3: Inventory Items & KYC Records
+		inventory_items: data.inventory_items || null,
 		dob: data.dob || null,
 		doa: data.doa || null,
+		aadhar_card: data.aadhar_card || null,
+		pan_card: data.pan_card || null,
+		photo: data.photo || null,
+		
+		// Step 4: Billing Details
+		billing_amount: data.billing_amount ? parseFloat(data.billing_amount) : null,
+		billing_cycle: billingCycle,
+		other_charges: data.other_charges ? parseFloat(data.other_charges) : null,
+		previous_dues: data.previous_dues ? parseFloat(data.previous_dues) : null,
+		start_date: data.start_date || null,
+		end_date: data.end_date || null,
+		received_amount: data.received_amount ? parseFloat(data.received_amount) : 0,
+		received_date: data.received_date || null,
+		discount: data.discount ? parseFloat(data.discount) : null,
+		collected_by: data.collected_by || null,
+		payment_method: data.payment_method || null,
+		
+		// Legacy fields for backward compatibility
+		selectedPackage: data.selected_package ? parseInt(data.selected_package) : null,
+		packageDetails: data.packageDetails || null,
+		selectedItems: data.inventory_items || null,
+		bill_date: new Date(),
 		aadhar_no: data.aadhar_no || null,
 		other_id: data.other_id || null,
 		pan_no: data.pan_no ? data.pan_no.toUpperCase() : null,
-		selectedPackage: data.selectedPackage ? parseInt(data.selectedPackage) : null,
-		packageDetails: data.packageDetails || null,
-		selectedItems: data.selectedItems || null,
-		bill_date: new Date(),
-		billing_amount: data.billing_amount ? parseFloat(data.billing_amount) : null,
-		payment_method: data.payment_method || null,
-		balance: data.billing_amount ? parseFloat(data.billing_amount) : 0,
-		cash: data.cash ? parseFloat(data.cash) : null,
-		online: data.online ? parseFloat(data.online) : null,
 		image: data.image || null,
 		frontAadharImage: data.frontAadharImage || null,
 		backAadharImage: data.backAadharImage || null,
 		panImage: data.panImage || null,
 		otherIdImage: data.otherIdImage || null,
 		signature: data.signature || null,
+		
+		// System fields
+		customer_id: customerId,
 		status: 'active',
 		customerType: 'individual',
 		registrationDate: new Date(),
-		expiry_date: expiryDate // 👈 NEW
+		expiry_date: expiryDate,
+		balance: totalAmount,
+		cash: data.payment_method === 'Cash' ? totalAmount : null,
+		online: data.payment_method === 'Online' ? totalAmount : null,
 	};
 
 	try {
+		// Check for existing mobile numbers
 		const isServiceProvider = await ServiceProviderModel.findOne({ where: { mobile_no: data.mobile } });
 		if (isServiceProvider) {
 			return res.status(200).json({ status: false, message: 'Mobile number already registered as Service Provider!' });
@@ -362,7 +210,7 @@ const SignupUser = async (req, res) => {
 			return res.status(200).json({ status: false, message: 'Failed to create customer details!' });
 		}
 
-		// 2️⃣ Create Account Entry with Recharge Details
+		// Create Account Entry with Recharge Details
 		if (data.billing_amount && parseFloat(data.billing_amount) > 0) {
 			try {
 				const voucherNo = await generateVoucherNo();
@@ -376,13 +224,12 @@ const SignupUser = async (req, res) => {
 					address: data.address,
 					amount: parseFloat(data.billing_amount),
 					payment_mode: data.payment_method,
-					balance: parseFloat(data.billing_amount),
+					balance: totalAmount,
 					trans_id: null,
 					partner_emp_id: null,
 					auto_renew: false,
 					recharge_status: 'completed',
-					// 👇 NEW fields
-					recharge_days: planDuration || null,
+					recharge_days: planDuration * billingCycle || null,
 					valid_till: expiryDate || null
 				};
 
@@ -393,13 +240,13 @@ const SignupUser = async (req, res) => {
 
 				await CustomerPlanHistory.create({
 					customer_id: customerId,
-					plan_id: data.selectedPackage,
-					plan_name: data.selectedPackage ? parseInt(data.selectedPackage) : null,
+					plan_id: data.selected_package,
+					plan_name: data.selected_package ? parseInt(data.selected_package) : null,
 					amount: parseFloat(data.billing_amount),
 					recharge_date: new Date(),
-					valid_from: new Date(data.bill_date || new Date()),
+					valid_from: new Date(data.start_date || new Date()),
 					valid_till: expiryDate,
-					recharge_days: planDuration,
+					recharge_days: planDuration * billingCycle,
 				});
 			} catch (accountError) {
 				console.error('Error creating account transaction:', accountError);
@@ -417,7 +264,7 @@ const SignupUser = async (req, res) => {
 				email: data.email,
 				gender: data.gender,
 				address: data.address,
-				t_address: data.t_address,
+				installation_address: data.installation_address,
 				area: data.area,
 				block: data.block,
 				apartment: data.apartment,
@@ -425,11 +272,20 @@ const SignupUser = async (req, res) => {
 				alternate_no: data.alternate_no,
 				dob: data.dob,
 				doa: data.doa,
-				aadhar_no: data.aadhar_no,
-				other_id: data.other_id,
-				pan_no: data.pan_no,
-				selectedPackage: data.selectedPackage,
-				packageDetails: data.packageDetails,
+				selected_package: data.selected_package,
+				other_services: data.other_services,
+				inventory_items: data.inventory_items,
+				billing_amount: data.billing_amount,
+				billing_cycle: billingCycle,
+				other_charges: data.other_charges,
+				previous_dues: data.previous_dues,
+				start_date: data.start_date,
+				end_date: data.end_date,
+				received_amount: data.received_amount,
+				received_date: data.received_date,
+				discount: data.discount,
+				collected_by: data.collected_by,
+				payment_method: data.payment_method,
 				expiry_date: expiryDate
 			},
 			message: "Customer Added Successfully!"
