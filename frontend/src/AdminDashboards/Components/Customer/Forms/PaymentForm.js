@@ -22,13 +22,16 @@ import { API_URL } from '../../../../config';
 import SelectBox from '../../../Elements/SelectBox';
 
 const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = {} }) => {
+
+    console.log("customerData-", customerData);
     const [formData, setFormData] = useState({
         customer_id: customerData?.customer_id || '',
         amount: '',
-        payment_mode: '',
+        payment_method: '',
         trans_id: '',
         plan_id: '',
-        selectedPackage: null
+        selectedPackage: null,
+        balance: customerData?.balance || 0
     });
     
     const [errors, setErrors] = useState({});
@@ -39,7 +42,8 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
         if (customerData?.customer_id) {
             setFormData(prev => ({
                 ...prev,
-                customer_id: customerData.customer_id
+                customer_id: customerData.customer_id,
+                balance: customerData?.balance || 0
             }));
         }
     }, [customerData]);
@@ -50,6 +54,7 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
     }, []);
 
     const handleChange = (field, value) => {
+       
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -91,11 +96,11 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
             newErrors.amount = 'Valid amount is required';
         }
         
-        if (!formData.payment_mode) {
-            newErrors.payment_mode = 'Payment mode is required';
+        if (!formData.payment_method) {
+            newErrors.payment_method = 'Payment mode is required';
         }
         
-        if (formData.payment_mode && formData.payment_mode !== 'cash' && formData.payment_mode !== 'cheque' && !formData.trans_id) {
+        if (formData.payment_method && formData.payment_method !== 'cash' && formData.payment_method !== 'cheque' && !formData.trans_id) {
             newErrors.trans_id = 'Transaction ID is required for this payment mode';
         }
         
@@ -120,9 +125,11 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
         setFormData({
             customer_id: customerData?.customer_id || '',
             amount: '',
-            payment_mode: '',
+            payment_method: '',
             trans_id: '',
-            plan_id: ''
+            plan_id: '',
+            selectedPackage: null,
+            balance: customerData?.balance || 0
         });
         setErrors({});
         onClose();
@@ -170,7 +177,7 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
                                     setFormData(prev => ({ 
                                         ...prev, 
                                         selectedPackage: value,
-                                        amount: value ? value.finalPrice : '',
+                                        amount: value ? (parseFloat(value.finalPrice) + parseFloat(prev.balance || 0)).toString() : '',
                                         plan_id: value ? value.id : '',
                                     }));
                                 }} 
@@ -196,6 +203,26 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
                 </Row>
                 
                 <Row className="mt-3">
+                    <Col xs={12} md={6} className='mb-3'>
+                        <TextField
+                            fullWidth
+                            label="Previous Due"
+                            type="number"
+                            value={formData?.balance}
+                            onChange={(e) => handleChange('balance', e.target.value)}
+                            error={!!errors.balance}
+                            helperText={errors.balance}
+                            required
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <CurrencyRupee fontSize="small" />
+                                    </InputAdornment>
+                                ),
+                            }}
+                            disabled
+                        />
+                    </Col>
                     <Col xs={12} md={6}>
                         <TextField
                             fullWidth
@@ -220,10 +247,10 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
                         <FormControl fullWidth>
                             <InputLabel>Payment Mode</InputLabel>
                             <Select
-                                value={formData?.payment_mode}
+                                value={formData?.payment_method}
                                 label="Payment Mode"
-                                onChange={(e) => handleChange('payment_mode', e.target.value)}
-                                error={!!errors.payment_mode}
+                                onChange={(e) => handleChange('payment_method', e.target.value)}
+                                error={!!errors.payment_method}
                                 required
                             >
                                 <MenuItem value="cash">Cash</MenuItem>
@@ -233,10 +260,7 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
                             </Select>
                         </FormControl>
                     </Col>
-                </Row>
-                
-                {formData.payment_mode && formData.payment_mode !== 'cash' && formData.payment_mode !== 'cheque' && (
-                    <Row className="mt-3">
+                {formData.payment_method && formData.payment_method !== 'cash' && formData.payment_method !== 'cheque' && (
                         <Col xs={12} md={6}>
                             <TextField
                                 fullWidth
@@ -248,8 +272,8 @@ const PaymentForm = ({ open, onClose, onSubmit, loading = false, customerData = 
                                 placeholder="Enter transaction/reference ID"
                             />
                         </Col>
-                    </Row>
-                )}
+                    )}
+                </Row>
             </DialogContent>
             
             <DialogActions sx={{ p: 3, pt: 1 }}>

@@ -30,6 +30,7 @@ import {
     CheckCircle, 
     AccessTime
 } from '@mui/icons-material';
+import { API_URL } from '../../../../config';
 
 const BillingDetails = ({ open, onClose, customerData = {} }) => {
     const [billingData, setBillingData] = useState([]);
@@ -48,7 +49,7 @@ const BillingDetails = ({ open, onClose, customerData = {} }) => {
         setError(null);
         
         try {
-            const response = await fetch('http://localhost:5000/customer/get-billing-details', {
+            const response = await fetch(`${API_URL}/customer/get-billing-details`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,26 +92,7 @@ const BillingDetails = ({ open, onClose, customerData = {} }) => {
         return `₹${parseFloat(amount).toFixed(2)}`;
     };
 
-    const getStatusColor = (validTill) => {
-        const today = new Date();
-        const expiryDate = new Date(validTill);
-        const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-        
-        if (daysLeft < 0) return 'error';
-        if (daysLeft <= 7) return 'warning';
-                return 'success';
-    };
 
-    const getStatusText = (validTill) => {
-        const today = new Date();
-        const expiryDate = new Date(validTill);
-        const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-        
-        if (daysLeft < 0) return 'Expired';
-        if (daysLeft === 0) return 'Expires Today';
-        if (daysLeft <= 7) return `${daysLeft} days left`;
-        return 'Active';
-    };
 
     return (
         <Dialog 
@@ -185,12 +167,14 @@ const BillingDetails = ({ open, onClose, customerData = {} }) => {
                         <Table>
                             <TableHead>
                                 <TableRow sx={{ bgcolor: 'grey.100' }}>
-                                    <TableCell><strong>Plan</strong></TableCell>
-                                    <TableCell><strong>Amount</strong></TableCell>
-                                    <TableCell><strong>Recharge Date</strong></TableCell>
-                                    <TableCell><strong>Valid From</strong></TableCell>
-                                    <TableCell><strong>Valid Till</strong></TableCell>
-                                    <TableCell><strong>Days</strong></TableCell>
+                                    <TableCell><strong>Plan ID</strong></TableCell>
+                                    <TableCell><strong>Billing Amount</strong></TableCell>
+                                    <TableCell><strong>Paid Amount</strong></TableCell>
+                                    <TableCell><strong>Due Amount</strong></TableCell>
+                                    <TableCell><strong>Discount</strong></TableCell>
+                                    <TableCell><strong>Start Date</strong></TableCell>
+                                    <TableCell><strong>End Date</strong></TableCell>
+                                    <TableCell><strong>Payment Method</strong></TableCell>
                                     <TableCell><strong>Status</strong></TableCell>
                                 </TableRow>
                             </TableHead>
@@ -198,50 +182,59 @@ const BillingDetails = ({ open, onClose, customerData = {} }) => {
                                 {billingData.map((billing, index) => (
                                     <TableRow key={billing.id} sx={{ '&:nth-of-type(odd)': { bgcolor: 'grey.50' } }}>
                                         <TableCell>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <Payment fontSize="small" color="primary" />
                                                 <Typography variant="body2" fontWeight="medium">
-                                                    {billing.plan_name}
+                                                    Plan {billing.plan_id}
                                                 </Typography>
-                                    </Box>
+                                            </Box>
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="body2" fontWeight="bold" color="success.main">
-                                                {formatAmount(billing.amount)}
+                                                {formatAmount(billing.billing_amount)}
                                             </Typography>
                                         </TableCell>
                                         <TableCell>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2" fontWeight="bold" color="primary.main">
+                                                {formatAmount(billing.paid_amount)}
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography variant="body2" fontWeight="bold" color="error.main">
+                                                {formatAmount(billing.due_amount)}
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography variant="body2" color="warning.main">
+                                                {formatAmount(billing.discount)}
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <CalendarToday fontSize="small" color="action" />
                                                 <Typography variant="body2">
-                                                    {formatDate(billing.recharge_date)}
+                                                    {formatDate(billing.start_date)}
                                                 </Typography>
-                                    </Box>
+                                            </Box>
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="body2">
-                                                {formatDate(billing.valid_from)}
+                                                {formatDate(billing.end_date)}
                                             </Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2">
-                                                {formatDate(billing.valid_till)}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <AccessTime fontSize="small" color="action" />
-                                                <Typography variant="body2">
-                                                    {billing.recharge_days} days
-                                                </Typography>
-                                    </Box>
                                         </TableCell>
                                         <TableCell>
                                             <Chip 
-                                                label={getStatusText(billing.valid_till)}
-                                                color={getStatusColor(billing.valid_till)}
+                                                label={billing.payment_method}
+                                                color={billing.payment_method === 'Online' ? 'success' : 'primary'}
                                                 size="small"
-                                                icon={getStatusColor(billing.valid_till) === 'success' ? <CheckCircle /> : undefined}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip 
+                                                label={billing.status}
+                                                color={billing.status === 'active' ? 'success' : 'default'}
+                                                size="small"
+                                                icon={billing.status === 'active' ? <CheckCircle /> : undefined}
                                             />
                                         </TableCell>
                                     </TableRow>
@@ -273,7 +266,7 @@ const BillingDetails = ({ open, onClose, customerData = {} }) => {
                         <Grid container spacing={2}>
                             <Grid item xs={6} md={3}>
                                 <Typography variant="body2" color="text.secondary">
-                                    Total Recharges
+                                    Total Records
                                 </Typography>
                                 <Typography variant="h6" color="text.primary">
                                     {billingData.length}
@@ -281,10 +274,26 @@ const BillingDetails = ({ open, onClose, customerData = {} }) => {
                             </Grid>
                             <Grid item xs={6} md={3}>
                                 <Typography variant="body2" color="text.secondary">
-                                    Total Amount
+                                    Total Billing
                                 </Typography>
                                 <Typography variant="h6" color="success.main">
-                                    {formatAmount(billingData.reduce((sum, item) => sum + parseFloat(item.amount), 0))}
+                                    {formatAmount(billingData.reduce((sum, item) => sum + parseFloat(item.billing_amount), 0))}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6} md={3}>
+                                <Typography variant="body2" color="text.secondary">
+                                    Total Paid
+                                </Typography>
+                                <Typography variant="h6" color="primary.main">
+                                    {formatAmount(billingData.reduce((sum, item) => sum + parseFloat(item.paid_amount), 0))}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6} md={3}>
+                                <Typography variant="body2" color="text.secondary">
+                                    Total Due
+                                </Typography>
+                                <Typography variant="h6" color="error.main">
+                                    {formatAmount(billingData.reduce((sum, item) => sum + parseFloat(item.due_amount), 0))}
                                 </Typography>
                             </Grid>
                             <Grid item xs={6} md={3}>
@@ -292,19 +301,19 @@ const BillingDetails = ({ open, onClose, customerData = {} }) => {
                                     Latest Plan
                                 </Typography>
                                 <Typography variant="h6" color="text.primary">
-                                    {billingData[0]?.plan_name || 'N/A'}
+                                    Plan {billingData[0]?.plan_id || 'N/A'}
                                 </Typography>
-                    </Grid>
+                            </Grid>
                             <Grid item xs={6} md={3}>
-                            <Typography variant="body2" color="text.secondary">
+                                <Typography variant="body2" color="text.secondary">
                                     Current Status
-                            </Typography>
-                            <Chip 
-                                    label={getStatusText(billingData[0]?.valid_till)}
-                                    color={getStatusColor(billingData[0]?.valid_till)}
-                                size="small" 
-                            />
-                    </Grid>
+                                </Typography>
+                                <Chip 
+                                    label={billingData[0]?.status || 'N/A'}
+                                    color={billingData[0]?.status === 'active' ? 'success' : 'default'}
+                                    size="small" 
+                                />
+                            </Grid>
                         </Grid>
                     </Box>
                     )}

@@ -1,40 +1,27 @@
 module.exports = (sequelize, DataTypes) => {
 	const CustomerPlanHistory = sequelize.define('customer_plan_history', {
-		customer_id: {
-			type: DataTypes.STRING,
+			id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+			customer_id: {
+				type: DataTypes.INTEGER,
+				allowNull: false
+			},
+			plan_id: {
+				type: DataTypes.INTEGER,
+				allowNull: false
+			},
+			start_date: { type: DataTypes.DATEONLY, allowNull: false },
+			end_date: { type: DataTypes.DATEONLY, allowNull: false },
+			billing_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+		discount: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
+		paid_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+		due_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+		payment_method: {
+			type: DataTypes.ENUM('Cash', 'Online', 'Cheque', 'UPI'),
 			allowNull: false
 		},
-		plan_id: {
-			type: DataTypes.INTEGER,
-			allowNull: false
-		},
-		plan_name: {
-			type: DataTypes.STRING,
-			allowNull: true
-		},
-		amount: {
-			type: DataTypes.DECIMAL(10, 2),
-			allowNull: true
-		},
-		recharge_date: {
-			type: DataTypes.DATEONLY,
-			defaultValue: DataTypes.NOW
-		},
-		valid_from: {
-			type: DataTypes.DATEONLY,
-			allowNull: false
-		},
-		valid_till: {
-			type: DataTypes.DATEONLY,
-			allowNull: false
-		},
-		recharge_days: {
-			type: DataTypes.INTEGER,
-			allowNull: true
-		},
-		remarks: {
-			type: DataTypes.TEXT,
-			allowNull: true
+		status: {
+			type: DataTypes.ENUM('active', 'expired'),
+			defaultValue: 'active',
 		}
 	}, {
 		timestamps: true,

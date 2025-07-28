@@ -229,6 +229,9 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const [area, setArea] = useState(null);
 	const [otherServices, setOtherServices] = useState(null);
 	const [collectedBy, setCollectedBy] = useState(null);
+	
+	// KYC toggle state
+	const [showKYC, setShowKYC] = useState(false);
 
 	// Data states
 	const [packages, setPackages] = useState([]);
@@ -528,7 +531,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 		} catch (error) {
 			console.error('Error:', error);
 			Swal.fire({
-				title: 'Error occurred while creating customer',
+				title: error.response.data.message,
 				icon: "error",
 			});
 		} finally {
@@ -895,63 +898,89 @@ const AddNewCustomerForm = ({prop, data}) => {
 					
 					<Row className="mt-4">
 						<Col md={12}>
-							<h5>KYC Records</h5>
-							<p className="text-muted">Click 'KYC' for Customer Verification.</p>
-						</Col>
-						<Col md={6}>
-							<FormGroup>
-								<Label for="dob">Date of Birth</Label>
-								<Field
-									as={Input}
-									type="date"
-									name="dob"
-								/>
-							</FormGroup>
-						</Col>
-						<Col md={6}>
-							<FormGroup>
-								<Label for="doa">Date of Anniversary</Label>
-								<Field
-									as={Input}
-									type="date"
-									name="doa"
-								/>
-							</FormGroup>
-						</Col>
-						<Col md={6}>
-							<FormGroup>
-								<Label for="aadhar_card">Aadhar Card</Label>
-								<Input 
-									type="file" 
-									name="aadhar_card" 
-									accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
-									onChange={(e) => handleImageChange(e, setAadharCard)} 
-								/>
-							</FormGroup>
-						</Col>
-						<Col md={6}>
-							<FormGroup>
-								<Label for="pan_card">PAN Card</Label>
-								<Input 
-									type="file" 
-									name="pan_card" 
-									accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
-									onChange={(e) => handleImageChange(e, setPanCard)} 
-								/>
-							</FormGroup>
-						</Col>
-						<Col md={6}>
-							<FormGroup>
-								<Label for="photo">Photo</Label>
-								<Input 
-									type="file" 
-									name="photo" 
-									accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
-									onChange={(e) => handleImageChange(e, setPhoto)} 
-								/>
-							</FormGroup>
+							<div className="d-flex justify-content-between align-items-center mb-3">
+								<div>
+									<h5>KYC Records</h5>
+									<p className="text-muted">Customer verification documents and details.</p>
+								</div>
+								<Button 
+									color={showKYC ? "secondary" : "primary"}
+									size="sm"
+									onClick={() => setShowKYC(!showKYC)}
+								>
+									{showKYC ? (
+										<>
+											<ALlIcon.FaEyeSlash className="mr-2" />
+											Hide KYC
+										</>
+									) : (
+										<>
+											<ALlIcon.FaEye className="mr-2" />
+											Show KYC
+										</>
+									)}
+								</Button>
+							</div>
 						</Col>
 					</Row>
+					
+					{showKYC && (
+						<Row className="mt-3">
+							<Col md={6}>
+								<FormGroup>
+									<Label for="dob">Date of Birth</Label>
+									<Field
+										as={Input}
+										type="date"
+										name="dob"
+									/>
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="doa">Date of Anniversary</Label>
+									<Field
+										as={Input}
+										type="date"
+										name="doa"
+									/>
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="aadhar_card">Aadhar Card</Label>
+									<Input 
+										type="file" 
+										name="aadhar_card" 
+										accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
+										onChange={(e) => handleImageChange(e, setAadharCard)} 
+									/>
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="pan_card">PAN Card</Label>
+									<Input 
+										type="file" 
+										name="pan_card" 
+										accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
+										onChange={(e) => handleImageChange(e, setPanCard)} 
+									/>
+								</FormGroup>
+							</Col>
+							<Col md={6}>
+								<FormGroup>
+									<Label for="photo">Photo</Label>
+									<Input 
+										type="file" 
+										name="photo" 
+										accept="image/jpeg,image/jpg,image/png,image/gif,image/bmp,image/webp"
+										onChange={(e) => handleImageChange(e, setPhoto)} 
+									/>
+								</FormGroup>
+							</Col>
+						</Row>
+					)}
 					<div className="d-flex justify-content-between mt-4">
 						<Button color="secondary" onClick={handlePrevious}>
 							<ALlIcon.FaArrowLeft className="mr-2" /> Previous
@@ -1072,28 +1101,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 								<ErrorMessage name="previous_dues" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
-						<Col md={4}>
-							<FormGroup>
-								<Label for="start_date">Start Date</Label>
-								<Field
-									as={Input}
-									type="date"
-									name="start_date"
-									placeholder="Optional to be filled"
-								/>
-							</FormGroup>
-						</Col>
-						<Col md={4}>
-							<FormGroup>
-								<Label for="end_date">End Date</Label>
-								<Field
-									as={Input}
-									type="date"
-									name="end_date"
-									placeholder="Optional to be filled"
-								/>
-							</FormGroup>
-						</Col>
+						
 						<Col md={4}>
 							<FormGroup>
 								<Label for="received_amount">Received Amount</Label>
@@ -1106,17 +1114,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 									step="0.01"
 								/>
 								<ErrorMessage name="received_amount" component="span" className="validationError" />
-							</FormGroup>
-						</Col>
-						<Col md={4}>
-							<FormGroup>
-								<Label for="received_date">Received Date</Label>
-								<Field
-									as={Input}
-									type="date"
-									name="received_date"
-									placeholder="No transaction should be record if No."
-								/>
 							</FormGroup>
 						</Col>
 						<Col md={4}>

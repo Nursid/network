@@ -53,6 +53,7 @@ db.CustomerComplaintModel = require("./CustomerComplaintModel")(sequelize, DataT
 // Fix associations - Customer has many plan histories and account entries
 db.CustomerModel.hasMany(db.CustomerPlanHistory, { foreignKey: 'customer_id', sourceKey: 'customer_id' });
 db.CustomerPlanHistory.belongsTo(db.CustomerModel, { foreignKey: 'customer_id', targetKey: 'customer_id' });
+db.CustomerModel.belongsTo(db.PlanModel, { foreignKey: 'selected_package', targetKey: 'id' });
 
 db.CustomerModel.hasMany(db.AccountModel, { foreignKey: 'cust_id', sourceKey: 'customer_id' });
 db.AccountModel.belongsTo(db.CustomerModel, { foreignKey: 'cust_id', targetKey: 'customer_id' });

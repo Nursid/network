@@ -205,8 +205,8 @@ const ManageCustomer = () => {
         try {
             const response = await axios.post(`${API_URL}/customer/re-payment`, formData);
             if (response.data.status) {
+              setPaymentModal(false);
                 Swal.fire('Success', 'Payment processed successfully!', 'success');
-                setPaymentModal(false);
                 // Refresh data
                 if (isFiltered) {
                     const filterData = {}
@@ -222,9 +222,11 @@ const ManageCustomer = () => {
                     dispatch(GetAllCustomers())
                 }
             } else {
+              setPaymentModal(false);
                 Swal.fire('Error', response.data.message || 'Failed to process payment', 'error');
             }
         } catch (error) {
+          setPaymentModal(false);
             Swal.fire('Error', 'Failed to process payment', 'error');
             console.error('Error processing payment:', error);
         } finally {
@@ -424,6 +426,13 @@ For any queries, please contact us.`;
             flex: isMobile ? 1 : undefined
         },
         { 
+            field: "username", 
+            headerName: "Username", 
+            minWidth: isMobile ? 120 : 150, 
+            editable: false,
+            flex: isMobile ? 1 : undefined
+        },
+        { 
             field: "mobile", 
             headerName: "Contact", 
             minWidth: isMobile ? 100 : 120, 
@@ -458,13 +467,31 @@ For any queries, please contact us.`;
         },
         {   
             field: "amount", 
-            headerName: "Plan Amt.", 
-            minWidth: isMobile ? 80 : 100, 
+            headerName: "Plan Amt. & Period", 
+            minWidth: isMobile ? 80 : 150, 
             editable: false,
             hide: isSmallMobile,
             renderCell: (params) => (
                 <span style={{ color: '#1976d2', fontWeight: 'bold' }}>
                     ₹{params.row.billing_amount || 0}
+                    <br />
+                    {params.row.plan && params.row.plan.days
+                        ? `${Math.round(params.row.plan.days / 30)} month${Math.round(params.row.plan.days / 30) > 1 ? 's' : ''}`
+                        : ''}
+                </span>
+            )
+        },
+        { 
+            field: "start_date", 
+            headerName: "Validity From & To", 
+            minWidth: isMobile ? 100 : 150, 
+            editable: false,
+            hide: isSmallMobile,
+            renderCell: (params) => (
+                <span style={{ fontSize: '11px' }}>
+                    {params.row.start_date ? moment(params.row.start_date).format("DD-MM-YYYY") : ''}
+                    <br />
+                    {params.row.end_date ? moment(params.row.end_date).format("DD-MM-YYYY") : ''}
                 </span>
             )
         },
