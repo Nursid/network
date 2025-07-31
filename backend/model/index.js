@@ -68,8 +68,6 @@ db.SupervisorAttendance.belongsTo(db.EmployeeModel, { foreignKey: 'emp_id', targ
 db.ServiceProviderAttendance.belongsTo(db.ServiceProviderModel, { foreignKey: 'servp_id', targetKey: 'id'});
 
 
-
-
 db.EmployeeModel.belongsTo(db.DepartmentsModel,{foreignKey: 'department_id'});
 db.EmployeeModel.belongsTo(db.DesignationModel,{foreignKey: 'designation_id'});
 

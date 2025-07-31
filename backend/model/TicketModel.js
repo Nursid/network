@@ -23,7 +23,7 @@ const TicketModel = sequelize.define('Ticket', {
         allowNull: true,
     },
     technician: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: true,
     },
     mobileNo: {

@@ -138,12 +138,39 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
+    Reminder: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    LeadsManagement: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    ServicesManagement: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    AdvertisementManagement: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    ReportsAnalysis: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    GSTBillsManagement: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    ExpensesManagement: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
   },
   {
     timestamps: true,
     tableName: "super_admin_roles",
   }
   );
-
   return SuperAdminRolesModel;
 };

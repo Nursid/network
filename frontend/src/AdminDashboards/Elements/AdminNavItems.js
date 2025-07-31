@@ -3,18 +3,21 @@ import { useNavigate } from 'react-router-dom'
 import { useUserRoleContext } from '../../Context/RolesContext'
 import { CiGrid41, CiViewList } from 'react-icons/ci';
 import { GiPayMoney } from 'react-icons/gi';
-import { MdPeopleOutline, MdInventory } from 'react-icons/md';
+import { MdPeopleOutline, MdInventory, MdAlarm, MdAnalytics, MdReceipt, MdAttachMoney, MdSettings, MdCampaign, MdAssessment} from 'react-icons/md';
 import { FaPeopleCarry } from 'react-icons/fa';
 import { MdAirplaneTicket } from "react-icons/md";
 import { useLocation } from 'react-router-dom';
 import { IoIosGitNetwork } from "react-icons/io";
 import { FaChevronDown, FaChevronRight, FaBars } from "react-icons/fa";
 import { BiTransfer, BiMoney, BiReceipt } from "react-icons/bi";
-import { FiUsers, FiUserCheck, FiUserPlus, FiLogOut } from "react-icons/fi";
+import { FiUsers, FiUserCheck, FiUserPlus, FiLogOut, FiSettings } from "react-icons/fi";
 import { AiOutlineFileText, AiOutlineGift } from "react-icons/ai";
-import { BsTicketPerforated, BsListTask } from "react-icons/bs";
+import { BsTicketPerforated, BsListTask, BsGear } from "react-icons/bs";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
+import { RiAdvertisementLine } from "react-icons/ri";
+import { TbReportAnalytics } from "react-icons/tb";
+import { VscGistSecret } from "react-icons/vsc";
 import Swal from 'sweetalert2';
 import { useAuth } from '../../Context/userAuthContext';
 
@@ -69,6 +72,12 @@ const AdminNavItems = ({ onSidebarToggle }) => {
       icon: <CiViewList size={isMobile ? 24 : 30} />,
       path: "/admin/dashboard"
     },
+    {
+      field: "Reminder",
+      title: "Reminder",
+      icon: <MdAlarm size={isMobile ? 24 : 30} />,
+      path: "/admin/reminder"
+    },
     { 
       field: "AccountTransaction", 
       title: "Account Transactions", 
@@ -78,6 +87,12 @@ const AdminNavItems = ({ onSidebarToggle }) => {
         { title: "Collection Tally", icon: <BiMoney size={20} />, path: "/admin/collection-tally" },
         { title: "Payment Pending", icon: <BiReceipt size={20} />, path: "/admin/payment-pending" },
       ]
+    },
+    { 
+      field: "Customer", 
+      title: "Customer", 
+      icon: <FaPeopleCarry size={isMobile ? 24 : 30} />,
+      path: "/admin/customer",
     },
     { 
       field: "ManageHR", 
@@ -90,10 +105,10 @@ const AdminNavItems = ({ onSidebarToggle }) => {
       ]
     },
     { 
-      field: "Customer", 
-      title: "Customer", 
+      field: "LeadsManagement",
+      title: "Leads Management",
       icon: <FaPeopleCarry size={isMobile ? 24 : 30} />,
-      path: "/admin/customer",
+      path: "/admin/leads-management",
     },
     { 
       field: "Tickets", 
@@ -119,14 +134,45 @@ const AdminNavItems = ({ onSidebarToggle }) => {
         { title: "Warehouse Management", icon: <FiUserCheck size={20} />, path: "/admin/warehouse-management" }
       ]
     },
+    {
+      field: "ServicesManagement",
+      title: "Services Management",
+      icon: <MdSettings size={isMobile ? 24 : 30} />,
+      path: "/admin/services-management",
+    },
+    {
+      field: "AdvertisementManagement",
+      title: "Advertisement Management",
+      icon: <RiAdvertisementLine size={isMobile ? 24 : 30} />,
+      path: "/admin/advertisement-management",
+    },
+    {
+      field: "ReportsAnalysis",
+      title: "Reports Analysis",
+      icon: <TbReportAnalytics size={isMobile ? 24 : 30} />,
+      path: "/admin/reports-analysis",
+    },
+    {
+      field: "GSTBillsManagement",
+      title: "GST Bills Management",
+      icon: <MdReceipt size={isMobile ? 24 : 30} />,
+      path: "/admin/gst-bills-management",
+    },
+    {
+      field: "ExpensesManagement",
+      title: "Expenses Management",
+      icon: <MdAttachMoney size={isMobile ? 24 : 30} />,
+      path: "/admin/expenses-management",
+    },
+    
     { 
       field: "ManageService", 
       title: "Settings", 
-      icon: <CiGrid41 size={isMobile ? 24 : 30} />,
+      icon: <BsGear size={isMobile ? 24 : 30} />,
       children: [
-        { title: "Manage Services", icon: <CiGrid41 size={20} />, path: "/admin/manage-services" },
+        { title: "Manage Services", icon: <MdSettings size={20} />, path: "/admin/manage-services" },
         { title: "Manage Plans", icon: <AiOutlineFileText size={20} />, path: "/admin/manage-plans" },
-        { title: "Manage Tickets Head", icon: <AiOutlineFileText size={20} />, path: "/admin/manage-tickets-head" }
+        { title: "Manage Tickets Head", icon: <BsTicketPerforated size={20} />, path: "/admin/manage-tickets-head" }
       ]
     },
   ];
