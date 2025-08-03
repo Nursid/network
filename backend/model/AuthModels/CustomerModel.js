@@ -169,10 +169,6 @@ module.exports = (sequelize) => {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: true,
         },
-        collected_by: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
         payment_method: {
             type: DataTypes.ENUM('Cash', 'Online', 'Cheque', 'UPI'),
             allowNull: true,

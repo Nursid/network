@@ -58,6 +58,10 @@ module.exports = (sequelize) => {
           valid_till: {
             type: DataTypes.DATEONLY,
             allowNull: true,
+          },
+          collected_by: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
           }
           
     }, {

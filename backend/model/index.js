@@ -71,6 +71,15 @@ db.ServiceProviderAttendance.belongsTo(db.ServiceProviderModel, { foreignKey: 's
 db.EmployeeModel.belongsTo(db.DepartmentsModel,{foreignKey: 'department_id'});
 db.EmployeeModel.belongsTo(db.DesignationModel,{foreignKey: 'designation_id'});
 
+// Account model associations
+db.AccountModel.belongsTo(db.CustomerModel, { foreignKey: 'cust_id', targetKey: 'customer_id' });
+db.CustomerModel.hasMany(db.AccountModel, { foreignKey: 'cust_id', sourceKey: 'customer_id' });
+
+// Customer to Employee association (for collected_by)
+db.AccountModel.belongsTo(db.EmployeeModel, { foreignKey: 'collected_by', targetKey: 'id', as: 'collectedByEmployee' });
+db.EmployeeModel.hasMany(db.AccountModel, { foreignKey: 'collected_by', sourceKey: 'id' });
+
+
 
 db.TicketModel.belongsTo(db.CustomerModel, { foreignKey: 'mobileNo', targetKey: 'mobile' });
 

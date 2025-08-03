@@ -12,6 +12,7 @@ router.get('/account-listing',AccountController.ListingAccount);
 router.post('/add-balance',AccountController.AddBalance);
 router.post("/edit-balance/:id",AccountController.EditBalance);
 router.post("/filter-amount",AccountController.FilterAmount);
+router.post("/filter-transactions",AccountController.FilterTransactions);
 router.get("/account-detail/:id",AccountController.GetAccountById);
 router.delete("/delete-account/:id",AccountController.DeleteAccount);
 

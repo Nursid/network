@@ -501,6 +501,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 					aadhar_card: null, pan_card: null, photo: null, billing_amount: '', billing_cycle: 1,
 					other_charges: '', previous_dues: '', start_date: '', end_date: '', received_amount: 0,
 					received_date: '', discount: '', collected_by: null, payment_method: null,
+					
 				});
 				setPhoto(null);
 				setAadharCard(null);

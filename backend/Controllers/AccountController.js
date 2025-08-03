@@ -2,6 +2,7 @@ const db = require("../model/index")
 const {Sequelize} = require('sequelize');
 const Op = Sequelize.Op;
 const AccountModel = db.AccountModel
+const EmployeeModel = db.EmployeeModel
 const moment = require('moment')
 
 const ListingAccount = async (req, res) => {
@@ -9,6 +10,20 @@ const ListingAccount = async (req, res) => {
   
 	  // Query the database with the date condition
 	  const data = await AccountModel.findAll({
+		include: [
+			{
+				model: db.CustomerModel,
+				attributes: ['name', 'customer_id'],
+				as: 'customer',
+				required: false, // Use LEFT JOIN to include transactions even if customer is null
+			},
+			{
+				model: db.EmployeeModel,
+				attributes: ['name', 'id'],
+				as: 'collectedByEmployee',
+				required: false
+			}
+		],
 		order: [['date', 'DESC']]
 	  });
   
@@ -132,6 +147,20 @@ const FilterAmount = async (req, res) => {
 
 		const data = await AccountModel.findAll({
 			where: whereCondition,
+			include: [
+				{
+					model: db.CustomerModel,
+					attributes: ['name', 'customer_id'],
+					as: 'customer',
+					required: false,
+				},
+				{
+					model: db.EmployeeModel,
+					attributes: ['name', 'id'],
+					as: 'collectedByEmployee',
+					required: false
+				}
+			],
 			order: [['date', 'DESC']]
 		});
 		
@@ -147,6 +176,85 @@ const FilterAmount = async (req, res) => {
 	}
 }
 
+const FilterTransactions = async (req, res) => {
+	try {
+		const { collectedBy, paymentType, paymentMethod, dateFrom, dateTo } = req.body;
+		
+		let whereCondition = {};
+
+		// Collected By filter (employee ID or name)
+		if (collectedBy) {
+			// Filter by employee ID in account's collected_by field
+			whereCondition.collected_by = parseInt(collectedBy);
+		}
+
+		// Payment Type filter (payment_mode)
+		if (paymentType && paymentType.trim() !== '') {
+			whereCondition.payment_mode = paymentType;
+		}
+
+		// Payment Method filter (payment_mode) - same as payment type
+		if (paymentMethod && paymentMethod.trim() !== '') {
+			whereCondition.payment_mode = paymentMethod;
+		}
+
+		// Date range filter
+		if (dateFrom || dateTo) {
+			let dateCondition = {};
+			
+			if (dateFrom) {
+				dateCondition[Op.gte] = moment(dateFrom).startOf('day').toDate();
+			}
+			
+			if (dateTo) {
+				dateCondition[Op.lte] = moment(dateTo).endOf('day').toDate();
+			}
+			
+			whereCondition.date = dateCondition;
+		}
+
+		const includeOptions = [
+			{
+				model: db.CustomerModel,
+				attributes: ['name', 'customer_id'],
+				as: 'customer',
+				required: false, // Use LEFT JOIN to include transactions even if customer is null
+			},
+			{
+				model: db.EmployeeModel,
+				attributes: ['name', 'id'],
+				as: 'collectedByEmployee',
+				required: false
+			}
+		];
+
+		// If filtering by employee name, add where condition to the employee include
+		if (collectedBy) {
+			includeOptions[1].where = {
+				id: collectedBy
+			};
+		}
+
+		const data = await AccountModel.findAll({
+			where: whereCondition,
+			include: includeOptions,
+			order: [['date', 'DESC']]
+		});
+		
+		if (data.length === 0) {
+			return res.status(200).json({ status: true, data: [], message: "No transactions found with the specified filters" });
+		}
+		
+		res.status(200).json({ status: true, data: data });
+	} catch (error) {
+		console.error('Filter error:', error);
+		res.status(400).json({
+			status: false,
+			message: "Internal Server Error: " + error.message
+		});
+	}
+};
+
 const GetAccountById = async (req, res) => {
 	try {
 		const account_id = req.params.id;
@@ -154,7 +262,21 @@ const GetAccountById = async (req, res) => {
 		const account = await AccountModel.findOne({
 			where: {
 				id: account_id
-			}
+			},
+			include: [
+				{
+					model: db.CustomerModel,
+					attributes: ['name', 'customer_id'],
+					as: 'customer',
+					required: false,
+				},
+				{
+					model: db.EmployeeModel,
+					attributes: ['name', 'id'],
+					as: 'collectedByEmployee',
+					required: false
+				}
+			]
 		});
 		
 		if (!account) {
@@ -198,6 +320,7 @@ module.exports = {
 	AddBalance,
 	EditBalance,
     FilterAmount,
+	FilterTransactions,
 	GetAccountById,
 	DeleteAccount
 }

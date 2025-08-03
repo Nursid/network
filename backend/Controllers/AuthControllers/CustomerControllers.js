@@ -497,7 +497,8 @@ const SignupUser = async (req, res) => {
 				auto_renew: false,
 				recharge_status: 'completed',
 				recharge_days: planDuration * billingCycle,
-				valid_till: expiryDate
+				valid_till: expiryDate,
+				collected_by: data.collected_by || null
 			}, { transaction });
 		}
 
@@ -1102,7 +1103,8 @@ const AddRePayment = async (req, res) => {
 		trans_id,
 		plan_id,
 		selectedPackage,
-		balance
+		balance,
+		collected_by
 	} = req.body;
 
 	try {
@@ -1168,7 +1170,8 @@ const AddRePayment = async (req, res) => {
 			vc_no: await generateVoucherNo(),
 			balance: totalPayable,
 			partner_emp_id: customer.partner_emp_id,
-			auto_renew: false
+			auto_renew: false,
+			collected_by: collected_by
 		});
 
 		// 7. Create Plan History
