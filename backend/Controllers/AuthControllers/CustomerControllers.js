@@ -1101,18 +1101,14 @@ const AddRePayment = async (req, res) => {
 		amount,
 		payment_method,
 		trans_id,
-		plan_id,
-		selectedPackage,
-		balance,
-		collected_by
 	} = req.body;
 
 	try {
 		// 1. Validate
-		if (!customer_id || !amount || !payment_method || !plan_id) {
+		if (!customer_id || !amount || !payment_method) {
 			return res.status(400).json({
 				status: false,
-				message: "Missing required fields: customer_id, amount, plan_id, or payment_mode"
+				message: "Missing required fields: customer_id, amount, or payment_mode"
 			});
 		}
 
@@ -1123,13 +1119,11 @@ const AddRePayment = async (req, res) => {
 		}
 
 		// 3. Use plan info from selectedPackage or DB fallback
-		const planData = selectedPackage?.days
-			? {
-				days: parseInt(selectedPackage.days),
-				finalPrice: parseFloat(selectedPackage.finalPrice),
-				plan: selectedPackage.plan
+		const planData = await PlanModel.findOne({
+			where: {
+				id: customer.selected_package
 			}
-			: await PlanModel.findByPk(plan_id);
+		});
 
 		if (!planData || !planData.days) {
 			return res.status(404).json({ status: false, message: "Plan not found or invalid" });
@@ -1151,9 +1145,9 @@ const AddRePayment = async (req, res) => {
 		const expiry = new Date(today);
 		expiry.setDate(today.getDate() + planData.days);
 
-		const previousDues = parseFloat(balance || 0);
+		const previousDues = parseFloat(customer.balance || 0);
 		const rechargeAmount = parseFloat(amount);
-		const totalPayable = rechargeAmount + previousDues;
+		const remainingBalance = Math.max(0, previousDues - rechargeAmount);
 
 		// 6. Create Account Entry
 		const account = await AccountModel.create({
@@ -1168,22 +1162,22 @@ const AddRePayment = async (req, res) => {
 			date: today,
 			address: customer.address,
 			vc_no: await generateVoucherNo(),
-			balance: totalPayable,
+			balance: remainingBalance,
 			partner_emp_id: customer.partner_emp_id,
 			auto_renew: false,
-			collected_by: collected_by
+			collected_by: req.user?.id || null // Fix undefined collected_by
 		});
 
 		// 7. Create Plan History
 		await CustomerPlanHistory.create({
 			customer_id,
-			plan_id,
+			plan_id: customer.selected_package,
 			start_date: today,
 			end_date: expiry,
 			billing_amount: rechargeAmount,
 			discount: 0,
 			paid_amount: rechargeAmount,
-			due_amount: previousDues,
+			due_amount: remainingBalance,
 			payment_method,
 			status: 'active'
 		});
@@ -1192,13 +1186,10 @@ const AddRePayment = async (req, res) => {
 		await CustomerModel.update(
 			{
 				bill_date: today,
-				billing_amount: rechargeAmount,
-				received_amount: rechargeAmount,
-				previous_dues: previousDues,
-				balance: 0, // After full payment
+				balance: remainingBalance, // Updated balance after payment
 				expiry_date: expiry,
 				status: 'active',
-				selected_package: plan_id
+				payment_status: remainingBalance === 0 ? true : false // Mark as paid if balance is zero
 			},
 			{ where: { customer_id } }
 		);
@@ -1206,13 +1197,15 @@ const AddRePayment = async (req, res) => {
 		// 9. Done
 		return res.status(200).json({
 			status: true,
-			message: "Recharge recorded and customer updated successfully",
+			message: remainingBalance === 0 ? "Payment completed successfully" : "Partial payment recorded successfully",
 			data: {
 				account,
 				valid_till: expiry,
-				paid: rechargeAmount,
-				previous_due: previousDues,
-				total: totalPayable
+				paid_amount: rechargeAmount,
+				previous_balance: previousDues,
+				remaining_balance: remainingBalance,
+				payment_status: remainingBalance === 0 ? 'Completed' : 'Partial',
+				customer_id: customer_id
 			}
 		});
 	} catch (error) {
@@ -1371,6 +1364,141 @@ const expireOldPlans = async () => {
 	}
 };
 
+
+const RenewPlan = async (req, res) => {
+	const {
+		customer_id,
+		plan_id,
+		renewalStartDate,
+		renewalEndDate,
+		renewalCycle,
+		selectedPackage
+	} = req.body;
+
+	try {
+		// Validate customer exists
+		const customer = await CustomerModel.findOne({ where: { customer_id } });
+		if (!customer) {
+			return res.status(404).json({ status: false, message: "Customer not found" });
+		}
+
+		// Validate plan exists
+		const plan = await PlanModel.findOne({ where: { id: plan_id } });
+		if (!plan) {
+			return res.status(404).json({ status: false, message: "Plan not found" });
+		}
+
+		// Get plan data from selectedPackage or database
+		const planData = selectedPackage?.days ? {
+			days: parseInt(selectedPackage.days),
+			finalPrice: parseFloat(selectedPackage.finalPrice),
+			plan: selectedPackage.plan,
+			connectionType: selectedPackage.connectionType,
+			code: selectedPackage.code
+		} : plan;
+
+		if (!planData || !planData.days) {
+			return res.status(400).json({ status: false, message: "Invalid plan data" });
+		}
+
+		// Calculate dates
+		const startDate = renewalStartDate ? new Date(renewalStartDate) : new Date();
+		const endDate = renewalEndDate ? new Date(renewalEndDate) : new Date(startDate.getTime() + (planData.days * 24 * 60 * 60 * 1000));
+		
+		// Calculate billing amount
+		const billingAmount = parseFloat(planData.finalPrice);
+		const previousBalance = parseFloat(customer.balance || 0);
+		const totalAmount = billingAmount + previousBalance;
+
+		// Update customer with new plan details and set payment as pending
+		const updateData = {
+			bill_date: startDate,
+			balance: totalAmount, // Total amount to be paid
+			expiry_date: endDate,
+			payment_status: false, // Payment pending
+			selected_package: plan_id, // Store plan ID as integer (foreign key)
+		};
+		console.log("updateData-",updateData)
+
+		await CustomerModel.update(updateData, { where: { customer_id } });
+
+		// Return success response with renewal details
+		res.status(200).json({ 
+			status: true, 
+			message: "Plan renewed successfully with pending payment",
+			data: {
+				customer_id,
+				plan: planData.plan,
+				billing_amount: billingAmount,
+				total_amount: totalAmount,
+				start_date: startDate,
+				end_date: endDate,
+				payment_status: "Pending",
+				renewal_cycle: renewalCycle || '1 Month'
+			}
+		});
+
+	} catch (error) {
+		console.error('Error in RenewPlan:', error);
+		res.status(500).json({ status: false, message: "Internal Server Error", error: error.message });
+	}
+};
+
+// Complete Payment for Renewed Plan
+const CompleteRenewalPayment = async (req, res) => {
+	const {
+		customer_id,
+		payment_method,
+		trans_id,
+		received_amount
+	} = req.body;
+
+	try {
+		// Validate customer exists
+		const customer = await CustomerModel.findOne({ where: { customer_id } });
+		if (!customer) {
+			return res.status(404).json({ status: false, message: "Customer not found" });
+		}
+
+		// Check if there's a pending payment
+		if (customer.payment_status === true) {
+			return res.status(400).json({ status: false, message: "No pending payment found" });
+		}
+
+		const amountReceived = parseFloat(received_amount);
+		const remainingBalance = parseFloat(customer.balance) - amountReceived;
+
+		// Update payment status
+		const updateData = {
+			payment_status: true, // Mark as paid
+			received_amount: amountReceived,
+			balance: remainingBalance > 0 ? remainingBalance : 0,
+			payment_method: payment_method,
+			transaction_id: trans_id,
+			payment_date: new Date()
+		};
+
+		await CustomerModel.update(updateData, { where: { customer_id } });
+
+		res.status(200).json({ 
+			status: true, 
+			message: "Payment completed successfully",
+			data: {
+				customer_id,
+				received_amount: amountReceived,
+				remaining_balance: remainingBalance,
+				payment_status: "Completed"
+			}
+		});
+
+	} catch (error) {
+		console.error('Error in CompleteRenewalPayment:', error);
+		res.status(500).json({ status: false, message: "Internal Server Error", error: error.message });
+	}
+};
+		
+	
+
 cron.schedule('0 0 * * *', () => {
 	console.log("🔁 Running auto-expiry for outdated plans...");
 	expireOldPlans();
@@ -1392,5 +1520,7 @@ module.exports = {
 	GetCustomerFilter,
 	AddRePayment,
 	GetBillingDetails,
-	importBulkCustomers
+	importBulkCustomers,
+	RenewPlan,
+	CompleteRenewalPayment
 };

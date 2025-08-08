@@ -88,6 +88,11 @@ module.exports = (sequelize) => {
                 key: 'id'
             }
         },
+        payment_status: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: false
+        },
         other_services: {
             type: DataTypes.TEXT,
             allowNull: true,
@@ -173,7 +178,6 @@ module.exports = (sequelize) => {
             type: DataTypes.ENUM('Cash', 'Online', 'Cheque', 'UPI'),
             allowNull: true,
         },
-        
         // Legacy fields for backward compatibility
         selectedPackage: {
             type: DataTypes.INTEGER,

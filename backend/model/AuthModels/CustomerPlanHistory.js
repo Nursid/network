@@ -11,13 +11,13 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			start_date: { type: DataTypes.DATEONLY, allowNull: false },
 			end_date: { type: DataTypes.DATEONLY, allowNull: false },
-			billing_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+			billing_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
 		discount: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
-		paid_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
-		due_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+		paid_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
+		due_amount: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
 		payment_method: {
 			type: DataTypes.ENUM('Cash', 'Online', 'Cheque', 'UPI'),
-			allowNull: false
+			allowNull: true
 		},
 		status: {
 			type: DataTypes.ENUM('active', 'expired'),

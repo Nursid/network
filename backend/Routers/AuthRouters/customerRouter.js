@@ -49,6 +49,8 @@ router.post('/block/:id', customerRouter.GetupdateBlockStatus);
 router.post('/re-payment', customerRouter.AddRePayment);
 router.post('/get-billing-details', customerRouter.GetBillingDetails);
 router.post('/import-bulk-customer', customerRouter.importBulkCustomers);
+router.post('/renew-plan', customerRouter.RenewPlan);
+
 
 
 module.exports = router;
