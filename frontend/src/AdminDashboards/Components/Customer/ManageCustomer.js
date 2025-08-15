@@ -5,7 +5,7 @@ import AddNewCustomerForm from './Forms/AddNewCustomerForm';
 import ModalComponent from '../../Elements/ModalComponent';
 import AdminDataTable from '../../Elements/AdminDataTable';
 import { useDispatch, useSelector } from 'react-redux';
-import { GetAllCustomers, FilterCustomers, DynamicFilterCustomers } from '../../../Store/Actions/Dashboard/Customer/CustomerActions';
+import { GetAllCustomers, FilterCustomers, DynamicFilterCustomers, GetReminderByID, GetAllReminder, SetReminder } from '../../../Store/Actions/Dashboard/Customer/CustomerActions';
 import moment from 'moment';
 import axios from 'axios';
 import { API_URL } from '../../../config';
@@ -54,6 +54,7 @@ import ComplaintForm from './Forms/ComplaintForm';
 import BillingDetails from './Forms/BillingDetails';
 import RePaymentForm from './Forms/RePayment';
 
+
 const ManageCustomer = () => {
     const navigate = useNavigate()
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -64,6 +65,19 @@ const ManageCustomer = () => {
     const [globalSearch, setGlobalSearch] = useState('')
     const [billingModal, setBillingModal] = useState(false)
 
+    // Add service provider controller 
+    const [addCustomer, setAddCustomer] = useState(false)
+    const [updateCustomer, setUpdateCustomer]=useState(false)
+    const [reminderModal, setReminderModal] = useState(false)
+    const [paymentModal, setPaymentModal] = useState(false)
+    const [complaintModal, setComplaintModal] = useState(false)
+    const [rePaymentModal, setRePaymentModal] = useState(false)
+
+   
+
+    const [selectedCustomer, setSelectedCustomer] = useState(null)
+    const [formLoading, setFormLoading] = useState(false)
+    const [importLoading, setImportLoading] = useState(false)
 
     const apartment_options = [
       { value: "Shiv Shakti Apartment", label: "Shiv Shakti Apartment" },
@@ -176,17 +190,24 @@ const ManageCustomer = () => {
     const handleAddRemainder = (customerId, customerData) => {
         setSelectedCustomer({ id: customerId, ...customerData });
         setReminderModal(true);
+        // Fetch reminders for this customer
+        dispatch(GetReminderByID(customerId));
     }
 
     const handleReminderSubmit = async (formData) => {
         setFormLoading(true);
         try {
-            const response = await axios.post(`${API_URL}/customer/${selectedCustomer.id}/reminder`, formData);
-            if (response.data.status) {
+            const response = await dispatch(SetReminder(formData));
+            if (response.status) {
                 Swal.fire('Success', 'Reminder set successfully!', 'success');
                 setReminderModal(false);
+                // Refresh reminders for this customer and all reminders
+                if (selectedCustomer?.id) {
+                    dispatch(GetReminderByID(selectedCustomer.id));
+                }
+                dispatch(GetAllReminder()); // Refresh all reminders
             } else {
-                Swal.fire('Error', response.data.message || 'Failed to set reminder', 'error');
+                Swal.fire('Error', response.message || 'Failed to set reminder', 'error');
             }
         } catch (error) {
             Swal.fire('Error', 'Failed to set reminder', 'error');
@@ -342,6 +363,8 @@ For any queries, please contact us.`;
     const dispatch = useDispatch()
     const { data, isLoading } = useSelector(state => state.GetAllCustomerReducer)
     const { data: filteredData, isLoading: filterLoading } = useSelector(state => state.FilterCustomersReducer)
+    const { allReminders, remindersByCustomer, setReminder } = useSelector(state => state.ReminderReducer)
+
     const [update, setUpdate]=useState([]);
     const [viewModal, setViewModel] = useState(false)
     
@@ -395,7 +418,10 @@ For any queries, please contact us.`;
     useEffect(() => {
         dispatch(GetAllCustomers())
         fetchPlans()
+       
     }, [])
+
+  
 
     const GetUpdateCustomer=(data)=>{
         setUpdate(data)
@@ -754,26 +780,19 @@ For any queries, please contact us.`;
         );
     }
 
-    // Add service provider controller 
-    const [addCustomer, setAddCustomer] = useState(false)
-    const [updateCustomer, setUpdateCustomer]=useState(false)
-    const [reminderModal, setReminderModal] = useState(false)
-    const [paymentModal, setPaymentModal] = useState(false)
-    const [complaintModal, setComplaintModal] = useState(false)
-    const [rePaymentModal, setRePaymentModal] = useState(false)
-
-   
-
-    const [selectedCustomer, setSelectedCustomer] = useState(null)
-    const [formLoading, setFormLoading] = useState(false)
-    const [importLoading, setImportLoading] = useState(false)
     
     const ToggleAddCustomer = () => setAddCustomer(!addCustomer)
     const ToggleUpdateCustomer = () => setUpdateCustomer(!updateCustomer)
+    const ToggleReminderModal = () => setReminderModal(!reminderModal)
 
     const handleSidebarToggle = (collapsed) => {
         setSidebarCollapsed(collapsed)
     }
+    useEffect(() => {
+      if (selectedCustomer?.id) {
+          dispatch(GetReminderByID(selectedCustomer.id));
+      }
+  }, [selectedCustomer?.id]);
 
     // Calculate dynamic widths based on screen size and sidebar state
     const getMainContentStyle = () => {
@@ -995,7 +1014,6 @@ const handleRePaymentSubmit = async (formData) => {
 }
 
 
-
     return (
     <>
         <Fragment>
@@ -1070,13 +1088,16 @@ const handleRePaymentSubmit = async (formData) => {
             <ModalComponent modal={updateCustomer} toggle={ToggleUpdateCustomer} data={<UpdateCustomerForm  prop={ToggleUpdateCustomer } updateData={update} />} modalTitle={"Update Customer"} size={"xl"} scrollable={true} />
 
             {/* New Modal Components */}
-            <SetReminderForm 
+            <ModalComponent modal={reminderModal} toggle={ToggleReminderModal} data={<SetReminderForm 
                 open={reminderModal}
                 onClose={() => setReminderModal(false)}
                 onSubmit={handleReminderSubmit}
-                loading={formLoading}
+                loading={formLoading || setReminder.isLoading}
                 customerData={selectedCustomer}
-            />
+                reminderLogs={remindersByCustomer.data.data || []}
+                customerId={selectedCustomer?.id}
+            />} modalTitle={"Set Reminder"} size={"xl"} scrollable={true} />
+
 
             <RenewPlanForm 
                 open={paymentModal}

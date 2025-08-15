@@ -50,6 +50,9 @@ router.post('/re-payment', customerRouter.AddRePayment);
 router.post('/get-billing-details', customerRouter.GetBillingDetails);
 router.post('/import-bulk-customer', customerRouter.importBulkCustomers);
 router.post('/renew-plan', customerRouter.RenewPlan);
+router.post('/reminder', customerRouter.SetReminder);
+router.get('/reminderbyid/:customer_id', customerRouter.GetReminderByID);
+router.get('/reminder/getall', customerRouter.GetAllReminder);
 
 
 

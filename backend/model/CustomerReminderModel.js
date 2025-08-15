@@ -3,33 +3,37 @@ const {
 } = require('sequelize');
 
 module.exports = (sequelize) => {
-    const CustomerReminder = sequelize.define('CustomerReminder', {
+    const CustomerReminder = sequelize.define('reminder', {
 
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
-        customerId: {
+        customer_id: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        task: {
+        reminder_date: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        reminderDate: {
-            type: DataTypes.DATE,
+        note: {
+            type: DataTypes.STRING,
             allowNull: false
         },
-        status: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
+        reminder_type: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        created_by: {
+            type: DataTypes.STRING,
+            allowNull: false
         },
 
     }, {
         timestamps: true,
-        tableName: 'customer_reminders',
+        tableName: 'reminders',
     });
 
     return CustomerReminder;

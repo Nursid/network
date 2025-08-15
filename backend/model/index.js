@@ -39,6 +39,7 @@ db.AccountModel= require("./AccountModel")(sequelize,DataTypes);
 db.TimeSlotModel = require("./TimeSlotModel")(sequelize, DataTypes)
 db.TicketModel = require("./TicketModel")(sequelize, DataTypes)
 db.FlowModel = require("./FlowModel")(sequelize, DataTypes)
+db.CustomerReminderModel = require("./CustomerReminderModel")(sequelize, DataTypes)
 
 
 db.SupervisorAttendance = require("./AttendanceModels/SupervisorAttendance")(sequelize, DataTypes)

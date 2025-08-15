@@ -17,6 +17,7 @@ import GetAllTicketReducers from "./Dashboard/TicketReducers";
 import GetAllTicketHeadReducers from "./Dashboard/TicketHeadReducers";
 import GetAllServicesReducer from "./Dashboard/GetAllServicesReducer";
 import GetAllCustomerFilterByFlowReducer from "./CustomersReducers.js/GetAllCustomersFilterByFlow";
+import ReminderReducer from "./CustomersReducers.js/ReminderReducer";
 
 const rootReducer = combineReducers({
     GetEmployeeRegReducer: GetEmployeeRegReducer,
@@ -37,7 +38,8 @@ const rootReducer = combineReducers({
     GetAllTicketReducers: GetAllTicketReducers,
     GetAllTicketHeadReducers: GetAllTicketHeadReducers,
     GetAllServicesReducer: GetAllServicesReducer,
-    GetAllCustomerFilterByFlowReducer: GetAllCustomerFilterByFlowReducer
+    GetAllCustomerFilterByFlowReducer: GetAllCustomerFilterByFlowReducer,
+    ReminderReducer: ReminderReducer
 })
 
 

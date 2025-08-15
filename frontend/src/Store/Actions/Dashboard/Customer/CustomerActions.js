@@ -139,6 +139,57 @@ export const DynamicFilterCustomers = (filterData) => {
     }
 }
 
+// Get all reminders
+export const GetAllReminder = () => {
+    return async (dispatch) => {
+        dispatch({ type: constant.GET_ALL_REMINDER_LOADING })
+        try {
+            const response = await axios.get(API_URL + '/customer/reminder/getall')
+            if (response.status === 200) {
+                dispatch({ type: constant.GET_ALL_REMINDER_SUCCESS, payload: response.data })
+                return response.data;
+            }
+        } catch (error) {
+            dispatch({ type: constant.GET_ALL_REMINDER_ERROR })
+            throw error;
+        }
+    }
+}
+
+// Get reminders by customer ID
+export const GetReminderByID = (customer_id) => {
+    return async (dispatch) => {
+        dispatch({ type: constant.GET_REMINDER_BY_ID_LOADING })
+        try {
+            const response = await axios.get(API_URL + `/customer/reminderbyid/${customer_id}`)
+            if (response.status === 200) {
+                dispatch({ type: constant.GET_REMINDER_BY_ID_SUCCESS, payload: response.data })
+                return response.data;
+            }
+        } catch (error) {
+            dispatch({ type: constant.GET_REMINDER_BY_ID_ERROR })
+            throw error;
+        }
+    }
+}
+
+// Set reminder
+export const SetReminder = (reminderData) => {
+    return async (dispatch) => {
+        dispatch({ type: constant.SET_REMINDER_LOADING })
+        try {
+            const response = await axios.post(API_URL + '/customer/reminder', reminderData)
+            if (response.status === 200) {
+                dispatch({ type: constant.SET_REMINDER_SUCCESS, payload: response.data })
+                return response.data;
+            }
+        } catch (error) {
+            dispatch({ type: constant.SET_REMINDER_ERROR })
+            throw error;
+        }
+    }
+}
+
 
 
 

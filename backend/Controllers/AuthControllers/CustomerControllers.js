@@ -7,6 +7,7 @@ const EmployeeModel = db.EmployeeModel
 const AccountModel = db.AccountModel
 const PlanModel = db.PlanModel
 const CustomerPlanHistory = db.CustomerPlanHistory
+const CustomerReminderModel = db.CustomerReminderModel
 const generateCustomerID = require("../misc/customeridgenerator");
 const generateVoucherNo = require("../misc/voucherGenerator");
 require("dotenv").config;
@@ -1444,6 +1445,43 @@ const RenewPlan = async (req, res) => {
 	}
 };
 
+const SetReminder = async (req, res) => {
+	const { reminder_type, reminder_date, note, created_by, customer_id } = req.body;
+
+	try {
+		// Validate required fields
+		if (!reminder_type || !reminder_date || !customer_id || !created_by) {
+			return res.status(400).json({ 
+				status: false, 
+				message: "Missing required fields: reminder_type, reminder_date, customer_id, and created_by are required" 
+			});
+		}
+
+		// Prepare data for database insertion
+		const reminderData = {
+			reminder_type,
+			reminder_date,
+			note: note || '', // Note can be optional
+			created_by: created_by.toString(), // Convert to string as per model
+			customer_id
+		};
+
+		const reminder = await CustomerReminderModel.create(reminderData);
+		res.status(200).json({ 
+			status: true, 
+			message: "Reminder set successfully", 
+			data: reminder 
+		});
+	} catch (error) {
+		console.error('Error in SetReminder:', error);
+		res.status(500).json({ 
+			status: false, 
+			message: "Internal Server Error", 
+			error: error.message 
+		});
+	}
+};
+
 // Complete Payment for Renewed Plan
 const CompleteRenewalPayment = async (req, res) => {
 	const {
@@ -1496,7 +1534,30 @@ const CompleteRenewalPayment = async (req, res) => {
 		res.status(500).json({ status: false, message: "Internal Server Error", error: error.message });
 	}
 };
-		
+
+const GetAllReminder = async (req, res) => {
+	try {
+		const reminder = await CustomerReminderModel.findAll({
+			order: [['id', 'DESC']]
+		});
+		res.status(200).json({ status: true, message: "successfully", data: reminder });
+	} catch (error) {
+		console.error('Error in GetAllReminder:', error);
+		res.status(500).json({ status: false, message: "Internal Server Error", error: error.message });
+	}
+};
+
+
+const GetReminderByID = async (req, res) => {
+	const { customer_id } = req.params;
+	try {
+		const reminder = await CustomerReminderModel.findAll({ where: { customer_id } });
+		res.status(200).json({ status: true, message: "Reminder successfully", data: reminder });
+	} catch (error) {
+		console.error('Error in GetReminder:', error);
+		res.status(500).json({ status: false, message: "Internal Server Error", error: error.message });
+	}
+};
 	
 
 cron.schedule('0 0 * * *', () => {
@@ -1522,5 +1583,8 @@ module.exports = {
 	GetBillingDetails,
 	importBulkCustomers,
 	RenewPlan,
-	CompleteRenewalPayment
+	CompleteRenewalPayment,
+	SetReminder,
+	GetAllReminder,
+	GetReminderByID
 };
