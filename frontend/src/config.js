@@ -3,7 +3,7 @@
 
 
 export const API_URL = "https://api.medicinehub.in";
-export const IMG_URL = "https://api.medicinehub.in/";
+export const IMG_URL = "https://api.medicinehub.in/uploads/";
 
 
 export const employeeList = ["backoffice", "admin", "supervisor"];

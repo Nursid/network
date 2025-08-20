@@ -170,7 +170,6 @@ const AdminNavItems = ({ onSidebarToggle }) => {
       title: "Settings", 
       icon: <BsGear size={isMobile ? 24 : 30} />,
       children: [
-        { title: "Manage Services", icon: <MdSettings size={20} />, path: "/admin/manage-services" },
         { title: "Manage Plans", icon: <AiOutlineFileText size={20} />, path: "/admin/manage-plans" },
         { title: "Manage Tickets Head", icon: <BsTicketPerforated size={20} />, path: "/admin/manage-tickets-head" }
       ]

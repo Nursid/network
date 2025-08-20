@@ -35,10 +35,6 @@ const getAllTicket = async (req, res) => {
 			include: [
 				{
 					model: CustomerModel,
-					attributes: [
-						'address', 'apartment', 't_address', 'block','name', 'email','mobile'
-					],
-					
 				},
 				{
 					model: ServiceProviderModel,

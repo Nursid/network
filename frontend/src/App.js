@@ -15,7 +15,6 @@ import ManageServiceProvider from './AdminDashboards/Components/ManageHr/ManageS
 import ManageSalary from './AdminDashboards/Components/ManageHr/ManageSalary';
 import StockManagement from './AdminDashboards/Components/Inventory/stockManagement';
 import WarehouseManagement from './AdminDashboards/Components/Inventory/warehouseManagement';
-import ManageService from './AdminDashboards/Components/Settings/ManageService';
 import AllTickets from './AdminDashboards/Components/Tickets/AllTickets';
 import AssignTickets from './AdminDashboards/Components/Tickets/AssignTickets';
 import TicketsHead from './AdminDashboards/Components/Settings/TicketHead';
@@ -58,7 +57,6 @@ function App() {
             <Route path='reports-analysis' element={<ReportsAnalysis />} />
             <Route path='gst-bills-management' element={<GSTBillsManagement />} />
             <Route path='expenses-management' element={<ExpensesManagement />} />
-            <Route path='manage-services' element={<ManageService />} />
             <Route path='manage-plans' element={<ManagePlans />} />
             <Route path='manage-tickets-head' element={<TicketsHead />} />
             <Route path='profile' element={<AdminProfile />} />

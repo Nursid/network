@@ -35,7 +35,53 @@ const MasterAddService = ({ ToggleMasterAddService , data}) => {
 
     const handleImageUpload = (e, type) => {
         const file = e.target.files[0];
-        setFormData({ ...formData, [type]: file });
+        const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+        const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        const maxFileSize = 5 * 1024 * 1024; // 5MB
+
+        if (file) {
+            // Check file size
+            if (file.size > maxFileSize) {
+                Swal.fire({
+                    title: 'File Too Large',
+                    text: 'Please select an image file smaller than 5MB.',
+                    icon: 'error'
+                });
+                e.target.value = null;
+                return;
+            }
+
+            // Check file extension
+            const fileName = file.name;
+            const fileExtension = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
+            
+            // Check MIME type
+            const fileMimeType = file.type.toLowerCase();
+            
+            if (allowedExtensions.includes(fileExtension) && allowedMimeTypes.includes(fileMimeType)) {
+                // Clean filename: remove spaces, special characters, and replace with underscores
+                const cleanFileName = fileName
+                    .replace(/[^\w\s.-]/g, '') // Remove special characters except word chars, spaces, dots, hyphens
+                    .replace(/\s+/g, '_') // Replace spaces with underscores
+                    .replace(/_{2,}/g, '_') // Replace multiple underscores with single underscore
+                    .toLowerCase(); // Convert to lowercase
+                
+                // Create a new File object with the cleaned name
+                const cleanedFile = new File([file], cleanFileName, {
+                    type: file.type,
+                    lastModified: file.lastModified
+                });
+                
+                setFormData({ ...formData, [type]: cleanedFile });
+            } else {
+                Swal.fire({
+                    title: 'Invalid File Type',
+                    text: 'Please select a valid image file (JPG, JPEG, PNG).',
+                    icon: 'error'
+                });
+                e.target.value = null;
+            }
+        }
     };
 
     const handleKeyPress = (e) => {
@@ -114,17 +160,20 @@ const MasterAddService = ({ ToggleMasterAddService , data}) => {
                 <Input
                     type="file"
                     name="icon"
-                    
+                    accept="image/jpeg,image/jpg,image/png"
                     onChange={(e) => handleImageUpload(e, 'icon')}
                 />
+                <small className="text-muted">Accepted formats: JPG, JPEG, PNG (Max: 5MB)</small>
             </FormGroup>
             <FormGroup>
                 <Label for="image">Choose Image</Label>
                 <Input
                     type="file"
                     name="image"
+                    accept="image/jpeg,image/jpg,image/png"
                     onChange={(e) => handleImageUpload(e, 'image')}
                 />
+                <small className="text-muted">Accepted formats: JPG, JPEG, PNG (Max: 5MB)</small>
             </FormGroup>
             <FormGroup>
                 <Label for="details">Details (360 characters)</Label>
