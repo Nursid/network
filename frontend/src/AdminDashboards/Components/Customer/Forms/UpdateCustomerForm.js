@@ -229,6 +229,21 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 	const [otherIdImage, setOtherIdImage] = useState(updateData?.otherIdImage || null);
 	const [signature, setSignature] = useState(updateData?.signature || null);
 	
+	// Helper function to calculate end date
+	const calculateEndDate = (startDate, billingCycle) => {
+		if (!startDate || !billingCycle) return '';
+		
+		const start = new Date(startDate);
+		if (isNaN(start.getTime())) return '';
+		
+		// Calculate end date by adding billing cycle days to start date
+		const endDate = new Date(start);
+		endDate.setDate(endDate.getDate() + (30 * billingCycle));
+		
+		// Format as YYYY-MM-DD for date input
+		return endDate.toISOString().split('T')[0];
+	};
+
 	// Selection states - initialize with existing data
 	const [gender, setGender] = useState(
 		updateData?.gender ? { value: updateData.gender, label: updateData.gender } : null
@@ -265,6 +280,20 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 		fetchInventoryItems();
 		fetchEmployees();
 	}, []);
+
+	// Effect to calculate end date when dependencies change
+	useEffect(() => {
+		if (formData.start_date && formData.billing_cycle) {
+			const newEndDate = calculateEndDate(
+				formData.start_date,
+				formData.billing_cycle
+			);
+			
+			if (newEndDate && newEndDate !== formData.end_date) {
+				setFormData(prev => ({ ...prev, end_date: newEndDate }));
+			}
+		}
+	}, [formData.start_date, formData.billing_cycle]);
 
 	const fetchPackages = async () => {
 		try {
@@ -496,9 +525,6 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 			selected_package: formData.selected_package?.value || null,
 			inventory_items: JSON.stringify(formData.inventory_items)
 		};
-
-		console.log("finalData---->", finalData);
-		return;
 
 		const formDataToSend = new FormData();
 
@@ -756,9 +782,15 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 							options={packages} 
 							setSelcted={(value) => {
 								console.log('Package selected:', value);
+								const newEndDate = calculateEndDate(
+									formData.start_date,
+									formData.billing_cycle
+								);
+								
 								setFormData(prev => ({ 
 									...prev, 
 									selected_package: value,
+									end_date: newEndDate
 								}));
 							}} 
 							initialValue={formData.selected_package}
@@ -1057,8 +1089,23 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 									min="1"
 									value={formData.billing_cycle}
 									onChange={(e) => {
+										const newBillingCycle = parseInt(e.target.value) || 1;
 										setFieldValue('billing_cycle', e.target.value);
-										setFormData(prev => ({ ...prev, billing_cycle: parseInt(e.target.value) || 1 }));
+										
+										const newEndDate = calculateEndDate(
+											formData.start_date,
+											newBillingCycle
+										);
+										
+										if (newEndDate) {
+											setFieldValue('end_date', newEndDate);
+										}
+										
+										setFormData(prev => ({ 
+											...prev, 
+											billing_cycle: newBillingCycle,
+											end_date: newEndDate
+										}));
 									}}
 								/>
 								<ErrorMessage name="billing_cycle" component="span" className="validationError" />
@@ -1141,6 +1188,27 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 									type="date"
 									name="start_date"
 									placeholder="By default, today's date"
+									value={formData.start_date}
+									onChange={(e) => {
+										const newStartDate = e.target.value;
+										console.log("newStartDate---", newStartDate);
+										setFieldValue('start_date', newStartDate);
+										
+										const newEndDate = calculateEndDate(
+											newStartDate,
+											formData.billing_cycle
+										);
+										
+										if (newEndDate) {
+											setFieldValue('end_date', newEndDate);
+										}
+										
+										setFormData(prev => ({ 
+											...prev, 
+											start_date: newStartDate,
+											end_date: newEndDate
+										}));
+									}}
 								/>
 								<ErrorMessage name="start_date" component="span" className="validationError" />
 							</FormGroup>
@@ -1153,7 +1221,9 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 									as={Input}	
 									type="date"
 									name="end_date"
-									placeholder="By default, today's date"	
+									placeholder="Automatically calculated"
+									value={formData.end_date}
+									readOnly
 								/>
 								<ErrorMessage name="end_date" component="span" className="validationError" />
 							</FormGroup>

@@ -8,25 +8,24 @@ export default function SelectBox({ options, setSelcted, initialValue }) {
   useEffect(() => {
     if (options.length > 0 && initialValue) {
       let initialOption = null;
-      
-      // Check if initialValue is an object with value property or just a string/value
+  
       if (typeof initialValue === 'object' && initialValue.value) {
-        // initialValue is an object like {value: "Male", label: "Male"}
         initialOption = options.find(option => option.value === initialValue.value);
       } else {
-        // initialValue is a simple value like "Male"
         initialOption = options.find(option => option.value === initialValue);
       }
-      
-      if (initialOption) {
+  
+      if (initialOption && initialOption.value !== selectedOption?.value) {
         setSelectedOption(initialOption);
-        setSelcted(initialOption); 
+        setSelcted(initialOption); // ✅ sirf tab jab naya value ho
       }
-    } else if (!initialValue) {
-      // Reset selection when initialValue is null/undefined
+    } else if (!initialValue && selectedOption !== null) {
       setSelectedOption(null);
+      setSelcted(null);
     }
-  }, [initialValue, options, setSelcted]);
+  }, [initialValue, options]);
+  
+  
 
   const handleChange = (selectedOption) => {
     setSelectedOption(selectedOption);

@@ -224,16 +224,15 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const [signature, setSignature] = useState(null);
 	
 	// Helper function to calculate end date
-	const calculateEndDate = (startDate, packageDays, billingCycle) => {
-		if (!startDate || !packageDays || !billingCycle) return '';
+	const calculateEndDate = (startDate, billingCycle) => {
+		if (!startDate || !billingCycle) return '';
 		
 		const start = new Date(startDate);
 		if (isNaN(start.getTime())) return '';
 		
-		const totalDays = packageDays * billingCycle;
+		// Calculate end date by adding billing cycle days to start date
 		const endDate = new Date(start);
-		endDate.setDate(endDate.getDate() + totalDays);
-		
+		endDate.setDate(endDate.getDate() + (30 * billingCycle));
 		// Format as YYYY-MM-DD for date input
 		return endDate.toISOString().split('T')[0];
 	};
@@ -263,10 +262,9 @@ const AddNewCustomerForm = ({prop, data}) => {
 
 	// Effect to calculate end date when dependencies change
 	useEffect(() => {
-		if (formData.start_date && formData.selected_package?.days && formData.billing_cycle) {
+		if (formData.start_date && formData.billing_cycle) {
 			const newEndDate = calculateEndDate(
 				formData.start_date,
-				formData.selected_package.days,
 				formData.billing_cycle
 			);
 			
@@ -274,7 +272,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 				setFormData(prev => ({ ...prev, end_date: newEndDate }));
 			}
 		}
-	}, [formData.start_date, formData.selected_package?.days, formData.billing_cycle]);
+	}, [formData.start_date, formData.billing_cycle]);
 
 	const fetchPackages = async () => {
 		try {
@@ -793,7 +791,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 								console.log('Package selected:', value);
 								const newEndDate = calculateEndDate(
 									formData.start_date,
-									value?.days,
 									formData.billing_cycle
 								);
 								
@@ -1172,7 +1169,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 										
 										const newEndDate = calculateEndDate(
 											formData.start_date,
-											formData.selected_package?.days,
 											newBillingCycle
 										);
 										
@@ -1202,11 +1198,11 @@ const AddNewCustomerForm = ({prop, data}) => {
 									value={formData.start_date}
 									onChange={(e) => {
 										const newStartDate = e.target.value;
+										console.log("newStartDate---",newStartDate);
 										setFieldValue('start_date', newStartDate);
 										
 										const newEndDate = calculateEndDate(
 											newStartDate,
-											formData.selected_package?.days,
 											formData.billing_cycle
 										);
 										
