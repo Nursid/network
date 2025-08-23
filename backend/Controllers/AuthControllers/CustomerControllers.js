@@ -818,6 +818,16 @@ const GetUpdateTheCustomer = async (req, res) => {
 			selectedPackage: data.selectedPackage || null,
 			packageDetails: data.packageDetails?.trim() || '',
 			selectedItems: data.selectedItems || null,
+			activation_date: data.activation_date || null,
+			start_date: data.start_date || null,
+			end_date: data.end_date || null,
+			collected_by: data.collected_by || null,
+			other_services: data.other_services || null,
+			other_charges: data.other_charges || null,
+			previous_dues: data.previous_dues || null,
+			received_amount: data.received_amount || null,
+			received_date: data.received_date || null,
+			discount: data.discount || null,
 			...fileFields // Add file fields
 		};
 
@@ -828,7 +838,6 @@ const GetUpdateTheCustomer = async (req, res) => {
 			}
 		});
 
-		console.log('Customer data to update:', customer_data);
 
 		// Update customer record
 		const updatedRows = await CustomerModel.update(customer_data, {
@@ -906,8 +915,6 @@ const FilterCustomers = async (req, res) => {
 	try {
 		const { status, locality, block, area, apartment, name, custId, endDate, startDate, alphabet } = req.body;
 
-		console.log({ status, locality, block, area, apartment, name, custId, endDate, startDate })
-		
 		// Build dynamic where clause
 		let whereClause = {};
 		

@@ -97,7 +97,10 @@ module.exports = (sequelize) => {
             type: DataTypes.TEXT,
             allowNull: true,
         },
-        
+        activation_date: {
+            type: DataTypes.DATEONLY,
+            allowNull: true,
+        },
         // Step 3: Inventory Items & KYC Records
         inventory_items: {
             type: DataTypes.TEXT,

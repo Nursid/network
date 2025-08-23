@@ -22,6 +22,7 @@ import Swal from 'sweetalert2';
 import { BounceLoader } from 'react-spinners';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import { Box } from '@mui/material';
 
 // Custom validation function for basic info (Step 1)
 const validateBasicInfo = (values) => {
@@ -171,7 +172,7 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 			value: updateData.selectedPackage,
 			label: `Package ID: ${updateData.selectedPackage}`
 		} : null,
-		other_services: null,
+		other_services: updateData?.other_services || null,
 		
 		// Step 3: Inventory Items & KYC Records
 		inventory_items: (() => {
@@ -190,9 +191,9 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 		})(),
 		dob: updateData?.dob || '',
 		doa: updateData?.doa || '',
-		aadhar_card: null,
-		pan_card: null,
-		photo: null,
+		aadhar_card: updateData?.aadhar_card || null,
+		pan_card: updateData?.pan_card || null,
+		photo: updateData?.photo || null,
 		
 		// Step 4: Billing Details
 		billing_amount: updateData?.billing_amount || '',
@@ -212,19 +213,21 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 			value: updateData.payment_method,
 			label: updateData.payment_method
 		} : null,
+		activation_date: updateData?.activation_date || '',
+		
 	});
 
 	// File uploads state
-	const [photo, setPhoto] = useState(null);
-	const [aadharCard, setAadharCard] = useState(null);
-	const [panCard, setPanCard] = useState(null);
+	const [photo, setPhoto] = useState(updateData?.photo || null);
+	const [aadharCard, setAadharCard] = useState(updateData?.aadhar_card || null);
+	const [panCard, setPanCard] = useState(updateData?.pan_card || null);
 	// Legacy file states for backward compatibility
-	const [image, setImage] = useState(null);
+	const [image, setImage] = useState(updateData?.image || null);
 	const [frontAadharImage, setFrontAadharImage] = useState(null);
-	const [backAadharImage, setBackAadharImage] = useState(null);
-	const [panImage, setPanImage] = useState(null);
-	const [otherIdImage, setOtherIdImage] = useState(null);
-	const [signature, setSignature] = useState(null);
+	const [backAadharImage, setBackAadharImage] = useState(updateData?.backAadharImage || null);
+	const [panImage, setPanImage] = useState(updateData?.panImage || null);
+	const [otherIdImage, setOtherIdImage] = useState(updateData?.otherIdImage || null);
+	const [signature, setSignature] = useState(updateData?.signature || null);
 	
 	// Selection states - initialize with existing data
 	const [gender, setGender] = useState(
@@ -494,6 +497,9 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 			inventory_items: JSON.stringify(formData.inventory_items)
 		};
 
+		console.log("finalData---->", finalData);
+		return;
+
 		const formDataToSend = new FormData();
 
 		for (const key in finalData) {
@@ -741,8 +747,8 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 
 	// Step 2: Package Selection
 	const renderPackageStep = () => (
-		<div>
-			<Row>
+		<Box sx={{ height: '50vh' }}>
+			<Row >
 				<Col md={6}>
 					<FormGroup>
 						<Label for="selected_package">Select Package</Label>
@@ -753,20 +759,10 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 								setFormData(prev => ({ 
 									...prev, 
 									selected_package: value,
-									billing_amount: value ? value.finalPrice : ''
 								}));
 							}} 
 							initialValue={formData.selected_package}
-						/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="other_services">Select Other Services</Label>
-						<SelectBox 
-							options={packages} 
-							setSelcted={setOtherServices} 
-							initialValue={otherServices}
+
 						/>
 					</FormGroup>
 				</Col>
@@ -797,7 +793,7 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 					Next <ALlIcon.FaArrowRight className="ml-2" />
 				</Button>
 			</div>	
-		</div>
+		</Box>
 	);
 
 	// Step 3: Inventory Items & KYC Records
@@ -1002,6 +998,10 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 				received_amount: formData.received_amount,
 				received_date: formData.received_date,
 				discount: formData.discount,
+				activation_date: formData.activation_date,
+				collected_by: formData.collected_by,
+				payment_method: formData.payment_method,
+				other_services: formData.other_services,
 			}}
 			validate={(values) => {
 				const errors = validateBilling(values);
@@ -1064,6 +1064,17 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 								<ErrorMessage name="billing_cycle" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
+
+						<Col md={4}>
+					<FormGroup>
+						<Label for="other_services">Select Other Services</Label>
+						<SelectBox 
+							options={packages} 
+							setSelcted={setOtherServices} 
+							initialValue={otherServices}
+						/>
+					</FormGroup>
+				</Col>
 						<Col md={4}>
 							<FormGroup>
 								<Label for="other_charges">Other Charges If Any</Label>
@@ -1121,7 +1132,34 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 								<ErrorMessage name="discount" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
-						<Col md={6}>
+
+						<Col md={4}>
+							<FormGroup>
+								<Label for="start_date">Start Date</Label>
+								<Field
+									as={Input}
+									type="date"
+									name="start_date"
+									placeholder="By default, today's date"
+								/>
+								<ErrorMessage name="start_date" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+
+						<Col md={4}>
+							<FormGroup>
+								<Label for="end_date">End Date</Label>
+								<Field
+									as={Input}	
+									type="date"
+									name="end_date"
+									placeholder="By default, today's date"	
+								/>
+								<ErrorMessage name="end_date" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+
+						<Col md={4}>
 							<FormGroup>
 								<Label for="collected_by">Collected By</Label>
 								<SelectBox 
@@ -1131,7 +1169,7 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 								/>
 							</FormGroup>
 						</Col>
-						<Col md={6}>
+						<Col md={4}>
 							<FormGroup>
 								<Label for="payment_method">Payment Method</Label>
 								<SelectBox 
@@ -1139,6 +1177,18 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 									setSelcted={(value) => setFormData(prev => ({ ...prev, payment_method: value }))} 
 									initialValue={formData.payment_method}
 								/>
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="activation_date">Activation Date</Label>
+								<Field
+									as={Input}	
+									type="date"
+									name="activation_date"
+									placeholder="By default, today's date"	
+								/>
+								<ErrorMessage name="activation_date" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
 					</Row>

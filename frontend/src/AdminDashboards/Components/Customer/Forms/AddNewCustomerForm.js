@@ -208,6 +208,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 		discount: '',
 		collected_by: null,
 		payment_method: null,
+		activation_date: '',
 	});
 
 	// File uploads state
@@ -222,6 +223,21 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const [otherIdImage, setOtherIdImage] = useState(null);
 	const [signature, setSignature] = useState(null);
 	
+	// Helper function to calculate end date
+	const calculateEndDate = (startDate, packageDays, billingCycle) => {
+		if (!startDate || !packageDays || !billingCycle) return '';
+		
+		const start = new Date(startDate);
+		if (isNaN(start.getTime())) return '';
+		
+		const totalDays = packageDays * billingCycle;
+		const endDate = new Date(start);
+		endDate.setDate(endDate.getDate() + totalDays);
+		
+		// Format as YYYY-MM-DD for date input
+		return endDate.toISOString().split('T')[0];
+	};
+
 	// Selection states
 	const [gender, setGender] = useState(null);
 	const [apartment, setApartment] = useState(null);
@@ -244,6 +260,21 @@ const AddNewCustomerForm = ({prop, data}) => {
 		fetchInventoryItems();
 		fetchEmployees();
 	}, []);
+
+	// Effect to calculate end date when dependencies change
+	useEffect(() => {
+		if (formData.start_date && formData.selected_package?.days && formData.billing_cycle) {
+			const newEndDate = calculateEndDate(
+				formData.start_date,
+				formData.selected_package.days,
+				formData.billing_cycle
+			);
+			
+			if (newEndDate && newEndDate !== formData.end_date) {
+				setFormData(prev => ({ ...prev, end_date: newEndDate }));
+			}
+		}
+	}, [formData.start_date, formData.selected_package?.days, formData.billing_cycle]);
 
 	const fetchPackages = async () => {
 		try {
@@ -760,23 +791,20 @@ const AddNewCustomerForm = ({prop, data}) => {
 							options={packages} 
 							setSelcted={(value) => {
 								console.log('Package selected:', value);
+								const newEndDate = calculateEndDate(
+									formData.start_date,
+									value?.days,
+									formData.billing_cycle
+								);
+								
 								setFormData(prev => ({ 
 									...prev, 
 									selected_package: value,
-									billing_amount: value ? value.finalPrice : ''
+									billing_amount: value ? value.finalPrice : '',
+									end_date: newEndDate
 								}));
 							}} 
 							initialValue={formData.selected_package}
-						/>
-					</FormGroup>
-				</Col>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="other_services">Select Other Services</Label>
-						<SelectBox 
-							options={packages} 
-							setSelcted={setOtherServices} 
-							initialValue={otherServices}
 						/>
 					</FormGroup>
 				</Col>
@@ -1012,6 +1040,10 @@ const AddNewCustomerForm = ({prop, data}) => {
 				received_amount: formData.received_amount,
 				received_date: formData.received_date,
 				discount: formData.discount,
+				activation_date: formData.activation_date,
+				collected_by: formData.collected_by,
+				payment_method: formData.payment_method,
+				other_services: formData.other_services,
 			}}
 			validate={(values) => {
 				const errors = validateBilling(values);
@@ -1057,23 +1089,15 @@ const AddNewCustomerForm = ({prop, data}) => {
 							</FormGroup>
 						</Col>
 						<Col md={4}>
-							<FormGroup>
-								<Label for="billing_cycle">Billing Cycle</Label>
-								<Field
-									as={Input}
-									type="number"
-									name="billing_cycle"
-									placeholder="By default 1"
-									min="1"
-									value={formData.billing_cycle}
-									onChange={(e) => {
-										setFieldValue('billing_cycle', e.target.value);
-										setFormData(prev => ({ ...prev, billing_cycle: parseInt(e.target.value) || 1 }));
-									}}
-								/>
-								<ErrorMessage name="billing_cycle" component="span" className="validationError" />
-							</FormGroup>
-						</Col>
+					<FormGroup>
+						<Label for="other_services">Select Other Services</Label>
+						<SelectBox 
+							options={packages} 
+							setSelcted={setOtherServices} 
+							initialValue={otherServices}
+						/>
+					</FormGroup>
+				</Col>
 						<Col md={4}>
 							<FormGroup>
 								<Label for="other_charges">Other Charges If Any</Label>
@@ -1131,7 +1155,102 @@ const AddNewCustomerForm = ({prop, data}) => {
 								<ErrorMessage name="discount" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
-						<Col md={6}>
+
+						<Col md={4}>
+							<FormGroup>
+								<Label for="billing_cycle">Billing Cycle</Label>
+								<Field
+									as={Input}
+									type="number"
+									name="billing_cycle"
+									placeholder="By default 1"
+									min="1"
+									value={formData.billing_cycle}
+									onChange={(e) => {
+										const newBillingCycle = parseInt(e.target.value) || 1;
+										setFieldValue('billing_cycle', e.target.value);
+										
+										const newEndDate = calculateEndDate(
+											formData.start_date,
+											formData.selected_package?.days,
+											newBillingCycle
+										);
+										
+										if (newEndDate) {
+											setFieldValue('end_date', newEndDate);
+										}
+										
+										setFormData(prev => ({ 
+											...prev, 
+											billing_cycle: newBillingCycle,
+											end_date: newEndDate
+										}));
+									}}
+								/>
+								<ErrorMessage name="billing_cycle" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+
+						<Col md={4}>
+							<FormGroup>
+								<Label for="start_date">Start Date</Label>
+								<Field
+									as={Input}
+									type="date"
+									name="start_date"
+									placeholder="By default, today's date"
+									value={formData.start_date}
+									onChange={(e) => {
+										const newStartDate = e.target.value;
+										setFieldValue('start_date', newStartDate);
+										
+										const newEndDate = calculateEndDate(
+											newStartDate,
+											formData.selected_package?.days,
+											formData.billing_cycle
+										);
+										
+										if (newEndDate) {
+											setFieldValue('end_date', newEndDate);
+										}
+										
+										setFormData(prev => ({ 
+											...prev, 
+											start_date: newStartDate,
+											end_date: newEndDate
+										}));
+									}}
+								/>
+								<ErrorMessage name="start_date" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="end_date">End Date</Label>
+								<Field
+									as={Input}	
+									type="date"
+									name="end_date"
+									placeholder="Automatically calculated"
+									value={formData.end_date}
+									readOnly
+								/>
+								<ErrorMessage name="end_date" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="activation_date">Activation Date</Label>
+								<Field
+									as={Input}	
+									type="date"
+									name="activation_date"
+									placeholder="By default, today's date"	
+								/>
+								<ErrorMessage name="activation_date" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+						<Col md={4}>
 							<FormGroup>
 								<Label for="collected_by">Collected By</Label>
 								<SelectBox 
@@ -1141,7 +1260,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 								/>
 							</FormGroup>
 						</Col>
-						<Col md={6}>
+						<Col md={4}>
 							<FormGroup>
 								<Label for="payment_method">Payment Method</Label>
 								<SelectBox 
