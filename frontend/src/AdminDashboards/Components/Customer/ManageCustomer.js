@@ -428,9 +428,8 @@ For any queries, please contact us.`;
         ToggleUpdateCustomer();
     }
 
-    const toggleView = (data) =>{
-        setUpdate(data);
-        setViewModel(!viewModal)
+    const toggleView = (customer_id, name) =>{
+        navigate(`/admin/customer-view/${name}-${customer_id}`)
     }
 
 
@@ -572,196 +571,362 @@ For any queries, please contact us.`;
                 </span>
             )
         },
-        { 
-            field: "edit", 
-            headerName: "Edit", 
-            minWidth: isMobile ? 100 : 120, 
-            editable: false,
-            hide: isSmallMobile,
-            renderCell: (params) => (
-                <span style={{ fontSize: '11px' }}>
-                    <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#2196f3', 
-                                    color: 'white',
-                                    width: '40px',
-                                    height: '40px',
-                                    minWidth: '40px'
-                                }}
-                                onClick={() => GetUpdateCustomer(params.row)}
-                            >
-                                <BorderColorIcon style={{ fontSize: '14px' }} />
-                            </IconButton>
-                </span>
-            )
-        },
-        {
-            field: "action",
-            headerName: "Action",
-            minWidth: isMobile ? 120 : 180,
-            sortable: false,
-            renderCell: (params) => (
-                <div style={{ 
-                    display: 'flex', 
-                    flexDirection: isMobile ? 'row' : 'column', 
-                    gap: isMobile ? '2px' : '4px',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '100%',
-                    padding: '4px 0',
-                    flexWrap: 'wrap'
-                }}>
-                    {/* First Row of Action Buttons */}
-                    <div style={{ 
-                        display: 'flex', 
-                        gap: isMobile ? '2px' : '3px', 
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexWrap: 'wrap'
-                    }}>
-                        <Tooltip title="View" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#4caf50', 
-                                    color: 'white',
-                                    width: isMobile ? '20px' : '24px',
-                                    height: isMobile ? '20px' : '24px',
-                                    minWidth: isMobile ? '20px' : '24px'
-                                }}
-                                onClick={() => toggleView(params.row)}
-                            >
-                                <VisibilityIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
-                            </IconButton>
-                        </Tooltip>
+        // { 
+        //     field: "edit", 
+        //     headerName: "Edit", 
+        //     minWidth: isMobile ? 100 : 120, 
+        //     editable: false,
+        //     hide: isSmallMobile,
+        //     renderCell: (params) => (
+        //         <span style={{ fontSize: '11px' }}>
+        //             <IconButton 
+        //                         size="small" 
+        //                         style={{ 
+        //                             backgroundColor: '#2196f3', 
+        //                             color: 'white',
+        //                             width: '40px',
+        //                             height: '40px',
+        //                             minWidth: '40px'
+        //                         }}
+        //                         onClick={() => GetUpdateCustomer(params.row)}
+        //                     >
+        //                         <BorderColorIcon style={{ fontSize: '14px' }} />
+        //                     </IconButton>
+        //         </span>
+        //     )
+        // },
+        // {
+        //     field: "action",
+        //     headerName: "Action",
+        //     minWidth: isMobile ? 120 : 180,
+        //     sortable: false,
+        //     renderCell: (params) => (
+        //         <div style={{ 
+        //             display: 'flex', 
+        //             flexDirection: isMobile ? 'row' : 'column', 
+        //             gap: isMobile ? '2px' : '4px',
+        //             alignItems: 'center',
+        //             justifyContent: 'center',
+        //             height: '100%',
+        //             padding: '4px 0',
+        //             flexWrap: 'wrap'
+        //         }}>
+        //             {/* First Row of Action Buttons */}
+        //             <div style={{ 
+        //                 display: 'flex', 
+        //                 gap: isMobile ? '2px' : '3px', 
+        //                 alignItems: 'center',
+        //                 justifyContent: 'center',
+        //                 flexWrap: 'wrap'
+        //             }}>
+        //                 <Tooltip title="View" arrow>
+        //                     <IconButton 
+        //                         size="large" 
+        //                         style={{ 
+        //                             backgroundColor: '#4caf50', 
+        //                             color: 'white',
+        //                             width: isMobile ? '25px' : '29px',
+        //                             height: isMobile ? '25px' : '29px',
+        //                             minWidth: isMobile ? '25px' : '29px'
+        //                         }}
+        //                         onClick={() => toggleView(params.row.customer_id, params.row.name)}
+        //                     >
+        //                         <VisibilityIcon style={{ fontSize: isMobile ? '15px' : '17px' }} />
+        //                     </IconButton>
+        //                 </Tooltip>
 
                      
-                        <Tooltip title="Delete" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#f44336', 
-                                    color: 'white',
-                                    width: isMobile ? '20px' : '24px',
-                                    height: isMobile ? '20px' : '24px',
-                                    minWidth: isMobile ? '20px' : '24px'
-                                }}
-                                onClick={() => GetDeleteByID(params.row.id)}
-                            >
-                                <DeleteForeverIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
-                            </IconButton>
-                        </Tooltip>
+        //                 <Tooltip title="Delete" arrow>
+        //                     <IconButton 
+        //                         size="large" 
+        //                         style={{ 
+        //                             backgroundColor: '#f44336', 
+        //                             color: 'white',
+        //                             width: isMobile ? '25px' : '29px',
+        //                             height: isMobile ? '25px' : '29px',
+        //                             minWidth: isMobile ? '25px' : '29px'
+        //                         }}
+        //                         onClick={() => GetDeleteByID(params.row.id)}
+        //                     >
+        //                         <DeleteForeverIcon style={{ fontSize: isMobile ? '15px' : '17px' }} />
+        //                     </IconButton>
+        //                 </Tooltip>
 
-                        <Tooltip title="Remainder" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#9c27b0', 
-                                    color: 'white',
-                                    width: isMobile ? '20px' : '24px',
-                                    height: isMobile ? '20px' : '24px',
-                                    minWidth: isMobile ? '20px' : '24px'
-                                }}
-                                onClick={() => handleAddRemainder(params.row.id, params.row)}
-                            >
-                                <NotificationsIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Renew Plan" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#607d8b', 
-                                    color: 'white',
-                                    width: isMobile ? '20px' : '24px',
-                                    height: isMobile ? '20px' : '24px',
-                                    minWidth: isMobile ? '20px' : '24px'
-                                }}
-                                onClick={() => handlePaymentEntry(params.row.id, params.row)}
-                            >
-                                <PaymentIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
-                            </IconButton>
-                        </Tooltip>
-                    </div>
+        //                 <Tooltip title="Remainder" arrow>
+        //                     <IconButton 
+        //                         size="small" 
+        //                         style={{ 
+        //                             backgroundColor: '#9c27b0', 
+        //                             color: 'white',
+        //                             width: isMobile ? '20px' : '24px',
+        //                             height: isMobile ? '20px' : '24px',
+        //                             minWidth: isMobile ? '20px' : '24px'
+        //                         }}
+        //                         onClick={() => handleAddRemainder(params.row.id, params.row)}
+        //                     >
+        //                         <NotificationsIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+        //                     </IconButton>
+        //                 </Tooltip>
+        //                 <Tooltip title="Renew Plan" arrow>
+        //                     <IconButton 
+        //                         size="small" 
+        //                         style={{ 
+        //                             backgroundColor: '#607d8b', 
+        //                             color: 'white',
+        //                             width: isMobile ? '20px' : '24px',
+        //                             height: isMobile ? '20px' : '24px',
+        //                             minWidth: isMobile ? '20px' : '24px'
+        //                         }}
+        //                         onClick={() => handlePaymentEntry(params.row.id, params.row)}
+        //                     >
+        //                         <PaymentIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+        //                     </IconButton>
+        //                 </Tooltip>
+        //             </div>
 
-                    {/* Second Row of Action Buttons */}
-                    <div style={{ 
-                        display: 'flex', 
-                        gap: isMobile ? '2px' : '3px', 
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexWrap: 'wrap'
-                    }}>
+        //             <div style={{ 
+        //                 display: 'flex', 
+        //                 gap: isMobile ? '2px' : '3px', 
+        //                 alignItems: 'center',
+        //                 justifyContent: 'center',
+        //                 flexWrap: 'wrap'
+        //             }}>
                        
 
-                        <Tooltip title="Billing Details" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#ff5722', 
-                                    color: 'white',
-                                    width: isMobile ? '20px' : '24px',
-                                    height: isMobile ? '20px' : '24px',
-                                    minWidth: isMobile ? '20px' : '24px'
-                                }}
-                                onClick={() => handleBillingSubmit(params.row)}
-                            >
-                                <ReceiptIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
-                            </IconButton>
-                        </Tooltip>
+        //                 <Tooltip title="Billing Details" arrow>
+        //                     <IconButton 
+        //                         size="small" 
+        //                         style={{ 
+        //                             backgroundColor: '#ff5722', 
+        //                             color: 'white',
+        //                             width: isMobile ? '20px' : '24px',
+        //                             height: isMobile ? '20px' : '24px',
+        //                             minWidth: isMobile ? '20px' : '24px'
+        //                         }}
+        //                         onClick={() => handleBillingSubmit(params.row)}
+        //                     >
+        //                         <ReceiptIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+        //                     </IconButton>
+        //                 </Tooltip>
 
-                        <Tooltip title="Complain" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#e91e63', 
-                                    color: 'white',
-                                    width: isMobile ? '20px' : '24px',
-                                    height: isMobile ? '20px' : '24px',
-                                    minWidth: isMobile ? '20px' : '24px'
-                                }}
-                                onClick={() => handleComplain(params.row)}
-                            >
-                                <ReportProblemIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
-                            </IconButton>
-                        </Tooltip>
+        //                 <Tooltip title="Complain" arrow>
+        //                     <IconButton 
+        //                         size="small" 
+        //                         style={{ 
+        //                             backgroundColor: '#e91e63', 
+        //                             color: 'white',
+        //                             width: isMobile ? '20px' : '24px',
+        //                             height: isMobile ? '20px' : '24px',
+        //                             minWidth: isMobile ? '20px' : '24px'
+        //                         }}
+        //                         onClick={() => handleComplain(params.row)}
+        //                     >
+        //                         <ReportProblemIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+        //                     </IconButton>
+        //                 </Tooltip>
 
-                        <Tooltip title="Send WhatsApp Message (Payment Reminder/Confirmation)" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#25d366', 
-                                    color: 'white',
-                                    width: isMobile ? '20px' : '24px',
-                                    height: isMobile ? '20px' : '24px',
-                                    minWidth: isMobile ? '20px' : '24px'
-                                }}
-                                onClick={() => handleWhatsAppMessage(params.row.id, params.row)}
-                            >
-                                <WhatsAppIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
-                            </IconButton>
-                        </Tooltip>
+        //                 <Tooltip title="Send WhatsApp Message (Payment Reminder/Confirmation)" arrow>
+        //                     <IconButton 
+        //                         size="small" 
+        //                         style={{ 
+        //                             backgroundColor: '#25d366', 
+        //                             color: 'white',
+        //                             width: isMobile ? '20px' : '24px',
+        //                             height: isMobile ? '20px' : '24px',
+        //                             minWidth: isMobile ? '20px' : '24px'
+        //                         }}
+        //                         onClick={() => handleWhatsAppMessage(params.row.id, params.row)}
+        //                     >
+        //                         <WhatsAppIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+        //                     </IconButton>
+        //                 </Tooltip>
 
-                        <Tooltip title="Payment" arrow>
-                            <IconButton 
-                                size="small" 
-                                style={{ 
-                                    backgroundColor: '#37474f', 
-                                    color: 'white',
-                                    width: isMobile ? '20px' : '24px',
-                                    height: isMobile ? '20px' : '24px',
-                                    minWidth: isMobile ? '20px' : '24px'
-                                }}
-                                onClick={() => handleRePayment(params.row)}
-                            >
-                                <PaymentIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
-                            </IconButton>
-                        </Tooltip>
-                    </div>
-                </div>
-            ),
-        },
+        //                 <Tooltip title="Payment" arrow>
+        //                     <IconButton 
+        //                         size="small" 
+        //                         style={{ 
+        //                             backgroundColor: '#37474f', 
+        //                             color: 'white',
+        //                             width: isMobile ? '20px' : '24px',
+        //                             height: isMobile ? '20px' : '24px',
+        //                             minWidth: isMobile ? '20px' : '24px'
+        //                         }}
+        //                         onClick={() => handleRePayment(params.row)}
+        //                     >
+        //                         <PaymentIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+        //                     </IconButton>
+        //                 </Tooltip> 
+        //             </div>
+        //         </div>
+        //     ),
+        // },
+
+        {
+          field: "action",
+          headerName: "Action",
+          minWidth: isMobile ? 120 : 180,
+          sortable: false,
+          renderCell: (params) => (
+              <div style={{ 
+                  display: 'flex', 
+                  flexDirection: isMobile ? 'row' : 'column', 
+                  gap: isMobile ? '2px' : '4px',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  padding: '4px 0',
+                  flexWrap: 'wrap'
+              }}>
+                  {/* First Row of Action Buttons */}
+                  <div style={{ 
+                      display: 'flex', 
+                      gap: isMobile ? '2px' : '3px', 
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexWrap: 'wrap'
+                  }}>
+                      <Tooltip title="View" arrow>
+                          <IconButton 
+                              size="small" 
+                              style={{ 
+                                  backgroundColor: '#4caf50', 
+                                  color: 'white',
+                                  width: isMobile ? '20px' : '24px',
+                                  height: isMobile ? '20px' : '24px',
+                                  minWidth: isMobile ? '20px' : '24px'
+                              }}
+                              onClick={() => toggleView(params.row.customer_id, params.row.name)}
+                          >
+                              <VisibilityIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+                          </IconButton>
+                      </Tooltip>
+
+                   
+                      <Tooltip title="Delete" arrow>
+                          <IconButton 
+                              size="small" 
+                              style={{ 
+                                  backgroundColor: '#f44336', 
+                                  color: 'white',
+                                  width: isMobile ? '20px' : '24px',
+                                  height: isMobile ? '20px' : '24px',
+                                  minWidth: isMobile ? '20px' : '24px'
+                              }}
+                              onClick={() => GetDeleteByID(params.row.id)}
+                          >
+                              <DeleteForeverIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+                          </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="Remainder" arrow>
+                          <IconButton 
+                              size="small" 
+                              style={{ 
+                                  backgroundColor: '#9c27b0', 
+                                  color: 'white',
+                                  width: isMobile ? '20px' : '24px',
+                                  height: isMobile ? '20px' : '24px',
+                                  minWidth: isMobile ? '20px' : '24px'
+                              }}
+                              onClick={() => handleAddRemainder(params.row.id, params.row)}
+                          >
+                              <NotificationsIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+                          </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Renew Plan" arrow>
+                          <IconButton 
+                              size="small" 
+                              style={{ 
+                                  backgroundColor: '#607d8b', 
+                                  color: 'white',
+                                  width: isMobile ? '20px' : '24px',
+                                  height: isMobile ? '20px' : '24px',
+                                  minWidth: isMobile ? '20px' : '24px'
+                              }}
+                              onClick={() => handlePaymentEntry(params.row.id, params.row)}
+                          >
+                              <PaymentIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+                          </IconButton>
+                      </Tooltip>
+                  </div>
+
+                  {/* Second Row of Action Buttons */}
+                  <div style={{ 
+                      display: 'flex', 
+                      gap: isMobile ? '2px' : '3px', 
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexWrap: 'wrap'
+                  }}>
+                     
+
+                      <Tooltip title="Billing Details" arrow>
+                          <IconButton 
+                              size="small" 
+                              style={{ 
+                                  backgroundColor: '#ff5722', 
+                                  color: 'white',
+                                  width: isMobile ? '20px' : '24px',
+                                  height: isMobile ? '20px' : '24px',
+                                  minWidth: isMobile ? '20px' : '24px'
+                              }}
+                              onClick={() => handleBillingSubmit(params.row)}
+                          >
+                              <ReceiptIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+                          </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="Complain" arrow>
+                          <IconButton 
+                              size="small" 
+                              style={{ 
+                                  backgroundColor: '#e91e63', 
+                                  color: 'white',
+                                  width: isMobile ? '20px' : '24px',
+                                  height: isMobile ? '20px' : '24px',
+                                  minWidth: isMobile ? '20px' : '24px'
+                              }}
+                              onClick={() => handleComplain(params.row)}
+                          >
+                              <ReportProblemIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+                          </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="Send WhatsApp Message (Payment Reminder/Confirmation)" arrow>
+                          <IconButton 
+                              size="small" 
+                              style={{ 
+                                  backgroundColor: '#25d366', 
+                                  color: 'white',
+                                  width: isMobile ? '20px' : '24px',
+                                  height: isMobile ? '20px' : '24px',
+                                  minWidth: isMobile ? '20px' : '24px'
+                              }}
+                              onClick={() => handleWhatsAppMessage(params.row.id, params.row)}
+                          >
+                              <WhatsAppIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+                          </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="Payment" arrow>
+                          <IconButton 
+                              size="small" 
+                              style={{ 
+                                  backgroundColor: '#37474f', 
+                                  color: 'white',
+                                  width: isMobile ? '20px' : '24px',
+                                  height: isMobile ? '20px' : '24px',
+                                  minWidth: isMobile ? '20px' : '24px'
+                              }}
+                              onClick={() => handleRePayment(params.row)}
+                          >
+                              <PaymentIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
+                          </IconButton>
+                      </Tooltip>
+                  </div>
+              </div>
+          ),
+      },
     ];
 
     const CustomToolbar = () => {

@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
-const { Op } = require("sequelize");
+const {
+	Op
+} = require("sequelize");
 const db = require("../../model/index");
 const CustomerModel = db.CustomerModel;
 const ServiceProviderModel = db.ServiceProviderModel
@@ -11,7 +13,11 @@ const CustomerReminderModel = db.CustomerReminderModel
 const generateCustomerID = require("../misc/customeridgenerator");
 const generateVoucherNo = require("../misc/voucherGenerator");
 require("dotenv").config;
-const {isEmail, isMobileNumber, isOptValid} = require("../utils");
+const {
+	isEmail,
+	isMobileNumber,
+	isOptValid
+} = require("../utils");
 const sequelize = require('../../config/sequalize');
 const cron = require('node-cron');
 
@@ -137,11 +143,11 @@ const cron = require('node-cron');
 // 		block: data.block || null,
 // 		apartment: data.apartment || null,
 // 		email: data.email || null,
-		
+
 // 		// Step 2: Package Selection
 // 		selected_package: data.selected_package ? parseInt(data.selected_package) : null,
 // 		other_services: data.other_services || null,
-		
+
 // 		// Step 3: Inventory Items & KYC Records
 // 		inventory_items: data.inventory_items || null,
 // 		dob: data.dob || null,
@@ -149,7 +155,7 @@ const cron = require('node-cron');
 // 		aadhar_card: data.aadhar_card || null,
 // 		pan_card: data.pan_card || null,
 // 		photo: data.photo || null,
-		
+
 // 		// Step 4: Billing Details
 // 		billing_amount: data.billing_amount ? parseFloat(data.billing_amount) : null,
 // 		billing_cycle: billingCycle,
@@ -162,7 +168,7 @@ const cron = require('node-cron');
 // 		discount: data.discount ? parseFloat(data.discount) : null,
 // 		collected_by: data.collected_by || null,
 // 		payment_method: data.payment_method || null,
-		
+
 // 		// Legacy fields for backward compatibility
 // 		selectedPackage: data.selected_package ? parseInt(data.selected_package) : null,
 // 		packageDetails: data.packageDetails || null,
@@ -177,7 +183,7 @@ const cron = require('node-cron');
 // 		panImage: data.panImage || null,
 // 		otherIdImage: data.otherIdImage || null,
 // 		signature: data.signature || null,
-		
+
 // 		// System fields
 // 		customer_id: customerId,
 // 		status: 'active',
@@ -340,26 +346,47 @@ const SignupUser = async (req, res) => {
 
 	// Basic validations
 	if (!data.name || !data.username || !data.mobile || !data.address) {
-		return res.status(400).json({ status: false, message: 'Required fields missing: name, username, mobile, and address are required' });
+		return res.status(400).json({
+			status: false,
+			message: 'Required fields missing: name, username, mobile, and address are required'
+		});
 	}
 
 	if (!/^\d{10}$/.test(data.mobile)) {
-		return res.status(400).json({ status: false, message: 'Mobile number must be exactly 10 digits' });
+		return res.status(400).json({
+			status: false,
+			message: 'Mobile number must be exactly 10 digits'
+		});
 	}
 	if (data.whatsapp_no && !/^\d{10}$/.test(data.whatsapp_no)) {
-		return res.status(400).json({ status: false, message: 'WhatsApp number must be exactly 10 digits' });
+		return res.status(400).json({
+			status: false,
+			message: 'WhatsApp number must be exactly 10 digits'
+		});
 	}
 	if (data.alternate_no && !/^\d{10}$/.test(data.alternate_no)) {
-		return res.status(400).json({ status: false, message: 'Alternate number must be exactly 10 digits' });
+		return res.status(400).json({
+			status: false,
+			message: 'Alternate number must be exactly 10 digits'
+		});
 	}
 	if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-		return res.status(400).json({ status: false, message: 'Invalid email format' });
+		return res.status(400).json({
+			status: false,
+			message: 'Invalid email format'
+		});
 	}
 	if (data.pan_no && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(data.pan_no.toUpperCase())) {
-		return res.status(400).json({ status: false, message: 'Invalid PAN format (e.g., ABCDE1234F)' });
+		return res.status(400).json({
+			status: false,
+			message: 'Invalid PAN format (e.g., ABCDE1234F)'
+		});
 	}
 	if (data.aadhar_no && !/^\d{12}$/.test(data.aadhar_no)) {
-		return res.status(400).json({ status: false, message: 'Aadhar number must be exactly 12 digits' });
+		return res.status(400).json({
+			status: false,
+			message: 'Aadhar number must be exactly 12 digits'
+		});
 	}
 
 	const customerId = await generateCustomerID();
@@ -452,33 +479,59 @@ const SignupUser = async (req, res) => {
 
 	// Start database transaction
 	const transaction = await sequelize.transaction();
-	
+
 	try {
 		// Check for duplicate mobile
 		const [serviceProvider, employee, customer] = await Promise.all([
-			ServiceProviderModel.findOne({ where: { mobile_no: data.mobile } }),
-			EmployeeModel.findOne({ where: { mobile_no: data.mobile } }),
-			CustomerModel.findOne({ where: { mobile: data.mobile } })
+			ServiceProviderModel.findOne({
+				where: {
+					mobile_no: data.mobile
+				}
+			}),
+			EmployeeModel.findOne({
+				where: {
+					mobile_no: data.mobile
+				}
+			}),
+			CustomerModel.findOne({
+				where: {
+					mobile: data.mobile
+				}
+			})
 		]);
-		
+
 		if (serviceProvider) {
 			await transaction.rollback();
-			return res.status(200).json({ status: false, message: 'Mobile number already registered in Service Provider!' });
+			return res.status(200).json({
+				status: false,
+				message: 'Mobile number already registered in Service Provider!'
+			});
 		}
 		if (employee) {
 			await transaction.rollback();
-			return res.status(200).json({ status: false, message: 'Mobile number already registered in Employee!' });
+			return res.status(200).json({
+				status: false,
+				message: 'Mobile number already registered in Employee!'
+			});
 		}
 		if (customer) {
 			await transaction.rollback();
-			return res.status(200).json({ status: false, message: 'Mobile number already registered in Customer!' });
+			return res.status(200).json({
+				status: false,
+				message: 'Mobile number already registered in Customer!'
+			});
 		}
 
 		// Create customer
-		const customerRecord = await CustomerModel.create(customer_data, { transaction });
+		const customerRecord = await CustomerModel.create(customer_data, {
+			transaction
+		});
 		if (!customerRecord) {
 			await transaction.rollback();
-			return res.status(500).json({ status: false, message: 'Failed to create customer record' });
+			return res.status(500).json({
+				status: false,
+				message: 'Failed to create customer record'
+			});
 		}
 
 		// Create account entry
@@ -500,14 +553,21 @@ const SignupUser = async (req, res) => {
 				recharge_days: planDuration * billingCycle,
 				valid_till: expiryDate,
 				collected_by: data.collected_by || null
-			}, { transaction });
+			}, {
+				transaction
+			});
 		}
 
 		// Expire previous plans
-		await CustomerPlanHistory.update(
-			{ status: 'expired' },
-			{ where: { customer_id: customerId, status: 'active' }, transaction }
-		);
+		await CustomerPlanHistory.update({
+			status: 'expired'
+		}, {
+			where: {
+				customer_id: customerId,
+				status: 'active'
+			},
+			transaction
+		});
 
 		// Create plan history
 		await CustomerPlanHistory.create({
@@ -521,7 +581,9 @@ const SignupUser = async (req, res) => {
 			due_amount: balanceAmount,
 			payment_method: data.payment_method,
 			status: 'active'
-		}, { transaction });
+		}, {
+			transaction
+		});
 
 		// Commit transaction
 		await transaction.commit();
@@ -547,40 +609,63 @@ const SignupUser = async (req, res) => {
 
 		if (error.name === 'SequelizeValidationError') {
 			const validationErrors = error.errors.map(err => err.message);
-			return res.status(400).json({ status: false, message: 'Validation Error', errors: validationErrors });
+			return res.status(400).json({
+				status: false,
+				message: 'Validation Error',
+				errors: validationErrors
+			});
 		}
 
 		if (error.name === 'SequelizeUniqueConstraintError') {
-			return res.status(400).json({ status: false, message: 'Username number already exists!' });
+			return res.status(400).json({
+				status: false,
+				message: 'Username number already exists!'
+			});
 		}
 
-		return res.status(500).json({ status: false, message: 'Internal Server Error' });
+		return res.status(500).json({
+			status: false,
+			message: 'Internal Server Error'
+		});
 	}
 };
 
 
 
 const LoginUser = async (req, res) => {
-	const {number, otp, otpid} = req.query;
+	const {
+		number,
+		otp,
+		otpid
+	} = req.query;
 
 	try {
 		if (!number && !otp) {
-			return res.status(400).json({error: true, message: "Invalid credentials"});
+			return res.status(400).json({
+				error: true,
+				message: "Invalid credentials"
+			});
 		}
 
 		const isVerified = await isOptValid(otp, otpid);
-		if (! isVerified) {
-			return res.status(404).json({error: true, message: "Otp Invalid or expired"});
+		if (!isVerified) {
+			return res.status(404).json({
+				error: true,
+				message: "Otp Invalid or expired"
+			});
 		}
 
-			const User = await CustomerModel.findOne({
-		where: {
-			mobile: number
-		}
-	});
+		const User = await CustomerModel.findOne({
+			where: {
+				mobile: number
+			}
+		});
 
 		if (!User) {
-			return res.status(404).json({error: true, message: "No user found"});
+			return res.status(404).json({
+				error: true,
+				message: "No user found"
+			});
 		}
 
 		res.status(200).json(User);
@@ -602,16 +687,19 @@ const DeleteUsers = (req, res) => {
 const AllCustomer = async (req, res) => {
 	try {
 		const customers = await CustomerModel.findAll({
-			include: [
-				{
+			include: [{
 					model: CustomerPlanHistory,
 					limit: 1,
-					order: [['start_date', 'DESC']]
+					order: [
+						['start_date', 'DESC']
+					]
 				},
 				{
 					model: AccountModel,
 					limit: 1,
-					order: [['date', 'DESC']]
+					order: [
+						['date', 'DESC']
+					]
 				},
 				{
 					model: PlanModel,
@@ -623,45 +711,80 @@ const AllCustomer = async (req, res) => {
 			]
 		});
 
-		if (customers.length === 0) 
-			return res.status(404).json({error: true, message: "No user found"});
+		if (customers.length === 0)
+			return res.status(404).json({
+				error: true,
+				message: "No user found"
+			});
 
 		// Transform the data to match your expected format
 		const transformedCustomers = customers.map(customer => {
 			const customerData = customer.toJSON();
 			return {
 				...customerData,
-				customer_plan_history: customerData.customer_plan_histories && customerData.customer_plan_histories.length > 0 
-					? customerData.customer_plan_histories[0] 
-					: null,
-				account: customerData.accounts && customerData.accounts.length > 0 
-					? customerData.accounts[0] 
-					: null,
+				customer_plan_history: customerData.customer_plan_histories && customerData.customer_plan_histories.length > 0 ?
+					customerData.customer_plan_histories[0] :
+					null,
+				account: customerData.accounts && customerData.accounts.length > 0 ?
+					customerData.accounts[0] :
+					null,
 				plan: customerData.plan || null,
 				customer_plan_histories: undefined, // Remove the array
 				accounts: undefined // Remove the array
 			};
 		});
-		
-		res.status(200).json({status: 200, data: transformedCustomers});
+
+		res.status(200).json({
+			status: 200,
+			data: transformedCustomers
+		});
 	} catch (error) {
 		console.error('AllCustomer error:', error);
-		res.status(500).json({error: true, message: error.message});
+		res.status(500).json({
+			error: true,
+			message: error.message
+		});
 	}
 };
 
 const GetCustomer = async (req, res) => {
 	try {
 		const id = req.params.id;
-			const isUser = await CustomerModel.findOne({
-		where:{
-			id:id
+		const isUser = await CustomerModel.findOne({
+
+			include: [{
+					model: CustomerPlanHistory,
+					limit: 1,
+					order: [
+						['start_date', 'DESC']
+					]
+				},
+				{
+					model: AccountModel,
+					limit: 1,
+					order: [
+						['date', 'DESC']
+					]
+				},
+				{
+					model: PlanModel,
+					as: 'plan'
+				}
+			],
+			where: {
+				customer_id: id
+			}
+		});
+		if (!isUser) {
+			return res.status(404).json({
+				error: true,
+				message: "No user found"
+			});
 		}
-	});
-		if (!isUser){ 
-			return res.status(404).json({error: true, message: "No user found"});
-		}
-		res.status(200).json({error: false, data: isUser});
+		res.status(200).json({
+			error: false,
+			data: isUser
+		});
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -670,227 +793,195 @@ const GetCustomer = async (req, res) => {
 const GetDeleteCustomerById = async (req, res) => {
 	const user_id = req.params.id;
 	try {
-			const rowsDeleted = await CustomerModel.destroy({
-		where: {
-			id: user_id
-		}
-		});
-
-		if (rowsDeleted === 0) {
-			return res.status(400).json({error: true, message: "No data found with this id"});
-		}
-		
-		res.status(200).json({error: false, message: "Deleted successfully"});
-	} catch (error) {
-		console.error("Error:", error);
-		res.status(500).json({error: true, message: "Internal server error"});
-	}
-};
-
-const GetUpdateTheCustomer = async (req, res) => {
-	
-	try {
-		const {user_id} = req.params;
-		const data = req.body;
-
-		// Handle multiple file uploads
-		// Accept either a new uploaded file or a string (existing image URL/filename) for each field
-		const fileFields = {
-			image: null,
-			frontAadharImage: null,
-			backAadharImage: null,
-			panImage: null,
-			otherIdImage: null,
-			signature: null
-		};
-
-		Object.keys(fileFields).forEach(fieldName => {
-			// If a new file is uploaded, use its filename
-			if (req.files && req.files[fieldName] && req.files[fieldName][0]) {
-				fileFields[fieldName] = req.files[fieldName][0].filename;
-			}
-			// If not, but a string is provided in the body (existing image url/filename), use it
-			else if (typeof req.body[fieldName] === 'string' && req.body[fieldName].trim() !== '') {
-				fileFields[fieldName] = req.body[fieldName].trim();
-			}
-			// Otherwise, leave as null (will not update)
-		});
-
-		// Validate required fields
-		if (!data.name || data.name.trim() === '') {
-			return res.status(400).json({status: false, message: 'Name is required'});
-		}
-
-		if (!data.username || data.username.trim() === '') {
-			return res.status(400).json({status: false, message: 'Username is required'});
-		}
-
-		if (!data.mobile || !/^\d{10}$/.test(data.mobile)) {
-			return res.status(400).json({status: false, message: 'Valid 10-digit mobile number is required'});
-		}
-
-		if (!data.address || data.address.trim() === '') {
-			return res.status(400).json({status: false, message: 'Address is required'});
-		}
-
-		// Validate email format if provided
-		if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-			return res.status(400).json({status: false, message: 'Valid email format is required'});
-		}
-
-		// Validate phone numbers if provided
-		if (data.whatsapp_no && !/^\d{10}$/.test(data.whatsapp_no)) {
-			return res.status(400).json({status: false, message: 'WhatsApp number must be 10 digits'});
-		}
-
-		if (data.alternate_no && !/^\d{10}$/.test(data.alternate_no)) {
-			return res.status(400).json({status: false, message: 'Alternate number must be 10 digits'});
-		}
-
-		// Validate Aadhar number if provided
-		if (data.aadhar_no && !/^\d{12}$/.test(data.aadhar_no)) {
-			return res.status(400).json({status: false, message: 'Aadhar number must be 12 digits'});
-		}
-
-		// Validate PAN number if provided
-		if (data.pan_no && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(data.pan_no)) {
-			return res.status(400).json({status: false, message: 'Invalid PAN format'});
-		}
-
-		// Check for existing users with same mobile (excluding current user)
-		const isServiceProvider = await ServiceProviderModel.findOne({
-			where: {
-				mobile_no: data.mobile
-			}
-		});
-
-		if (isServiceProvider) {
-			return res.status(400).json({status: false, message: 'Mobile number already exists as Service Provider!'});
-		}
-
-		const isSupervisor = await EmployeeModel.findOne({
-			where: {
-				mobile_no: data.mobile
-			}
-		});
-
-		if (isSupervisor) {
-			return res.status(400).json({status: false, message: 'Mobile number already exists as Supervisor!'});
-		}
-
-		// Check for duplicate username (excluding current user)
-		const existingCustomer = await CustomerModel.findOne({
-			where: {
-				username: data.username,
-				id: { [Op.ne]: user_id } // Exclude current user
-			}
-		});
-
-		if (existingCustomer) {
-			return res.status(400).json({status: false, message: 'Username already exists!'});
-		}
-
-		// Prepare data for CustomerModel (all customer details in one model)
-		const customer_data = {
-			name: data.name?.trim() || '',
-			username: data.username?.trim() || '',
-			email: data.email?.trim() || '',
-			mobile: data.mobile?.trim() || '',
-			address: data.address?.trim() || '',
-			t_address: data.t_address?.trim() || '',
-			whatsapp_no: data.whatsapp_no?.trim() || '',
-			alternate_no: data.alternate_no?.trim() || '',
-			aadhar_no: data.aadhar_no?.trim() || '',
-			other_id: data.other_id?.trim() || '',
-			pan_no: data.pan_no?.trim()?.toUpperCase() || '',
-			dob: data.dob || null,
-			doa: data.doa || null,
-			bill_date: data.bill_date || null,
-			billing_amount: data.billing_amount || null,
-			gender: data.gender || null,
-			block: data.block || null,
-			area: data.area || null,
-			apartment: data.apartment || null,
-			payment_method: data.payment_method || null,
-			online: data.online || null,
-			cash: data.cash || null,
-			// Package and inventory fields
-			selectedPackage: data.selectedPackage || null,
-			packageDetails: data.packageDetails?.trim() || '',
-			selectedItems: data.selectedItems || null,
-			activation_date: data.activation_date || null,
-			start_date: data.start_date || null,
-			end_date: data.end_date || null,
-			collected_by: data.collected_by || null,
-			other_services: data.other_services || null,
-			other_charges: data.other_charges || null,
-			previous_dues: data.previous_dues || null,
-			received_amount: data.received_amount || null,
-			received_date: data.received_date || null,
-			discount: data.discount || null,
-			...fileFields // Add file fields
-		};
-
-		// Remove empty string values and replace with null
-		Object.keys(customer_data).forEach(key => {
-			if (customer_data[key] === '') {
-				customer_data[key] = null;
-			}
-		});
-
-
-		// Update customer record
-		const updatedRows = await CustomerModel.update(customer_data, {
+		const rowsDeleted = await CustomerModel.destroy({
 			where: {
 				id: user_id
 			}
 		});
 
-		console.log('Updated Rows:', updatedRows);
-
-		if (!updatedRows || updatedRows[0] === 0) {
-			return res.status(404).json({status: false, message: "Customer not updated!"});
+		if (rowsDeleted === 0) {
+			return res.status(400).json({
+				error: true,
+				message: "No data found with this id"
+			});
 		}
 
-		return res.status(200).json({
-			status: true, 
-			message: "Customer updated successfully",
-			data: {
-				user_id,
-				updatedFields: Object.keys(customer_data)
-			}
+		res.status(200).json({
+			error: false,
+			message: "Deleted successfully"
 		});
-
 	} catch (error) {
-		console.error('Update customer error:', error);
-		return res.status(500).json({
-			status: false, 
-			message: "Internal Server Error: " + error.message
+		console.error("Error:", error);
+		res.status(500).json({
+			error: true,
+			message: "Internal server error"
 		});
 	}
 };
 
- const GetupdateBlockStatus = async (req, res) => {
-
-	const {id} = req.params;
-	const {is_block} = req.body;
+const GetUpdateTheCustomer = async (req, res) => {
 
 	try {
-			const record = await CustomerModel.findOne({
-		where: {
-			id: id
+		const {
+			customer_id
+		} = req.params;
+		const data = req.body;
+
+		console.log("data", data)
+
+		const customer = await CustomerModel.findOne({
+			where: {
+				customer_id: customer_id,
+			}
+		});
+
+		if (!customer) {
+			return res.status(404).json({
+				status: false,
+				message: "Customer not found!"
+			});
 		}
-	});
 
-		if (! record) {
-			return res.status(404).json({error: 'Record not found'});
+
+
+		// 🔹 Handle file uploads
+		const fileFields = {};
+		const uploadFields = ["image", "frontAadharImage", "backAadharImage", "panImage", "otherIdImage", "signature"];
+
+		uploadFields.forEach((fieldName) => {
+			if (req.files && req.files[fieldName] && req.files[fieldName][0]) {
+				fileFields[fieldName] = req.files[fieldName][0].filename;
+			} else if (typeof data[fieldName] === "string" && data[fieldName].trim() !== "") {
+				fileFields[fieldName] = data[fieldName].trim();
+			}
+		});
+
+		// 🔹 Prepare update object only from provided fields
+		const customer_data = {};
+		Object.keys(data).forEach((key) => {
+			if (data[key] !== undefined) {
+				customer_data[key] = typeof data[key] === "string" ? data[key].trim() : data[key];
+			}
+		});
+
+		// Add file fields if provided
+		Object.assign(customer_data, fileFields);
+
+		// 🔹 Username duplicate check (only if changed)
+		if (customer_data.username && customer_data.username !== customer.username) {
+			const existingCustomer = await CustomerModel.findOne({
+				where: {
+					username: customer_data.username,
+					customer_id: {
+						[Op.ne]: customer_id
+					}, // exclude current user
+				},
+			});
+			if (existingCustomer) {
+				return res.status(400).json({
+					status: false,
+					message: "Username already exists!"
+				});
+			}
 		}
 
-		await record.update({is_block: is_block});
+		// 🔹 Mobile number duplicate check (only if changed)
+		if (customer_data.mobile && customer_data.mobile !== customer.mobile) {
+			const isServiceProvider = await ServiceProviderModel.findOne({
+				where: {
+					mobile_no: customer_data.mobile
+				},
+			});
+			if (isServiceProvider) {
+				return res.status(400).json({
+					status: false,
+					message: "Mobile number already exists as Service Provider!"
+				});
+			}
 
-		return res.status(200).json({message: 'Block status updated successfully'});
+			const isSupervisor = await EmployeeModel.findOne({
+				where: {
+					mobile_no: customer_data.mobile
+				},
+			});
+			if (isSupervisor) {
+				return res.status(400).json({
+					status: false,
+					message: "Mobile number already exists as Supervisor!"
+				});
+			}
+
+			const existingCustomer = await CustomerModel.findOne({
+				where: {
+					mobile: customer_data.mobile,
+					customer_id: {
+						[Op.ne]: customer_id
+					},
+				},
+			});
+			if (existingCustomer) {
+				return res.status(400).json({
+					status: false,
+					message: "Mobile number already exists as Customer!"
+				});
+			}
+		}
+
+		// 🔹 Balance calculation (only if billing_amount & received_amount provided)
+		if (customer_data.billing_amount !== undefined && customer_data.received_amount !== undefined) {
+			customer_data.balance = customer_data.billing_amount - customer_data.received_amount;
+		}
+
+		// 🔹 Update only provided fields
+		await customer.update(customer_data);
+
+		return res.status(200).json({
+			status: true,
+			message: "Customer updated successfully",
+			updatedFields: Object.keys(customer_data),
+		});
 	} catch (error) {
-		res.status(500).json({error});
+		console.error("Update customer error:", error);
+		return res.status(500).json({
+			status: false,
+			message: "Internal Server Error: " + error.message,
+		});
+	}
+};
+
+const GetupdateBlockStatus = async (req, res) => {
+
+	const {
+		id
+	} = req.params;
+	const {
+		is_block
+	} = req.body;
+
+	try {
+		const record = await CustomerModel.findOne({
+			where: {
+				id: id
+			}
+		});
+
+		if (!record) {
+			return res.status(404).json({
+				error: 'Record not found'
+			});
+		}
+
+		await record.update({
+			is_block: is_block
+		});
+
+		return res.status(200).json({
+			message: 'Block status updated successfully'
+		});
+	} catch (error) {
+		res.status(500).json({
+			error
+		});
 	}
 }
 
@@ -898,47 +989,85 @@ const UpdateStatus = async (req, res) => {
 	const user_id = req.params.id
 	try {
 		const is_block = req.body;
-			const data = await CustomerModel.update(is_block, {
-		where: {
-			id: user_id
-		}
-	});
+		const data = await CustomerModel.update(is_block, {
+			where: {
+				id: user_id
+			}
+		});
 		if (data) {
-			res.status(200).json({error: false, message: data})
+			res.status(200).json({
+				error: false,
+				message: data
+			})
 		}
 	} catch (error) {
-		res.status(200).json({error: false, message: "Blocked Successfully"});
+		res.status(200).json({
+			error: false,
+			message: "Blocked Successfully"
+		});
 	}
 }
 
 const FilterCustomers = async (req, res) => {
 	try {
-		const { status, locality, block, area, apartment, name, custId, endDate, startDate, alphabet } = req.body;
+		const {
+			status,
+			locality,
+			block,
+			area,
+			apartment,
+			name,
+			custId,
+			endDate,
+			startDate,
+			alphabet
+		} = req.body;
 
 		// Build dynamic where clause
 		let whereClause = {};
-		
+
 		// Status filter
 		if (status && status !== 'all') {
 			whereClause.status = status;
 		}
-		
+
 		// Locality filter (searching in area, block, apartment, address fields)
 		if (locality && locality !== 'all' && locality !== '' && locality.value !== '') {
-			whereClause[Op.or] = [
-				{ area: { [Op.like]: `%${locality}%` } },
-				{ block: { [Op.like]: `%${locality}%` } },
-				{ apartment: { [Op.like]: `%${locality}%` } },
-				{ address: { [Op.like]: `%${locality}%` } },
-				{ t_address: { [Op.like]: `%${locality}%` } }
+			whereClause[Op.or] = [{
+					area: {
+						[Op.like]: `%${locality}%`
+					}
+				},
+				{
+					block: {
+						[Op.like]: `%${locality}%`
+					}
+				},
+				{
+					apartment: {
+						[Op.like]: `%${locality}%`
+					}
+				},
+				{
+					address: {
+						[Op.like]: `%${locality}%`
+					}
+				},
+				{
+					t_address: {
+						[Op.like]: `%${locality}%`
+					}
+				}
 			];
 		}
-		
+
 		// Company filter (if you have a company field)
 		if (block && block !== 'all' && block !== '' && block.value !== '') {
-			whereClause.block = { [Op.like]: `%${block}%` };
+			whereClause.block = {
+				[Op.like]: `%${block}%`
+			};
 		}
-		
+
 		// Broadband filter (assuming this is package related)
 		if (apartment && apartment !== 'all' && apartment !== '' && apartment.value !== '') {
 			whereClause.apartment = apartment;
@@ -948,16 +1077,23 @@ const FilterCustomers = async (req, res) => {
 		}
 
 		if (name && name !== 'all' && name !== '' && name.value !== '') {
-			whereClause.name = { [Op.like]: `%${name}%` };
+			whereClause.name = {
+				[Op.like]: `%${name}%`
+			};
 		}
-		
+
 		if (custId && custId !== 'all' && custId !== '' && custId.value !== '') {
-			whereClause[Op.or] = [
-				{ customer_id: { [Op.like]: `%${custId}%` } },
-				{ id: custId }
+			whereClause[Op.or] = [{
+					customer_id: {
+						[Op.like]: `%${custId}%`
+					}
+				},
+				{
+					id: custId
+				}
 			];
 		}
-		
+
 		// Date range filter
 		if (startDate && endDate) {
 			whereClause.createdAt = {
@@ -974,34 +1110,38 @@ const FilterCustomers = async (req, res) => {
 		}
 
 		if (alphabet && alphabet !== 'all' && alphabet !== '' && alphabet !== 'ALL') {
-			whereClause.name = { [Op.like]: `${alphabet}%` };
+			whereClause.name = {
+				[Op.like]: `${alphabet}%`
+			};
 		}
 
-		console.log("=---",JSON.stringify(whereClause))
-		
+		console.log("=---", JSON.stringify(whereClause))
+
 		const customers = await CustomerModel.findAll({
 			where: whereClause,
-			order: [['id', 'DESC']]
+			order: [
+				['id', 'DESC']
+			]
 		});
-		
+
 		if (customers.length === 0) {
 			return res.status(200).json({
-				status: 200, 
+				status: 200,
 				data: [],
 				message: "No customers found matching the filter criteria"
 			});
 		}
-		
+
 		res.status(200).json({
-			status: 200, 
+			status: 200,
 			data: customers,
 			count: customers.length
 		});
-		
+
 	} catch (error) {
 		console.error('Filter customers error:', error);
 		res.status(500).json({
-			error: true, 
+			error: true,
 			message: "Internal Server Error: " + error.message
 		});
 	}
@@ -1020,21 +1160,21 @@ const AllCustomerFilterByFlow = async (req, res) => {
 
 		if (allCustomers.length === 0) {
 			return res.status(200).json({
-				status: 200, 
-				data: [], 
+				status: 200,
+				data: [],
 				message: "No customers found that are not assigned to any flow"
 			});
 		}
-		
+
 		res.status(200).json({
-			status: 200, 
+			status: 200,
 			data: allCustomers,
 			message: `Found ${allCustomers.length} customers not assigned to any flow`
 		});
 	} catch (error) {
 		console.error('AllCustomerFilterByFlow error:', error);
 		res.status(500).json({
-			error: true, 
+			error: true,
 			message: "Internal Server Error: " + error.message
 		});
 	}
@@ -1042,64 +1182,103 @@ const AllCustomerFilterByFlow = async (req, res) => {
 
 
 const GetCustomerFilter = async (req, res) => {
-    try {
-        const { 
-            globalSearch
-        } = req.body;
-        
-        // Build dynamic where clause
-        let whereClause = {};
-        
-        // Handle global search first (if present, it overrides other filters except date range)
-        if (globalSearch && globalSearch !== '') {
-            const searchTerm = globalSearch.trim();
-            
-            // Check if it's a single letter for alphabetical search
-            if (searchTerm.length === 1 && /^[A-Za-z]$/.test(searchTerm)) {
-                whereClause.name = { [Op.like]: `${searchTerm}%` };
-            } else {
-                // Global search across multiple fields
-                whereClause[Op.or] = [
-                    { name: { [Op.like]: `%${searchTerm}%` } },
-                    { mobile: { [Op.like]: `%${searchTerm}%` } },
-                    { email: { [Op.like]: `%${searchTerm}%` } },
-                    { address: { [Op.like]: `%${searchTerm}%` } },
-                    { area: { [Op.like]: `%${searchTerm}%` } },
-                    { block: { [Op.like]: `%${searchTerm}%` } },
-                    { apartment: { [Op.like]: `%${searchTerm}%` } },
-					{ username: { [Op.like]: `%${searchTerm}%` } },
-					{ customer_id: { [Op.like]: `%${searchTerm}%` } }
-                ];
-            }
-        } 
-        
-        const customers = await CustomerModel.findAll({
-            where: whereClause,
-            order: [['id', 'DESC']]
-        });
-        
-        if (customers.length === 0) {
-            return res.status(200).json({
-                status: 200, 
-                data: [],
-                message: "No customers found matching the filter criteria"
-            });
-        }
-        
-        res.status(200).json({
-            status: 200, 
-            data: customers,
-            count: customers.length,
-            message: `Found ${customers.length} customers matching the filter criteria`
-        });
-        
-    } catch (error) {
-        console.error('GetCustomerFilter error:', error);
-        res.status(500).json({
-            error: true, 
-            message: "Internal Server Error: " + error.message
-        });
-    }
+	try {
+		const {
+			globalSearch
+		} = req.body;
+
+		// Build dynamic where clause
+		let whereClause = {};
+
+		// Handle global search first (if present, it overrides other filters except date range)
+		if (globalSearch && globalSearch !== '') {
+			const searchTerm = globalSearch.trim();
+
+			// Check if it's a single letter for alphabetical search
+			if (searchTerm.length === 1 && /^[A-Za-z]$/.test(searchTerm)) {
+				whereClause.name = {
+					[Op.like]: `${searchTerm}%`
+				};
+			} else {
+				// Global search across multiple fields
+				whereClause[Op.or] = [{
+						name: {
+							[Op.like]: `%${searchTerm}%`
+						}
+					},
+					{
+						mobile: {
+							[Op.like]: `%${searchTerm}%`
+						}
+					},
+					{
+						email: {
+							[Op.like]: `%${searchTerm}%`
+						}
+					},
+					{
+						address: {
+							[Op.like]: `%${searchTerm}%`
+						}
+					},
+					{
+						area: {
+							[Op.like]: `%${searchTerm}%`
+						}
+					},
+					{
+						block: {
+							[Op.like]: `%${searchTerm}%`
+						}
+					},
+					{
+						apartment: {
+							[Op.like]: `%${searchTerm}%`
+						}
+					},
+					{
+						username: {
+							[Op.like]: `%${searchTerm}%`
+						}
+					},
+					{
+						customer_id: {
+							[Op.like]: `%${searchTerm}%`
+						}
+					}
+				];
+			}
+		}
+
+		const customers = await CustomerModel.findAll({
+			where: whereClause,
+			order: [
+				['id', 'DESC']
+			]
+		});
+
+		if (customers.length === 0) {
+			return res.status(200).json({
+				status: 200,
+				data: [],
+				message: "No customers found matching the filter criteria"
+			});
+		}
+
+		res.status(200).json({
+			status: 200,
+			data: customers,
+			count: customers.length,
+			message: `Found ${customers.length} customers matching the filter criteria`
+		});
+
+	} catch (error) {
+		console.error('GetCustomerFilter error:', error);
+		res.status(500).json({
+			error: true,
+			message: "Internal Server Error: " + error.message
+		});
+	}
 }
 
 
@@ -1121,9 +1300,16 @@ const AddRePayment = async (req, res) => {
 		}
 
 		// 2. Get Customer
-		const customer = await CustomerModel.findOne({ where: { customer_id } });
+		const customer = await CustomerModel.findOne({
+			where: {
+				customer_id
+			}
+		});
 		if (!customer) {
-			return res.status(404).json({ status: false, message: "Customer not found" });
+			return res.status(404).json({
+				status: false,
+				message: "Customer not found"
+			});
 		}
 
 		// 3. Use plan info from selectedPackage or DB fallback
@@ -1134,19 +1320,21 @@ const AddRePayment = async (req, res) => {
 		});
 
 		if (!planData || !planData.days) {
-			return res.status(404).json({ status: false, message: "Plan not found or invalid" });
+			return res.status(404).json({
+				status: false,
+				message: "Plan not found or invalid"
+			});
 		}
 
 		// 4. Expire customer's previous active plan (if any)
-		await CustomerPlanHistory.update(
-			{ status: 'expired' },
-			{
-				where: {
-					customer_id,
-					status: 'active'
-				}
+		await CustomerPlanHistory.update({
+			status: 'expired'
+		}, {
+			where: {
+				customer_id,
+				status: 'active'
 			}
-		);
+		});
 
 		// 5. Calculate dates & billing
 		const today = new Date();
@@ -1191,16 +1379,17 @@ const AddRePayment = async (req, res) => {
 		});
 
 		// 8. Update CustomerModel
-		await CustomerModel.update(
-			{
-				bill_date: today,
-				balance: remainingBalance, // Updated balance after payment
-				expiry_date: expiry,
-				status: 'active',
-				payment_status: remainingBalance === 0 ? true : false // Mark as paid if balance is zero
-			},
-			{ where: { customer_id } }
-		);
+		await CustomerModel.update({
+			bill_date: today,
+			balance: remainingBalance, // Updated balance after payment
+			expiry_date: expiry,
+			status: 'active',
+			payment_status: remainingBalance === 0 ? true : false // Mark as paid if balance is zero
+		}, {
+			where: {
+				customer_id
+			}
+		});
 
 		// 9. Done
 		return res.status(200).json({
@@ -1236,7 +1425,9 @@ const GetBillingDetails = async (req, res) => {
 			where: {
 				customer_id: customer_id
 			},
-			order: [['end_date', 'DESC']]
+			order: [
+				['end_date', 'DESC']
+			]
 		});
 
 		if (!isCustomer) {
@@ -1261,111 +1452,113 @@ const GetBillingDetails = async (req, res) => {
 }
 
 const importBulkCustomers = async (req, res) => {
-	const { customers } = req.body;
-  
+	const {
+		customers
+	} = req.body;
+
 	if (!Array.isArray(customers) || customers.length === 0) {
-	  return res.status(400).json({ message: 'No customer data found' });
+		return res.status(400).json({
+			message: 'No customer data found'
+		});
 	}
-  
+
 	try {
-	  // Process each customer to generate customer_id and set default values
-	  const processedCustomers = [];
-	  
-	  // Get the starting customer ID for bulk import
-	  let currentCustomerId = await generateCustomerID();
-	  
-	  for (const customer of customers) {
-		// Set default values and process the customer data
-		const processedCustomer = {
-		  ...customer,
-		  customer_id: currentCustomerId,
-		  status: customer.status || 'active',
-		  customerType: customer.customerType || 'individual',
-		  registrationDate: new Date(),
-		  bill_date: customer.bill_date ? new Date(customer.bill_date) : new Date(),
-		  billing_amount: customer.billing_amount ? parseFloat(customer.billing_amount) : 0,
-		  balance: customer.billing_amount ? parseFloat(customer.billing_amount) : 0,
-		  mobile: customer.mobile || customer.mobile_no || '',
-		  name: customer.name || customer.customer_name || '',
-		  address: customer.address || '',
-		  area: customer.area || '',
-		  block: customer.block || '',
-		  apartment: customer.apartment || '',
-		  email: customer.email || null,
-		  gender: customer.gender || null,
-		  whatsapp_no: customer.whatsapp_no || null,
-		  alternate_no: customer.alternate_no || null,
-		  dob: customer.dob || null,
-		  doa: customer.doa || null,
-		  aadhar_no: customer.aadhar_no || null,
-		  other_id: customer.other_id || null,
-		  pan_no: customer.pan_no ? customer.pan_no.toUpperCase() : null,
-		  selectedPackage: customer.selectedPackage ? parseInt(customer.selectedPackage) : null,
-		  packageDetails: customer.packageDetails || null,
-		  selectedItems: customer.selectedItems || null,
-		  payment_method: customer.payment_method || null,
-		  cash: customer.cash ? parseFloat(customer.cash) : null,
-		  online: customer.online ? parseFloat(customer.online) : null,
-		  image: customer.image || null,
-		  frontAadharImage: customer.frontAadharImage || null,
-		  backAadharImage: customer.backAadharImage || null,
-		  panImage: customer.panImage || null,
-		  otherIdImage: customer.otherIdImage || null,
-		  signature: customer.signature || null,
-		  username: customer.username || customer.mobile || customer.mobile_no || '',
-		  t_address: customer.t_address || null,
-		  expiry_date: customer.expiry_date ? new Date(customer.expiry_date) : null
-		};
-		
-				processedCustomers.push(processedCustomer);
-		
-		// Increment customer ID for next customer
-		currentCustomerId++;
-	  }
-	  
-	  console.log(processedCustomers)
-	  
-	  // Use bulk insert with processed customers
-	  const inserted = await CustomerModel.bulkCreate(processedCustomers);
-	  res.status(200).json({ 
-		status: true,
-		message: 'Customers imported successfully', 
-		inserted: inserted.length
-	  });
+		// Process each customer to generate customer_id and set default values
+		const processedCustomers = [];
+
+		// Get the starting customer ID for bulk import
+		let currentCustomerId = await generateCustomerID();
+
+		for (const customer of customers) {
+			// Set default values and process the customer data
+			const processedCustomer = {
+				...customer,
+				customer_id: currentCustomerId,
+				status: customer.status || 'active',
+				customerType: customer.customerType || 'individual',
+				registrationDate: new Date(),
+				bill_date: customer.bill_date ? new Date(customer.bill_date) : new Date(),
+				billing_amount: customer.billing_amount ? parseFloat(customer.billing_amount) : 0,
+				balance: customer.billing_amount ? parseFloat(customer.billing_amount) : 0,
+				mobile: customer.mobile || customer.mobile_no || '',
+				name: customer.name || customer.customer_name || '',
+				address: customer.address || '',
+				area: customer.area || '',
+				block: customer.block || '',
+				apartment: customer.apartment || '',
+				email: customer.email || null,
+				gender: customer.gender || null,
+				whatsapp_no: customer.whatsapp_no || null,
+				alternate_no: customer.alternate_no || null,
+				dob: customer.dob || null,
+				doa: customer.doa || null,
+				aadhar_no: customer.aadhar_no || null,
+				other_id: customer.other_id || null,
+				pan_no: customer.pan_no ? customer.pan_no.toUpperCase() : null,
+				selectedPackage: customer.selectedPackage ? parseInt(customer.selectedPackage) : null,
+				packageDetails: customer.packageDetails || null,
+				selectedItems: customer.selectedItems || null,
+				payment_method: customer.payment_method || null,
+				cash: customer.cash ? parseFloat(customer.cash) : null,
+				online: customer.online ? parseFloat(customer.online) : null,
+				image: customer.image || null,
+				frontAadharImage: customer.frontAadharImage || null,
+				backAadharImage: customer.backAadharImage || null,
+				panImage: customer.panImage || null,
+				otherIdImage: customer.otherIdImage || null,
+				signature: customer.signature || null,
+				username: customer.username || customer.mobile || customer.mobile_no || '',
+				t_address: customer.t_address || null,
+				expiry_date: customer.expiry_date ? new Date(customer.expiry_date) : null
+			};
+
+			processedCustomers.push(processedCustomer);
+
+			// Increment customer ID for next customer
+			currentCustomerId++;
+		}
+
+		console.log(processedCustomers)
+
+		// Use bulk insert with processed customers
+		const inserted = await CustomerModel.bulkCreate(processedCustomers);
+		res.status(200).json({
+			status: true,
+			message: 'Customers imported successfully',
+			inserted: inserted.length
+		});
 	} catch (error) {
-	  console.error('Import error:', error);
-	  res.status(500).json({ 
-		status: false,
-		message: 'Failed to import customers', 
-		error: error.message 
-	  });
+		console.error('Import error:', error);
+		res.status(500).json({
+			status: false,
+			message: 'Failed to import customers',
+			error: error.message
+		});
 	}
-  };
+};
 
 const expireOldPlans = async () => {
 	try {
-		const result = await CustomerPlanHistory.update(
-			{ status: 'expired' },
-			{
-				where: {
-					status: 'active',
-					end_date: {
-						[Op.lt]: new Date() // expire plans whose end_date < today
-					}
+		const result = await CustomerPlanHistory.update({
+			status: 'expired'
+		}, {
+			where: {
+				status: 'active',
+				end_date: {
+					[Op.lt]: new Date() // expire plans whose end_date < today
 				}
 			}
-		);
-		const result2 = await CustomerModel.update(
-			{ status: 'expired' },
-			{
-				where: {
-					status: 'active',
-					expiry_date: {
-						[Op.lt]: new Date() // expire plans whose end_date < today
-					}
+		});
+		const result2 = await CustomerModel.update({
+			status: 'expired'
+		}, {
+			where: {
+				status: 'active',
+				expiry_date: {
+					[Op.lt]: new Date() // expire plans whose end_date < today
 				}
 			}
-		);
+		});
 		console.log(`✅ Expired ${result[0]} old plans`);
 	} catch (err) {
 		console.error("❌ Error auto-expiring plans:", err);
@@ -1385,15 +1578,29 @@ const RenewPlan = async (req, res) => {
 
 	try {
 		// Validate customer exists
-		const customer = await CustomerModel.findOne({ where: { customer_id } });
+		const customer = await CustomerModel.findOne({
+			where: {
+				customer_id
+			}
+		});
 		if (!customer) {
-			return res.status(404).json({ status: false, message: "Customer not found" });
+			return res.status(404).json({
+				status: false,
+				message: "Customer not found"
+			});
 		}
 
 		// Validate plan exists
-		const plan = await PlanModel.findOne({ where: { id: plan_id } });
+		const plan = await PlanModel.findOne({
+			where: {
+				id: plan_id
+			}
+		});
 		if (!plan) {
-			return res.status(404).json({ status: false, message: "Plan not found" });
+			return res.status(404).json({
+				status: false,
+				message: "Plan not found"
+			});
 		}
 
 		// Get plan data from selectedPackage or database
@@ -1406,13 +1613,16 @@ const RenewPlan = async (req, res) => {
 		} : plan;
 
 		if (!planData || !planData.days) {
-			return res.status(400).json({ status: false, message: "Invalid plan data" });
+			return res.status(400).json({
+				status: false,
+				message: "Invalid plan data"
+			});
 		}
 
 		// Calculate dates
 		const startDate = renewalStartDate ? new Date(renewalStartDate) : new Date();
 		const endDate = renewalEndDate ? new Date(renewalEndDate) : new Date(startDate.getTime() + (planData.days * 24 * 60 * 60 * 1000));
-		
+
 		// Calculate billing amount
 		const billingAmount = parseFloat(planData.finalPrice);
 		const previousBalance = parseFloat(customer.balance || 0);
@@ -1426,13 +1636,17 @@ const RenewPlan = async (req, res) => {
 			payment_status: false, // Payment pending
 			selected_package: plan_id, // Store plan ID as integer (foreign key)
 		};
-		console.log("updateData-",updateData)
+		console.log("updateData-", updateData)
 
-		await CustomerModel.update(updateData, { where: { customer_id } });
+		await CustomerModel.update(updateData, {
+			where: {
+				customer_id
+			}
+		});
 
 		// Return success response with renewal details
-		res.status(200).json({ 
-			status: true, 
+		res.status(200).json({
+			status: true,
 			message: "Plan renewed successfully with pending payment",
 			data: {
 				customer_id,
@@ -1448,19 +1662,29 @@ const RenewPlan = async (req, res) => {
 
 	} catch (error) {
 		console.error('Error in RenewPlan:', error);
-		res.status(500).json({ status: false, message: "Internal Server Error", error: error.message });
+		res.status(500).json({
+			status: false,
+			message: "Internal Server Error",
+			error: error.message
+		});
 	}
 };
 
 const SetReminder = async (req, res) => {
-	const { reminder_type, reminder_date, note, created_by, customer_id } = req.body;
+	const {
+		reminder_type,
+		reminder_date,
+		note,
+		created_by,
+		customer_id
+	} = req.body;
 
 	try {
 		// Validate required fields
 		if (!reminder_type || !reminder_date || !customer_id || !created_by) {
-			return res.status(400).json({ 
-				status: false, 
-				message: "Missing required fields: reminder_type, reminder_date, customer_id, and created_by are required" 
+			return res.status(400).json({
+				status: false,
+				message: "Missing required fields: reminder_type, reminder_date, customer_id, and created_by are required"
 			});
 		}
 
@@ -1474,17 +1698,17 @@ const SetReminder = async (req, res) => {
 		};
 
 		const reminder = await CustomerReminderModel.create(reminderData);
-		res.status(200).json({ 
-			status: true, 
-			message: "Reminder set successfully", 
-			data: reminder 
+		res.status(200).json({
+			status: true,
+			message: "Reminder set successfully",
+			data: reminder
 		});
 	} catch (error) {
 		console.error('Error in SetReminder:', error);
-		res.status(500).json({ 
-			status: false, 
-			message: "Internal Server Error", 
-			error: error.message 
+		res.status(500).json({
+			status: false,
+			message: "Internal Server Error",
+			error: error.message
 		});
 	}
 };
@@ -1500,14 +1724,24 @@ const CompleteRenewalPayment = async (req, res) => {
 
 	try {
 		// Validate customer exists
-		const customer = await CustomerModel.findOne({ where: { customer_id } });
+		const customer = await CustomerModel.findOne({
+			where: {
+				customer_id
+			}
+		});
 		if (!customer) {
-			return res.status(404).json({ status: false, message: "Customer not found" });
+			return res.status(404).json({
+				status: false,
+				message: "Customer not found"
+			});
 		}
 
 		// Check if there's a pending payment
 		if (customer.payment_status === true) {
-			return res.status(400).json({ status: false, message: "No pending payment found" });
+			return res.status(400).json({
+				status: false,
+				message: "No pending payment found"
+			});
 		}
 
 		const amountReceived = parseFloat(received_amount);
@@ -1523,10 +1757,14 @@ const CompleteRenewalPayment = async (req, res) => {
 			payment_date: new Date()
 		};
 
-		await CustomerModel.update(updateData, { where: { customer_id } });
+		await CustomerModel.update(updateData, {
+			where: {
+				customer_id
+			}
+		});
 
-		res.status(200).json({ 
-			status: true, 
+		res.status(200).json({
+			status: true,
 			message: "Payment completed successfully",
 			data: {
 				customer_id,
@@ -1538,34 +1776,62 @@ const CompleteRenewalPayment = async (req, res) => {
 
 	} catch (error) {
 		console.error('Error in CompleteRenewalPayment:', error);
-		res.status(500).json({ status: false, message: "Internal Server Error", error: error.message });
+		res.status(500).json({
+			status: false,
+			message: "Internal Server Error",
+			error: error.message
+		});
 	}
 };
 
 const GetAllReminder = async (req, res) => {
 	try {
 		const reminder = await CustomerReminderModel.findAll({
-			order: [['id', 'DESC']]
+			order: [
+				['id', 'DESC']
+			]
 		});
-		res.status(200).json({ status: true, message: "successfully", data: reminder });
+		res.status(200).json({
+			status: true,
+			message: "successfully",
+			data: reminder
+		});
 	} catch (error) {
 		console.error('Error in GetAllReminder:', error);
-		res.status(500).json({ status: false, message: "Internal Server Error", error: error.message });
+		res.status(500).json({
+			status: false,
+			message: "Internal Server Error",
+			error: error.message
+		});
 	}
 };
 
 
 const GetReminderByID = async (req, res) => {
-	const { customer_id } = req.params;
+	const {
+		customer_id
+	} = req.params;
 	try {
-		const reminder = await CustomerReminderModel.findAll({ where: { customer_id } });
-		res.status(200).json({ status: true, message: "Reminder successfully", data: reminder });
+		const reminder = await CustomerReminderModel.findAll({
+			where: {
+				customer_id
+			}
+		});
+		res.status(200).json({
+			status: true,
+			message: "Reminder successfully",
+			data: reminder
+		});
 	} catch (error) {
 		console.error('Error in GetReminder:', error);
-		res.status(500).json({ status: false, message: "Internal Server Error", error: error.message });
+		res.status(500).json({
+			status: false,
+			message: "Internal Server Error",
+			error: error.message
+		});
 	}
 };
-	
+
 
 cron.schedule('0 0 * * *', () => {
 	console.log("🔁 Running auto-expiry for outdated plans...");

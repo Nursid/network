@@ -37,7 +37,7 @@ router.post("/filter", customerRouter.FilterCustomers);
 router.post("/dynamicfilter", customerRouter.GetCustomerFilter);
 router.get("/getallcustomerfilterbyflow", customerRouter.AllCustomerFilterByFlow);
 
-router.put('/getupdate/:user_id', upload.fields([
+router.put('/getupdate/:customer_id', upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'frontAadharImage', maxCount: 1 },
   { name: 'backAadharImage', maxCount: 1 },

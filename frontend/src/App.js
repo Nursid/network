@@ -29,6 +29,8 @@ import ReportsAnalysis from './AdminDashboards/Components/ReportsAnalysis/Report
 import GSTBillsManagement from './AdminDashboards/Components/GSTBillsManagement/GSTBillsManagement';
 import ExpensesManagement from './AdminDashboards/Components/ExpensesManagement/ExpensesManagement';
 
+import CustomerView from './AdminDashboards/Components/Customer/View/CustomerView';
+
 function App() {
 
   return (
@@ -56,12 +58,14 @@ function App() {
             <Route path='advertisement-management' element={<AdvertisementManagement />} />
             <Route path='reports-analysis' element={<ReportsAnalysis />} />
             <Route path='gst-bills-management' element={<GSTBillsManagement />} />
+            <Route path='customer-view/:id' element={<CustomerView />} /> 
             <Route path='expenses-management' element={<ExpensesManagement />} />
             <Route path='manage-plans' element={<ManagePlans />} />
             <Route path='manage-tickets-head' element={<TicketsHead />} />
             <Route path='profile' element={<AdminProfile />} />
             <Route path='flow' element={<NetworkFlow />} />
             <Route path='all-transaction' element={<AllTransaction />} />
+           
           </Route>
         </Routes>
       </BrowserRouter>
