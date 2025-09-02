@@ -133,7 +133,18 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        
+        provider: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        mac_id: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        box_unique_number: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         // Step 4: Billing Details
         billing_amount: {
             type: DataTypes.DECIMAL(10, 2),

@@ -30,8 +30,15 @@ import Checkbox from '@mui/material/Checkbox';
 import { gender_option, apartment_options, area_option, block_option, payment_method_options } from '../../../../Components/utils';
 
 
+const checkCustomer = async (key, value) => {
+	const response = await axios.post(`${API_URL}/customer/check-customer`, {
+		[key]: value,
+	});
+	return response.data;
+};
+
 // Custom validation function for basic info (Step 1)
-const validateBasicInfo = (values) => {
+const validateBasicInfo = async (values) => {
 	const errors = {};
 
 	// Name validation
@@ -93,23 +100,70 @@ const validateBasicInfo = (values) => {
 	return errors;
 };
 
+// Function to validate individual fields on blur
+const validateFieldOnBlur = async (fieldName, value, setFieldError) => {
+	if (!value) return;
+
+	let isValid = true;
+	let errorMessage = '';
+
+	switch (fieldName) {
+		case 'username':
+			if (value.length >= 3) { // Only check if username is at least 3 characters
+				try {
+					const response = await checkCustomer("username", value);
+					if (response.isCustomer) {
+						isValid = false;
+						errorMessage = response.message;
+					}
+				} catch (error) {
+					console.error('Error checking username on blur:', error);
+				}
+			}
+			break;
+
+		case 'mobile':
+			if (value.length === 10) { // Only check if mobile is exactly 10 digits
+				try {
+					const response = await checkCustomer("mobile", value);
+					if (response.isCustomer) {
+						isValid = false;
+						errorMessage = response.message;
+					}
+				} catch (error) {
+					console.error('Error checking mobile on blur:', error);
+				}
+			}
+			break;
+
+		case 'email':
+			if (value.includes('@') && value.includes('.')) { // Only check if email format is complete
+				try {
+					const response = await checkCustomer("email", value);
+					if (response.isCustomer) {
+						isValid = false;
+						errorMessage = response.message;
+					}
+				} catch (error) {
+					console.error('Error checking email on blur:', error);
+				}
+			}
+			break;
+
+		default:
+			return;
+	}
+
+	if (!isValid) {
+		setFieldError(fieldName, errorMessage);
+	} else {
+		setFieldError(fieldName, '');
+	}
+};
+
 // Billing validation function (Step 4)
 const validateBilling = (values) => {
 	const errors = {};
-
-	// Billing amount validation
-	// if (!values.billing_amount) {
-	// 	errors.billing_amount = 'Billing amount is required';
-	// } else {
-	// 	const amount = parseFloat(values.billing_amount);
-	// 	if (isNaN(amount)) {
-	// 		errors.billing_amount = 'Please enter a valid amount';
-	// 	} else if (amount <= 0) {
-	// 		errors.billing_amount = 'Billing amount must be greater than 0';
-	// 	} else if (amount > 999999.99) {
-	// 		errors.billing_amount = 'Billing amount cannot exceed 999999.99';
-	// 	}
-	// }
 
 	// Billing cycle validation
 	if (values.billing_cycle) {
@@ -311,8 +365,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const fetchEmployees = async () => {
 		try {
 			const response = await axios.get(`${API_URL}/employee/getall`);
-
-			console.log("response---->", response);
 			if (response.status === 200) {
 				const employeeOptions = response.data.data.map(emp => ({
 					value: emp.id,
@@ -571,7 +623,7 @@ const AddNewCustomerForm = ({prop, data}) => {
 			validate={validateBasicInfo}
 			onSubmit={handleNext}
 		>
-			{({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
+			{({ values, errors, touched, handleChange, handleBlur, isSubmitting, setFieldError }) => (
 				<Form>
 					<Row>
 						<Col md={6}>
@@ -583,6 +635,20 @@ const AddNewCustomerForm = ({prop, data}) => {
 									placeholder="Enter Customer Name"
 									maxLength="200"
 									onKeyPress={handleKeyPress}
+									onChange={(e) => {
+										handleChange(e);
+										// Basic validation for name field
+										if (e.target.value && e.target.value.length > 200) {
+											setFieldError('name', 'Name must be less than 200 characters');
+										} else if (e.target.value && !/^[a-zA-Z\s]+$/.test(e.target.value)) {
+											setFieldError('name', 'Name can only contain letters and spaces');
+										} else {
+											setFieldError('name', '');
+										}
+									}}
+									onBlur={handleBlur}
+									isValid={!errors.name}
+									invalid={errors.name}
 								/>
 								<ErrorMessage name="name" component="span" className="validationError" />
 							</FormGroup>
@@ -595,6 +661,21 @@ const AddNewCustomerForm = ({prop, data}) => {
 									name="username"
 									placeholder="Enter Username"
 									maxLength="50"
+									onChange={(e) => {
+										handleChange(e);
+										// Basic validation only - no API calls
+										if (e.target.value && e.target.value.length > 50) {
+											setFieldError('username', 'Username must be less than 50 characters');
+										} else {
+											setFieldError('username', '');
+										}
+									}}
+									onBlur={(e) => {
+										handleBlur(e);
+										validateFieldOnBlur('username', e.target.value, setFieldError);
+									}}
+									isValid={!errors.username}
+									invalid={errors.username}
 								/>
 								<ErrorMessage name="username" component="span" className="validationError" />
 							</FormGroup>
@@ -607,28 +688,34 @@ const AddNewCustomerForm = ({prop, data}) => {
 						</Col>
 						<Col md={6}>
 							<FormGroup>
-								<Label for="address">Current Address <span style={{color: "red"}}>*</span></Label>
+								<Label for="email">Email</Label>
 								<Field
 									as={Input}
-									type="textarea"
-									name="address"
-									placeholder="Enter Current Address"
+									type="email"
+									name="email"
+									placeholder="Enter Email"
+									onChange={(e) => {
+										handleChange(e);
+										// Basic validation for email format
+										if (e.target.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value)) {
+											setFieldError('email', 'Invalid email format');
+										} else if (e.target.value && e.target.value.length > 100) {
+											setFieldError('email', 'Email must be less than 100 characters');
+										} else {
+											setFieldError('email', '');
+										}
+									}}
+									onBlur={(e) => {
+										handleBlur(e);
+										validateFieldOnBlur('email', e.target.value, setFieldError);
+									}}
+									isValid={!errors.email}
+									invalid={errors.email}
 								/>
-								<ErrorMessage name="address" component="span" className="validationError" />
+								<ErrorMessage name="email" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
-						<Col md={6}>
-							<FormGroup>
-								<Label for="installation_address">Installation's Address</Label>
-								<Field
-									as={Input}
-									type="textarea"
-									name="installation_address"
-									placeholder="Enter Installation Address"
-								/>
-								<ErrorMessage name="installation_address" component="span" className="validationError" />
-							</FormGroup>
-						</Col>
+					
 						<Col md={6}>
 							<FormGroup>
 								<Label for="mobile">Mobile No. <span style={{color: "red"}}>*</span></Label>
@@ -639,6 +726,21 @@ const AddNewCustomerForm = ({prop, data}) => {
 									placeholder="Enter Mobile No."
 									maxLength="10"
 									onKeyPress={handleNumericKeyPress}
+									onChange={(e) => {
+										handleChange(e);
+										// Basic validation for mobile number
+										if (e.target.value && !/^\d{10}$/.test(e.target.value)) {
+											setFieldError('mobile', 'Mobile number must be exactly 10 digits');
+										} else {
+											setFieldError('mobile', '');
+										}
+									}}
+									onBlur={(e) => {
+										handleBlur(e);
+										validateFieldOnBlur('mobile', e.target.value, setFieldError);
+									}}
+									isValid={!errors.mobile}
+									invalid={errors.mobile}
 								/>
 								<ErrorMessage name="mobile" component="span" className="validationError" />
 							</FormGroup>
@@ -653,6 +755,18 @@ const AddNewCustomerForm = ({prop, data}) => {
 									placeholder="Enter WhatsApp No."
 									maxLength="10"
 									onKeyPress={handleNumericKeyPress}
+									onChange={(e) => {
+										handleChange(e);
+										// Basic validation for whatsapp number
+										if (e.target.value && !/^\d{10}$/.test(e.target.value)) {
+											setFieldError('whatsapp_no', 'WhatsApp number must be exactly 10 digits');
+										} else {
+											setFieldError('whatsapp_no', '');
+										}
+									}}
+									onBlur={handleBlur}
+									isValid={!errors.whatsapp_no}
+									invalid={errors.whatsapp_no}
 								/>
 								<ErrorMessage name="whatsapp_no" component="span" className="validationError" />
 							</FormGroup>
@@ -667,6 +781,18 @@ const AddNewCustomerForm = ({prop, data}) => {
 									placeholder="Enter Alternate No."
 									maxLength="10"
 									onKeyPress={handleNumericKeyPress}
+									onChange={(e) => {
+										handleChange(e);
+										// Basic validation for alternate number
+										if (e.target.value && !/^\d{10}$/.test(e.target.value)) {
+											setFieldError('alternate_no', 'Alternate number must be exactly 10 digits');
+										} else {
+											setFieldError('alternate_no', '');
+										}
+									}}
+									onBlur={handleBlur}
+									isValid={!errors.alternate_no}
+									invalid={errors.alternate_no}
 								/>
 								<ErrorMessage name="alternate_no" component="span" className="validationError" />
 							</FormGroup>
@@ -691,16 +817,53 @@ const AddNewCustomerForm = ({prop, data}) => {
 						</Col>
 						<Col md={6}>
 							<FormGroup>
-								<Label for="email">Email</Label>
+								<Label for="installation_address">Installation's Address</Label>
 								<Field
 									as={Input}
-									type="email"
-									name="email"
-									placeholder="Enter Email"
+									type="textarea"
+									name="installation_address"
+									placeholder="Enter Installation Address"
+									onChange={(e) => {
+										handleChange(e);
+										// Basic validation for installation address field
+										if (e.target.value && e.target.value.length > 200) {
+											setFieldError('installation_address', 'Installation address must be less than 200 characters');
+										} else {
+											setFieldError('installation_address', '');
+										}
+									}}
+									onBlur={handleBlur}
+									isValid={!errors.installation_address}
+									invalid={errors.installation_address}
 								/>
-								<ErrorMessage name="email" component="span" className="validationError" />
+								<ErrorMessage name="installation_address" component="span" className="validationError" />
 							</FormGroup>
 						</Col>
+						<Col md={6}>
+							<FormGroup>
+								<Label for="address">Current Address <span style={{color: "red"}}>*</span></Label>
+								<Field
+									as={Input}
+									type="textarea"
+									name="address"
+									placeholder="Enter Current Address"
+									onChange={(e) => {
+										handleChange(e);
+										// Basic validation for address field
+										if (e.target.value && e.target.value.length > 200) {
+											setFieldError('address', 'Address must be less than 200 characters');
+										} else {
+											setFieldError('address', '');
+										}
+									}}
+									onBlur={handleBlur}
+									isValid={!errors.address}
+									invalid={errors.address}
+								/>
+								<ErrorMessage name="address" component="span" className="validationError" />
+							</FormGroup>
+						</Col>
+						
 					</Row>
 					<div className="d-flex justify-content-end">
 						<Button type="submit" color="primary">

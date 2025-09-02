@@ -11,12 +11,25 @@ import AddressInfoCard from './AddressInfoCard';
 import axios from 'axios';
 import { API_URL } from '../../../../../config';
 import Swal from 'sweetalert2';
+import { Label, Input } from 'reactstrap';
 
 const CustomerProfile = ({ data, fetchData }) => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [basicDetailsModal, setBasicDetailsModal] = useState(false);
   const [addressModal, setAddressModal] = useState(false);
+  const [providerModal, setProviderModal] = useState(false);
+  const [macIdModal, setMacIdModal] = useState(false);
+  const [boxUniqueNumberModal, setBoxUniqueNumberModal] = useState(false);
+  const [provider, setProvider] = useState(data?.provider || '');
+  const [macId, setMacId] = useState(data?.mac_id || '');
+  const [boxUniqueNumber, setBoxUniqueNumber] = useState(data?.box_unique_number || '');
+
+  const toggleProviderModal = () => setProviderModal(!providerModal);
+  const toggleMacIdModal = () => setMacIdModal(!macIdModal);
+  const toggleBoxUniqueNumberModal = () => setBoxUniqueNumberModal(!boxUniqueNumberModal);
+
+  const toggleAddressModal = () => setAddressModal(!addressModal);
 
   const toggleDropdown = () => setDropdownOpen(prevState => !prevState);
 
@@ -33,8 +46,6 @@ const CustomerProfile = ({ data, fetchData }) => {
 
   // Modal toggle functions
   const toggleBasicDetailsModal = () => setBasicDetailsModal(!basicDetailsModal);
-  const toggleAddressModal = () => setAddressModal(!addressModal);
-
   // Handle save basic details
   const handleUpdate = async (formData, message) => {
     try{
@@ -60,6 +71,19 @@ const CustomerProfile = ({ data, fetchData }) => {
   const handleSaveBasicDetails = (formData) => {
      handleUpdate(formData, 'Basic details updated successfully');
     setBasicDetailsModal(false);
+  };
+
+  const handleSaveProvider = (formData) => {
+     handleUpdate(formData, 'Provider updated successfully');
+    setProviderModal(false);
+  };
+  const handleSaveMacId = (formData) => {
+    handleUpdate(formData, 'Mac Id updated successfully');
+    setMacIdModal(false);
+  };
+  const handleSaveBoxUniqueNumber = (formData) => {
+    handleUpdate(formData, 'Box Unique Number updated successfully');
+    setBoxUniqueNumberModal(false);
   };
 
   // Handle save address
@@ -165,16 +189,16 @@ const CustomerProfile = ({ data, fetchData }) => {
         </Card>
 
         {/* Box Unique Number */}
-        <div className="box-unique-section mb-4">
+        {/* <div className="box-unique-section mb-4">
           <div className="d-flex align-items-center mb-3">
             <span className="text-primary fw-semibold border-bottom border-primary pb-1">
               Box Unique Number: {data?.box_unique_number || ''}
             </span>
           </div>
-        </div>
+        </div> */}
 
         {/* Connection Status */}
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0 shadow-sm ">
         <CardBody className="p-4">
           <div className="connection-status mb-4">
             {data?.status == 'active' ? (
@@ -193,18 +217,24 @@ const CustomerProfile = ({ data, fetchData }) => {
            <Row className="align-items-center">
              <Col md={6}>
                <div className="d-flex flex-row gap-2 justify-content-between align-items-center">
+                 {data?.box_unique_number && (
                  <div className="justify-content-between align-items-center">
                    <span className="text-muted">Box Unique Number:</span>
                    <span className="fw-semibold ms-2">{data?.box_unique_number || ''}</span>
                  </div>
+                 )}
+                 {data?.mac_id && (
                  <div className="justify-content-between align-items-center">
                    <span className="text-muted">Mac Id:</span>
-                   <span className="fw-semibold ms-2">NA</span>
+                   <span className="fw-semibold ms-2">{data?.mac_id || ''}</span>
                  </div>
+                 )}
+                 {data?.provider && (
                  <div className="justify-content-between align-items-center">
                    <span className="text-muted">Provider:</span>
-                   <span className="fw-semibold ms-2">LXDP</span>
+                   <span className="fw-semibold ms-2">{data?.provider || ''}</span>
                  </div>
+                 )}
                </div>
              </Col>
              <Col md={6}>
@@ -223,7 +253,7 @@ const CustomerProfile = ({ data, fetchData }) => {
                      <DropdownToggle color="primary" size="sm">
                        <FaIcons.FaEllipsisV />
                      </DropdownToggle>
-                     <DropdownMenu>
+                     <DropdownMenu positionFixed style={{ maxHeight: "200px", overflowY: "auto" }}>
                        <DropdownItem onClick={() => handleUpdateBasicDetails()}>
                          <FaIcons.FaUser className="me-2" />
                          Update Basic Details
@@ -231,6 +261,18 @@ const CustomerProfile = ({ data, fetchData }) => {
                        <DropdownItem onClick={() => handleUpdateAddress()}>
                          <FaIcons.FaMapMarkerAlt className="me-2" />
                          Update Address
+                       </DropdownItem>
+                       <DropdownItem onClick={() => toggleProviderModal()}>
+                         <FaIcons.FaMapMarkerAlt className="me-2" />
+                         Update Provider
+                       </DropdownItem>
+                       <DropdownItem onClick={() => toggleMacIdModal()}>
+                         <FaIcons.FaMapMarkerAlt className="me-2" />
+                         Update Mac Id
+                       </DropdownItem>
+                       <DropdownItem onClick={() => toggleBoxUniqueNumberModal()}>
+                         <FaIcons.FaMapMarkerAlt className="me-2" />
+                         Update Box Unique Number
                        </DropdownItem>
                      </DropdownMenu>
                    </Dropdown>
@@ -330,6 +372,53 @@ const CustomerProfile = ({ data, fetchData }) => {
         />
       </ModalBody>
     </Modal>
+
+
+    <Modal isOpen={providerModal} toggle={toggleProviderModal} size="lg">
+      <ModalHeader toggle={toggleProviderModal}>
+        <FaIcons.FaUser className="me-2" />
+        Update Provider
+      </ModalHeader>
+      <ModalBody>
+        <Label>Provider</Label>
+        <Input type="text" value={provider} onChange={(e) => setProvider(e.target.value)} />
+      </ModalBody>
+      <ModalFooter>
+        <Button color="success" onClick={() => handleSaveProvider({ provider: provider, customer_id: data?.customer_id })}>Save</Button>
+        <Button color="secondary" onClick={toggleProviderModal}>Cancel</Button>
+      </ModalFooter>
+    </Modal>
+
+    <Modal isOpen={macIdModal} toggle={toggleMacIdModal} size="lg">
+      <ModalHeader toggle={toggleMacIdModal}>
+        <FaIcons.FaUser className="me-2" />
+        Update Mac Id
+      </ModalHeader>
+      <ModalBody> 
+        <Label>Mac Id</Label>
+        <Input type="text" value={macId} onChange={(e) => setMacId(e.target.value)} />
+      </ModalBody>
+      <ModalFooter>
+        <Button color="success" onClick={() => handleSaveMacId({ mac_id: macId, customer_id: data?.customer_id })}>Save</Button>
+        <Button color="secondary" onClick={toggleMacIdModal}>Cancel</Button>
+      </ModalFooter>
+    </Modal>
+
+    <Modal isOpen={boxUniqueNumberModal} toggle={toggleBoxUniqueNumberModal} size="lg">
+      <ModalHeader toggle={toggleBoxUniqueNumberModal}>
+        <FaIcons.FaUser className="me-2" />
+        Update Box Unique Number
+      </ModalHeader>
+      <ModalBody>
+        <Label>Box Unique Number</Label>
+        <Input type="text" value={boxUniqueNumber} onChange={(e) => setBoxUniqueNumber(e.target.value)} />
+      </ModalBody>
+      <ModalFooter>
+        <Button color="success" onClick={() => handleSaveBoxUniqueNumber({ box_unique_number: boxUniqueNumber, customer_id: data?.customer_id })}>Save</Button>
+        <Button color="secondary" onClick={toggleBoxUniqueNumberModal}>Cancel</Button>
+      </ModalFooter>
+    </Modal>
+
     </>
   );
 };
