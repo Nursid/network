@@ -42,15 +42,15 @@ const PlansCard = ({ data }) => {
                 <tr>
                   <td className="border-0 py-3">
                     <div>
-                      <div className="fw-semibold">{data.plan.plan} Plan</div>
+                      <div className="fw-semibold">{data?.plan?.plan} Plan</div>
                       <div className="small text-muted">
-                        Type: {data.plan.connectionType || ''}
+                        Type: {data?.plan?.connectionType || ''}
                       </div>
                       <div className="small text-muted">
-                        Code/Id: {data.plan.code || data.plan.id}
+                        Code/Id: {data?.plan?.code || data?.plan?.id}
                       </div>
                       <div className="small text-muted">
-                        Valid For: {data.plan.days} Days
+                        Valid For: {data?.plan?.days} Days
                       </div>
                     </div>
                   </td>

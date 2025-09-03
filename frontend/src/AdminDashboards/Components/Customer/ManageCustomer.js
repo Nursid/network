@@ -1104,15 +1104,15 @@ const handleImport = async (event) => {
     
     // Validate required fields for at least the first row
     const firstRow = jsonData[0];
-    if (!firstRow.name && !firstRow.customer_name) {
+    if (!firstRow.name) {
       setImportLoading(false);
-      Swal.fire('Error', 'Excel file must contain a "name" or "customer_name" column.', 'error');
+      Swal.fire('Error', 'Excel file must contain a "name" column.', 'error');
       return;
     }
     
-    if (!firstRow.mobile && !firstRow.mobile_no) {
+    if (!firstRow.mobile) {
       setImportLoading(false);
-      Swal.fire('Error', 'Excel file must contain a "mobile" or "mobile_no" column.', 'error');
+      Swal.fire('Error', 'Excel file must contain a "mobile" column.', 'error');
       return;
     }
     

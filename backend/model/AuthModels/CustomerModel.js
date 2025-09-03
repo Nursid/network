@@ -71,6 +71,18 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
+        city: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        state: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        pincode: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         email: {
             type: DataTypes.STRING(100),
             allowNull: true,
@@ -81,12 +93,8 @@ module.exports = (sequelize) => {
         
         // Step 2: Package Selection
         selected_package: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: true,
-            references: {
-                model: 'plans',
-                key: 'id'
-            }
         },
         payment_status: {
             type: DataTypes.BOOLEAN,
@@ -94,6 +102,10 @@ module.exports = (sequelize) => {
             defaultValue: false
         },
         other_services: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+        service_type: {
             type: DataTypes.TEXT,
             allowNull: true,
         },
@@ -134,6 +146,10 @@ module.exports = (sequelize) => {
             allowNull: true,
         },
         provider: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        gst: {
             type: DataTypes.STRING,
             allowNull: true,
         },
@@ -195,11 +211,7 @@ module.exports = (sequelize) => {
         // Legacy fields for backward compatibility
         selectedPackage: {
             type: DataTypes.INTEGER,
-            allowNull: true,
-            references: {
-                model: 'plans',
-                key: 'id'
-            }
+            allowNull: true
         },
         packageDetails: {
             type: DataTypes.TEXT,
