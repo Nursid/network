@@ -276,7 +276,14 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        
+        payar_name: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        payar_number: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },        
         // Status and Metadata
         status: {
             type: DataTypes.ENUM('active', 'inactive', 'suspended'),

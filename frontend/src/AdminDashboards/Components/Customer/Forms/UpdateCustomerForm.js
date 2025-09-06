@@ -539,8 +539,7 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 			const apiUrl = `${API_URL}/customer/getupdate/${updateData.user_id || updateData.id}`;
 			const response = await axios.put(apiUrl, formDataToSend);
 			
-			console.log('Response from server:', response.data);
-			
+
 			if (response.data.status === true) {
 				prop();
 				Swal.fire('Successfully!', 'Customer has been updated.', 'success');

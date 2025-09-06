@@ -28,6 +28,7 @@ import AdvertisementManagement from './AdminDashboards/Components/AdvertisementM
 import ReportsAnalysis from './AdminDashboards/Components/ReportsAnalysis/ReportsAnalysis';
 import GSTBillsManagement from './AdminDashboards/Components/GSTBillsManagement/GSTBillsManagement';
 import ExpensesManagement from './AdminDashboards/Components/ExpensesManagement/ExpensesManagement';
+import DeletedAcount from './AdminDashboards/Components/AccountTransaction/DeletedAcount';
 
 import CustomerView from './AdminDashboards/Components/Customer/View/CustomerView';
 
@@ -44,6 +45,7 @@ function App() {
             <Route path='account-transactions' element={<AccountTransaction />}/>
             <Route path='collection-tally' element={<CollectionTally />} />
             <Route path='payment-pending' element={<PaymentPending />} />
+            <Route path='deleted-account' element={<DeletedAcount />} />
             <Route path='customer' element={<ManageCustomer />} />
             <Route path='manage-employees' element={<ManageEmployee />} />
             <Route path='local-staff-management' element={<ManageServiceProvider />} />

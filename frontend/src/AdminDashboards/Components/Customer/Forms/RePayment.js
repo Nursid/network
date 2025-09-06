@@ -32,9 +32,13 @@ const RePaymentForm = ({ open, onClose, onSubmit, loading = false, customerData 
 
     const [formData, setFormData] = useState({
         customer_id: customerData?.customer_id || '',
+        balance: customerData?.balance || 0,
+        code: customerData?.selected_package || '',
         amount: customerData?.balance || 0,
         trans_id: '',
         payment_method: '',
+        payar_name: customerData?.payar_name || '',
+        payar_number: customerData?.payar_number || '',
     });
     
     const [errors, setErrors] = useState({});
@@ -94,8 +98,6 @@ const RePaymentForm = ({ open, onClose, onSubmit, loading = false, customerData 
             customer_id: parseInt(formData.customer_id),
             amount: parseFloat(formData.amount),
         };
-        console.log("submitData-",submitData)
-        
         try {
             await onSubmit(submitData);
             // Reset form after successful submission
@@ -131,7 +133,6 @@ const RePaymentForm = ({ open, onClose, onSubmit, loading = false, customerData 
         if (open) {
             // Reset form when dialog opens to ensure clean state
             resetForm();
-            
             // Focus management
             if (amountInputRef.current) {
                 const timer = setTimeout(() => {
@@ -231,13 +232,13 @@ const RePaymentForm = ({ open, onClose, onSubmit, loading = false, customerData 
                                                 <strong>Name:</strong> {customerData?.name || 'John Doe'}
                                             </Typography>
                                             <Typography variant="body2">
-                                                <strong>Username:</strong> {customerData?.username || 'johndoe123'}
+                                                <strong>Username:</strong> {customerData?.username || ''}
                                             </Typography>
                                             <Typography variant="body2">
-                                                <strong>Contact:</strong> {customerData?.contact || '+91-9876543210'}
+                                                <strong>Contact:</strong> {customerData?.contact || ''}
                                             </Typography>
                                             <Typography variant="body2">
-                                                <strong>Address:</strong> {customerData?.address || '123, Main Street, Mumbai, MH'}
+                                                <strong>Address:</strong> {customerData?.address || ''}
                                             </Typography>
                                             <Typography variant="body2">
                                                 <strong>Status:</strong> 
@@ -335,7 +336,7 @@ const RePaymentForm = ({ open, onClose, onSubmit, loading = false, customerData 
                                                     Total Amount Due:
                                                 </Typography>
                                                 <Typography variant="body2" sx={{ fontWeight: 700, color: '#1976d2', fontSize: '1.1rem' }}>
-                                                    ₹{(parseFloat(customerData?.balance || 0) + parseFloat(customerData?.previous_dues || 0)).toFixed(2)}
+                                                    ₹{(parseFloat(parseFloat(customerData?.previous_dues || 0) + parseFloat(customerData?.balance || 0))).toFixed(2)}
                                                 </Typography>
                                             </Box>
                                         </Box>
@@ -410,12 +411,12 @@ const RePaymentForm = ({ open, onClose, onSubmit, loading = false, customerData 
                                                     <TextField
                                                         fullWidth
                                                         size="small"
-                                                        label="Transaction ID"
+                                                        label="Transaction Note&Id"
                                                         value={formData.trans_id}
                                                         onChange={(e) => handleChange('trans_id', e.target.value)}
                                                         error={!!errors.trans_id}
                                                         helperText={errors.trans_id}
-                                                        placeholder="Enter transaction/reference ID"
+                                                        placeholder="Enter transaction/reference Note&Id"
                                                         InputProps={{
                                                             startAdornment: (
                                                                 <InputAdornment position="start">
@@ -426,7 +427,25 @@ const RePaymentForm = ({ open, onClose, onSubmit, loading = false, customerData 
                                                     />
                                                 </Col>
                                             )}
-                                            
+
+                                                <Col md={12} className="mb-3">
+                                                    <TextField
+                                                        fullWidth
+                                                        size="small"
+                                                        label="Payar Name"
+                                                        value={formData.payar_name}
+                                                        onChange={(e) => handleChange('payar_name', e.target.value)}
+                                                    />
+                                                </Col>
+                                            <Col md={12} className="mb-3">
+                                                    <TextField
+                                                        fullWidth
+                                                        size="small"
+                                                        label="Payar Number"
+                                                        value={formData.payar_number}
+                                                        onChange={(e) => handleChange('payar_number', e.target.value)}
+                                                    />
+                                                </Col>
                                         </Row>
                                     </Col>
                                 </Row>

@@ -62,8 +62,12 @@ module.exports = (sequelize) => {
           collected_by: {
             type: DataTypes.INTEGER,
             allowNull: true,
+          },
+          active: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: true,
           }
-          
     }, {
         timestamps: true,
         tableName: 'accounts',

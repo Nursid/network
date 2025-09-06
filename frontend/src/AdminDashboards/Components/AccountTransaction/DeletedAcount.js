@@ -6,12 +6,9 @@ import axios from 'axios';
 import { API_URL } from '../../../config';
 import AdminNavItems from '../../Elements/AdminNavItems';
 import { useMediaQuery, useTheme } from '@mui/material';
-import { FormControl, Select, MenuItem, InputLabel, Box, Button, TextField, IconButton, Tooltip } from '@mui/material';
-import Swal from 'sweetalert2';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { FormControl, Select, MenuItem, InputLabel, Box, Button, TextField } from '@mui/material';
 
-
-const AllTransaction = () => { 
+const DeletedAcount = () => { 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -34,26 +31,27 @@ const AllTransaction = () => {
         paymentMethod: []
     });
 
-    const fetchAccountData = async () => {
-      try {
-          setLoading(true);
-          const response = await axios.get(`${API_URL}/api/account-listing`); // Adjust API endpoint as needed
-          if (response.data.status) {
-              setData(response.data.data);
-              // Extract unique values for filter options
-              extractFilterOptions(response.data.data);
-          } else {
-              setError('Failed to fetch account data');
-          }
-      } catch (error) {
-          console.error('Error fetching account data:', error);
-          setError('Error fetching account data');
-      } finally {
-          setLoading(false);
-      }
-  };
     // Fetch account data from API
     useEffect(() => {
+        const fetchAccountData = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get(`${API_URL}/api/account-inactive`); // Adjust API endpoint as needed
+                if (response.data.status) {
+                    setData(response.data.data);
+                    // Extract unique values for filter options
+                    extractFilterOptions(response.data.data);
+                } else {
+                    setError('Failed to fetch account data');
+                }
+            } catch (error) {
+                console.error('Error fetching account data:', error);
+                setError('Error fetching account data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchAccountData();
     }, []);
 
@@ -156,41 +154,9 @@ const AllTransaction = () => {
         }));
     };
 
-    const toggleDeactivate = (data) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'You won\'t be able to revert this!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, deactivate it!'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                // Make API call to deactivate the account
-                axios.post(`${API_URL}/api/account-toggle`, { active: false, id: data.id })
-                .then(response => {
-                    if (response.status === 200) {
-                        Swal.fire({
-                            title: 'Account Deleted successfully!',
-                            icon: 'success'
-                        })
-                        fetchAccountData();
-                    }else{
-                        Swal.fire({
-                            title: 'Failed to delete!',
-                            icon: 'error'
-                        })
-                        fetchAccountData();
-                    }
-                })
-            }
-        })
-    }
-
     const all_columns = [
         { 
-            field: "_id", 
+            field: "id", 
             headerName: "ID", 
             flex: isMobile ? 0 : 1, 
             minWidth: isMobile ? 60 : 80,
@@ -298,31 +264,6 @@ const AllTransaction = () => {
                 </span>
             )
         },
-        { 
-            field: "action", 
-            headerName: "Delete", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 80 : 120,
-            renderCell: (params) => (
-                <div className="d-flex gap-1">
-                   <Tooltip title="Delete" arrow>
-                          <IconButton 
-                              size="small" 
-                              style={{ 
-                                  backgroundColor: '#f44336', 
-                                  color: 'white',
-                                  width: isMobile ? '20px' : '24px',
-                                  height: isMobile ? '20px' : '24px',
-                                  minWidth: isMobile ? '20px' : '24px'
-                              }}
-                              onClick={() => toggleDeactivate(params.row)}
-                          >
-                              <DeleteForeverIcon style={{ fontSize: isMobile ? '12px' : '14px' }} />
-                          </IconButton>
-                      </Tooltip>
-                </div>
-            ),
-        },
     ];
 
     const DataWithID = (data) => {
@@ -417,12 +358,12 @@ const AllTransaction = () => {
                   fontWeight: '600', 
                   fontSize: isMobile ? '1.2rem' : '1.5rem' 
                 }}>
-                  💰 All Transactions
+                  💰 Deleted Account
                 </h4>
                 <p className='text-white-50 mb-0' style={{ 
                   fontSize: isMobile ? '0.8rem' : '0.9rem' 
                 }}>
-                  View and manage all account transactions
+                  View and manage all deleted account
                 </p>
               </div>
             </div>
@@ -595,4 +536,4 @@ const AllTransaction = () => {
     );
 };
 
-export default AllTransaction;
+export default DeletedAcount;

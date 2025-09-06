@@ -21,21 +21,15 @@ const PaymentPending = () => {
         const fetchAccountData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${API_URL}/api/account-listing`);
+                const response = await axios.get(`${API_URL}/api/account-pending`);
                 if (response.data.status) {
-                    // Filter for pending payment records
-                    const pendingData = response.data.data.filter(item => 
-                        item.recharge_status === 'Due' || 
-                        item.recharge_status === 'Pending' || 
-                        (item.balance && item.balance > 0)
-                    );
-                    setData(pendingData);
+                    setData(response.data.data);
                 } else {
-                    setError('Failed to fetch pending payment data');
+                    setError('Failed to fetch collection data');
                 }
             } catch (error) {
-                console.error('Error fetching pending payment data:', error);
-                setError('Error fetching pending payment data');
+                console.error('Error fetching collection data:', error);
+                setError('Error fetching collection data');
             } finally {
                 setLoading(false);
             }
@@ -53,29 +47,16 @@ const PaymentPending = () => {
             hide: isSmallMobile
         },
         { 
-            field: "date", 
-            headerName: "Date", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 100 : 120
-        },
-        { 
-            field: "cust_id", 
+            field: "customer_id", 
             headerName: isMobile ? "Cust ID" : "Customer ID", 
             flex: isMobile ? 0 : 1, 
             minWidth: isMobile ? 80 : 120
         },
         { 
-            field: "cust_name", 
+            field: "name", 
             headerName: isMobile ? "Name" : "Customer Name", 
             flex: isMobile ? 1 : 1, 
             minWidth: isMobile ? 120 : 150
-        },
-        { 
-            field: "vc_no", 
-            headerName: isMobile ? "Voucher" : "Voucher No.", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 80 : 120,
-            hide: isSmallMobile
         },
         { 
             field: "address", 
@@ -85,75 +66,28 @@ const PaymentPending = () => {
             hide: isSmallMobile
         },
         { 
-            field: "amount", 
+            field: "balance", 
             headerName: "Amount", 
             flex: isMobile ? 0 : 1, 
             minWidth: isMobile ? 80 : 120,
             renderCell: (params) => (
-                <span className="fw-bold text-warning">
+                <span className="fw-bold text-success">
                     ₹{params.value || 0}
                 </span>
             )
         },
         { 
-            field: "payment_mode", 
-            headerName: isMobile ? "Mode" : "Payment Mode", 
+            field: "payment_status", 
+            headerName: isMobile ? "Status" : "Payment Status", 
             flex: isMobile ? 0 : 1, 
             minWidth: isMobile ? 80 : 120,
-            hide: isSmallMobile
-        },
-        { 
-            field: "balance", 
-            headerName: "Balance", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 80 : 120,
+            hide: isSmallMobile,
             renderCell: (params) => (
-                <span className={`fw-bold ${params.value > 0 ? 'text-danger' : 'text-success'}`}>
-                    ₹{params.value || 0}
-                </span>
-            ),
-            hide: isSmallMobile
-        },
-        { 
-            field: "trans_id", 
-            headerName: isMobile ? "Trans ID" : "Transaction ID", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 100 : 150,
-            hide: isSmallMobile
-        },
-        { 
-            field: "partner_emp_id", 
-            headerName: isMobile ? "Partner" : "Partner/Emp. ID", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 80 : 140,
-            hide: isSmallMobile
-        },
-        { 
-            field: "auto_renew", 
-            headerName: isMobile ? "Auto" : "Auto Renew", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 60 : 100,
-            renderCell: (params) => params.value ? 'Yes' : 'No',
-            hide: isSmallMobile
-        },
-        { 
-            field: "recharge_status", 
-            headerName: "Status", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 80 : 130,
-            renderCell: (params) => (
-                <span 
-                    className={`badge ${
-                        params.value === 'Due' ? 'bg-danger' : 
-                        params.value === 'Pending' ? 'bg-warning' : 
-                        'bg-secondary'
-                    }`}
-                    style={{ fontSize: isMobile ? '0.7rem' : '0.75rem' }}
-                >
-                    {params.value || 'Pending'}
+                <span className={`badge ${params.value ? 'bg-success' : 'bg-danger'}`}>
+                    {params.value ? 'Paid' : 'Pending'}
                 </span>
             )
-        }
+        },
     ];
 
     const DataWithID = (data) => {
@@ -162,8 +96,7 @@ const PaymentPending = () => {
             for (let item of data) {
                 newData.push({
                     ...item,
-                    _id: item.id || data.indexOf(item),
-                    date: item.date ? moment(item.date).format(isMobile ? "DD/MM/YY" : "DD-MM-YYYY") : 'N/A',
+                    id: data.indexOf(item),
                 });
             }
         }

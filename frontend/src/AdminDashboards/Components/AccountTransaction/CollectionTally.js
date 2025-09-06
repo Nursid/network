@@ -6,7 +6,7 @@ import axios from 'axios';
 import { API_URL } from '../../../config';
 import AdminNavItems from '../../Elements/AdminNavItems';
 import { useMediaQuery, useTheme } from '@mui/material';
-
+import { FormControl, Select, MenuItem, InputLabel, Box, Button, TextField } from '@mui/material';
 
 const CollectionTally = () => { 
     const [data, setData] = useState([]);
@@ -17,24 +17,36 @@ const CollectionTally = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    // Fetch account data from API - filtered for collections
+    // Filter states
+    const [filters, setFilters] = useState({
+        collectedBy: '',
+        paymentType: '',
+        paymentMethod: '',
+        dateFrom: '',
+        dateTo: ''
+    });
+    const [filterOptions, setFilterOptions] = useState({
+        collectedBy: [],
+        paymentType: [],
+        paymentMethod: []
+    });
+
+    // Fetch account data from API
     useEffect(() => {
         const fetchAccountData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${API_URL}/api/account-listing`);
+                const response = await axios.get(`${API_URL}/api/account-listing`); // Adjust API endpoint as needed
                 if (response.data.status) {
-                    // Filter for collection records (you can adjust this filter based on your business logic)
-                    const collectionData = response.data.data.filter(item => 
-                        item.payment_mode && item.amount > 0
-                    );
-                    setData(collectionData);
+                    setData(response.data.data);
+                    // Extract unique values for filter options
+                    extractFilterOptions(response.data.data);
                 } else {
-                    setError('Failed to fetch collection data');
+                    setError('Failed to fetch account data');
                 }
             } catch (error) {
-                console.error('Error fetching collection data:', error);
-                setError('Error fetching collection data');
+                console.error('Error fetching account data:', error);
+                setError('Error fetching account data');
             } finally {
                 setLoading(false);
             }
@@ -42,6 +54,105 @@ const CollectionTally = () => {
 
         fetchAccountData();
     }, []);
+
+    // Extract unique values for filter dropdowns
+    const extractFilterOptions = (data) => {
+        const collectedBy = [...new Set(data.map(item => {
+            // Use employee name and ID from the direct collectedByEmployee relationship
+            if (item.collectedByEmployee?.name && item.collectedByEmployee?.id) {
+                return {
+                    id: item.collectedByEmployee.id,
+                    name: item.collectedByEmployee.name
+                };
+            }
+            return null;
+        }).filter(Boolean))];
+        
+        // Remove duplicates based on ID and sort by name
+        const uniqueEmployees = collectedBy.filter((employee, index, self) => 
+            index === self.findIndex(e => e.id === employee.id)
+        ).sort((a, b) => a.name.localeCompare(b.name));
+        
+        const paymentTypes = [...new Set(data.map(item => item.payment_mode).filter(Boolean))].sort();
+        
+        setFilterOptions({
+            collectedBy: uniqueEmployees,
+            paymentType: paymentTypes,
+            paymentMethod: paymentTypes // Using same as payment type for now
+        });
+    };
+
+    // Apply filters
+    const applyFilters = async () => {
+        try {
+            setLoading(true);
+            
+            // Validate date range
+            if (filters.dateFrom && filters.dateTo && filters.dateFrom > filters.dateTo) {
+                setError('From date cannot be greater than To date');
+                setLoading(false);
+                return;
+            }
+            
+            // Find the employee ID if collectedBy is selected
+            let collectedByValue = filters.collectedBy;
+            if (filters.collectedBy && typeof filters.collectedBy === 'object') {
+                collectedByValue = filters.collectedBy.id;
+            }
+            
+            const filterData = {
+                collectedBy: collectedByValue,
+                paymentType: filters.paymentType,
+                paymentMethod: filters.paymentMethod,
+                dateFrom: filters.dateFrom,
+                dateTo: filters.dateTo
+            };
+            
+            const response = await axios.post(`${API_URL}/api/filter-transactions`, filterData);
+            if (response.data.status) {
+                setData(response.data.data);
+                setError(null); // Clear any previous errors
+            } else {
+                setError(response.data.message || 'Failed to filter data');
+            }
+        } catch (error) {
+            console.error('Error filtering data:', error);
+            setError('Error filtering data');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Reset filters
+    const resetFilters = async () => {
+        setFilters({
+            collectedBy: '',
+            paymentType: '',
+            paymentMethod: '',
+            dateFrom: '',
+            dateTo: ''
+        });
+        
+        try {
+            setLoading(true);
+            const response = await axios.get(`${API_URL}/api/account-listing`);
+            if (response.data.status) {
+                setData(response.data.data);
+            }
+        } catch (error) {
+            console.error('Error resetting filters:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle filter changes
+    const handleFilterChange = (field, value) => {
+        setFilters(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
 
     const all_columns = [
         { 
@@ -64,10 +175,14 @@ const CollectionTally = () => {
             minWidth: isMobile ? 80 : 120
         },
         { 
-            field: "cust_name", 
+            field: "customer_name", 
             headerName: isMobile ? "Name" : "Customer Name", 
             flex: isMobile ? 1 : 1, 
-            minWidth: isMobile ? 120 : 150
+            minWidth: isMobile ? 120 : 150,
+            renderCell: (params) => {
+                // Display customer name from associated data if available, otherwise use cust_name
+                return params.row.customer?.name || params.row.cust_name || 'N/A';
+            }
         },
         { 
             field: "vc_no", 
@@ -101,18 +216,18 @@ const CollectionTally = () => {
             minWidth: isMobile ? 80 : 120,
             hide: isSmallMobile
         },
-        { 
-            field: "balance", 
-            headerName: "Balance", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 80 : 120,
-            renderCell: (params) => (
-                <span className={`fw-bold ${params.value > 0 ? 'text-danger' : 'text-success'}`}>
-                    ₹{params.value || 0}
-                </span>
-            ),
-            hide: isSmallMobile
-        },
+        // { 
+        //     field: "balance", 
+        //     headerName: "Balance", 
+        //     flex: isMobile ? 0 : 1, 
+        //     minWidth: isMobile ? 80 : 120,
+        //     renderCell: (params) => (
+        //         <span className={`fw-bold ${params.value > 0 ? 'text-danger' : 'text-success'}`}>
+        //             ₹{params.value || 0}
+        //         </span>
+        //     ),
+        //     hide: isSmallMobile
+        // },
         { 
             field: "trans_id", 
             headerName: isMobile ? "Trans ID" : "Transaction ID", 
@@ -121,18 +236,14 @@ const CollectionTally = () => {
             hide: isSmallMobile
         },
         { 
-            field: "partner_emp_id", 
-            headerName: isMobile ? "Partner" : "Partner/Emp. ID", 
+            field: "collected_by", 
+            headerName: isMobile ? "Collected By" : "Collected By", 
             flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 80 : 140,
-            hide: isSmallMobile
-        },
-        { 
-            field: "auto_renew", 
-            headerName: isMobile ? "Auto" : "Auto Renew", 
-            flex: isMobile ? 0 : 1, 
-            minWidth: isMobile ? 60 : 100,
-            renderCell: (params) => params.value ? 'Yes' : 'No',
+            minWidth: isMobile ? 100 : 150,
+            renderCell: (params) => {
+                // Display employee name from the direct collectedByEmployee relationship
+                return params.row.collectedByEmployee?.name || 'N/A';
+            },
             hide: isSmallMobile
         },
         { 
@@ -152,7 +263,7 @@ const CollectionTally = () => {
                     {params.value || 'Pending'}
                 </span>
             )
-        }
+        },
     ];
 
     const DataWithID = (data) => {
@@ -163,6 +274,10 @@ const CollectionTally = () => {
                     ...item,
                     _id: item.id || data.indexOf(item),
                     date: item.date ? moment(item.date).format(isMobile ? "DD/MM/YY" : "DD-MM-YYYY") : 'N/A',
+                    // Ensure associated data is properly accessible
+                    customer: item.customer || {},
+                    // Use the direct employee relationship
+                    collectedByEmployee: item.collectedByEmployee || {}
                 });
             }
         }
@@ -243,13 +358,155 @@ const CollectionTally = () => {
                   fontWeight: '600', 
                   fontSize: isMobile ? '1.2rem' : '1.5rem' 
                 }}>
-                  📊 Collection Tally
+                  💰 Collection Tally
                 </h4>
                 <p className='text-white-50 mb-0' style={{ 
                   fontSize: isMobile ? '0.8rem' : '0.9rem' 
                 }}>
-                  View collection summary and reports
+                  View and manage all collection tally
                 </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Filter Section */}
+          <div className={`${isMobile ? 'px-2' : 'px-4'} mb-3`}>
+            <div style={{
+              background: 'white',
+              borderRadius: '12px',
+              padding: isMobile ? '15px' : '20px',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+              border: '1px solid #e0e0e0'
+            }}>
+              <div className="d-flex align-items-center justify-content-between mb-3">
+                <h6 className="mb-0" style={{ fontWeight: '600', color: '#333' }}>
+                  🔍 Filter Transactions
+                </h6>
+                <div>
+                  <Button 
+                    variant="outlined" 
+                    size="small" 
+                    onClick={resetFilters}
+                    style={{ marginRight: '10px' }}
+                  >
+                    Reset
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    size="small" 
+                    onClick={applyFilters}
+                    disabled={loading}
+                    style={{ 
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white'
+                    }}
+                  >
+                    {loading ? 'Applying...' : 'Apply Filters'}
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Error Display */}
+              {error && (
+                <div className="alert alert-danger py-2 mb-3" style={{ fontSize: '0.875rem' }}>
+                  <i className="fas fa-exclamation-triangle me-2"></i>
+                  {error}
+                </div>
+              )}
+              
+              {/* Results Count */}
+              <div className="mb-3">
+                <small className="text-muted">
+                  <i className="fas fa-info-circle me-1"></i>
+                  Found {data.length} transaction{data.length !== 1 ? 's' : ''}
+                </small>
+              </div>
+              
+              <div className={`${isMobile ? 'row g-2' : 'row g-3'}`}>
+                                 {/* Collected By Filter */}
+                 <div className={`${isMobile ? 'col-6' : 'col-md-3'}`}>
+                   <FormControl fullWidth size="small">
+                     <InputLabel>Collected By</InputLabel>
+                     <Select
+                       value={filters.collectedBy || ""}
+                       label="Collected By"
+                       onChange={(e) => handleFilterChange('collectedBy', e.target.value)}
+                       renderValue={(selected) => {
+                         if (!selected) return "All";
+                         if (typeof selected === 'object' && selected.name) {
+                           return selected.name;
+                         }
+                         return "All";
+                       }}
+                     >
+                       <MenuItem value="">All</MenuItem>
+                       {filterOptions.collectedBy.map((option) => (
+                         <MenuItem key={option.id} value={option}>
+                           {option.name}
+                         </MenuItem>
+                       ))}
+                     </Select>
+                   </FormControl>
+                 </div>
+
+                {/* Payment Type Filter */}
+                <div className={`${isMobile ? 'col-6' : 'col-md-3'}`}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Payment Type</InputLabel>
+                    <Select
+                      value={filters.paymentType}
+                      label="Payment Type"
+                      onChange={(e) => handleFilterChange('paymentType', e.target.value)}
+                    >
+                      <MenuItem value="">All</MenuItem>
+                      {filterOptions.paymentType.map((option) => (
+                        <MenuItem key={option} value={option}>{option}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
+
+                {/* Payment Method Filter */}
+                <div className={`${isMobile ? 'col-6' : 'col-md-3'}`}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Payment Method</InputLabel>
+                    <Select
+                      value={filters.paymentMethod}
+                      label="Payment Method"
+                      onChange={(e) => handleFilterChange('paymentMethod', e.target.value)}
+                    >
+                      <MenuItem value="">All</MenuItem>
+                      {filterOptions.paymentMethod.map((option) => (
+                        <MenuItem key={option} value={option}>{option}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
+
+                {/* Date Range Filters */}
+                <div className={`${isMobile ? 'col-6' : 'col-md-3'}`}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="From Date"
+                    type="date"
+                    value={filters.dateFrom}
+                    onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </div>
+
+                <div className={`${isMobile ? 'col-6' : 'col-md-3'}`}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="To Date"
+                    type="date"
+                    value={filters.dateTo}
+                    onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </div>
               </div>
             </div>
           </div>

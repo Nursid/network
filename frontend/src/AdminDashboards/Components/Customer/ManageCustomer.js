@@ -555,7 +555,7 @@ For any queries, please contact us.`;
                 <span style={{ fontSize: '11px' }}>
                     {params.row.start_date ? moment(params.row.start_date).format("DD-MM-YYYY") : ''}
                     <br />
-                    {params.row.end_date ? moment(params.row.end_date).format("DD-MM-YYYY") : ''}
+                    {params.row.expiry_date ? moment(params.row.expiry_date).format("DD-MM-YYYY") : ''}
                 </span>
             )
         },

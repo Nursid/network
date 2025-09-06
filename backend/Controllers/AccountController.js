@@ -3,6 +3,7 @@ const {Sequelize} = require('sequelize');
 const Op = Sequelize.Op;
 const AccountModel = db.AccountModel
 const EmployeeModel = db.EmployeeModel
+const CustomerModel = db.CustomerModel
 const moment = require('moment')
 
 const ListingAccount = async (req, res) => {
@@ -12,18 +13,21 @@ const ListingAccount = async (req, res) => {
 	  const data = await AccountModel.findAll({
 		include: [
 			{
-				model: db.CustomerModel,
+				model: CustomerModel,
 				attributes: ['name', 'customer_id'],
 				as: 'customer',
 				required: false, // Use LEFT JOIN to include transactions even if customer is null
 			},
 			{
-				model: db.EmployeeModel,
+				model: EmployeeModel,
 				attributes: ['name', 'id'],
 				as: 'collectedByEmployee',
 				required: false
 			}
 		],
+		where: {
+			active: true
+		},
 		order: [['date', 'DESC']]
 	  });
   
@@ -235,6 +239,7 @@ const FilterTransactions = async (req, res) => {
 			};
 		}
 
+		whereCondition.active = true;
 		const data = await AccountModel.findAll({
 			where: whereCondition,
 			include: includeOptions,
@@ -315,6 +320,60 @@ const DeleteAccount = async (req, res) => {
 	}
 }
 
+const PendingAccount = async (req, res) => {
+	try {
+		const data = await CustomerModel.findAll({
+			attributes: ['name', 'customer_id', 'balance', 'address' ],
+			where: {
+				payment_status: false
+			}
+		});
+		if (data.length === 0) {
+			return res.status(200).json({status: true, data: []});
+		}
+		res.status(200).json({status: true, data: data});
+	} catch (error) {
+		res.status(400).json({message: "Invalid request"});
+	}
+}
+
+const ActiveAccount = async (req, res) => {
+	try {
+		const { active, id } = req.body;
+		const data = await AccountModel.update(
+			{
+				active: active
+			},
+			{
+			where: {
+				id: id
+			}
+		});
+		if (data) {
+			return res.status(200).json({status: true, message: "Account updated successfully!"});
+		}
+	} catch (error) {
+		res.status(400).json({message: "Invalid request"});
+	}
+}
+
+const InactiveAccount = async (req, res) => {
+	try {
+		const data = await AccountModel.findAll({
+			where: {
+				active: false
+			}
+		});
+		if (data.length === 0) {
+			return res.status(200).json({status: true, data: []});
+		}
+		res.status(200).json({status: true, data: data});
+	} catch (error) {
+		res.status(400).json({message: "Invalid request"});
+	}
+}
+
+
 module.exports = {
 	ListingAccount,
 	AddBalance,
@@ -322,5 +381,8 @@ module.exports = {
     FilterAmount,
 	FilterTransactions,
 	GetAccountById,
-	DeleteAccount
+	DeleteAccount,
+	PendingAccount,
+	ActiveAccount,
+	InactiveAccount
 }

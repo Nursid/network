@@ -239,11 +239,11 @@ const AddNewCustomerForm = ({prop, data}) => {
 		block: null,
 		apartment: null,
 		email: '',
-		
+		payar_name: '',
+		payar_number: '',
 		// Step 2: Package Selection
 		selected_package: null,
 		other_services: null,
-		
 		// Step 3: Inventory Items & KYC Records
 		inventory_items: [],
 		dob: '',
@@ -1138,6 +1138,8 @@ const AddNewCustomerForm = ({prop, data}) => {
 				collected_by: formData.collected_by,
 				payment_method: formData.payment_method,
 				other_services: formData.other_services,
+				payar_name: formData.payar_name,
+				payar_number: formData.payar_number,
 			}}
 			validate={(values) => {
 				const errors = validateBilling(values);
@@ -1360,6 +1362,30 @@ const AddNewCustomerForm = ({prop, data}) => {
 									options={payment_method_options} 
 									setSelcted={(value) => setFormData(prev => ({ ...prev, payment_method: value }))} 
 									initialValue={formData.payment_method}
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="payar_name">Payar Name</Label>
+								<Field
+									as={Input}
+									type="text"
+									name="payar_name"
+									placeholder="Enter Payar Name"
+									value={formData.payar_name}
+								/>
+							</FormGroup>
+						</Col>
+						<Col md={4}>
+							<FormGroup>
+								<Label for="payar_number">Payar Number</Label>
+								<Field
+									as={Input}
+									type="text"
+									name="payar_number"
+									placeholder="Enter Payar Number"
+									value={formData.payar_number}
 								/>
 							</FormGroup>
 						</Col>

@@ -126,17 +126,16 @@ const SignupUser = async (req, res) => {
 		block: data.block || null,
 		apartment: data.apartment || null,
 		email: data.email || null,
-
-		selected_package: data.selected_package ? parseInt(data.selected_package) : null,
+		payar_name: data.payar_name || null,
+		payar_number: data.payar_number || null,
+		selected_package: data.selected_package,
 		other_services: data.other_services || null,
-
 		inventory_items: data.inventory_items ? JSON.stringify(data.inventory_items) : null,
 		dob: data.dob || null,
 		doa: data.doa || null,
 		aadhar_card: data.aadhar_card || null,
 		pan_card: data.pan_card || null,
 		photo: data.photo || null,
-
 		billing_amount: billingAmount,
 		billing_cycle: billingCycle,
 		other_charges: otherCharges,
@@ -148,7 +147,6 @@ const SignupUser = async (req, res) => {
 		discount: discount,
 		collected_by: data.collected_by || null,
 		payment_method: data.payment_method || null,
-
 		selectedPackage: data.selected_package ? parseInt(data.selected_package) : null,
 		packageDetails: data.packageDetails || null,
 		selectedItems: data.inventory_items ? JSON.stringify(data.inventory_items) : null,
@@ -162,7 +160,6 @@ const SignupUser = async (req, res) => {
 		panImage: data.panImage || null,
 		otherIdImage: data.otherIdImage || null,
 		signature: data.signature || null,
-
 		customer_id: customerId,
 		status: 'active',
 		customerType: 'individual',
@@ -327,7 +324,6 @@ const SignupUser = async (req, res) => {
 };
 
 
-
 const LoginUser = async (req, res) => {
 	const {
 		number,
@@ -383,20 +379,21 @@ const DeleteUsers = (req, res) => {
 const AllCustomer = async (req, res) => {
 	try {
 		const customers = await CustomerModel.findAll({
-			include: [{
-					model: CustomerPlanHistory,
-					limit: 1,
-					order: [
-						['start_date', 'DESC']
-					]
-				},
-				{
-					model: AccountModel,
-					limit: 1,
-					order: [
-						['date', 'DESC']
-					]
-				},
+			include: [
+				// {
+			// 		model: CustomerPlanHistory,
+			// 		limit: 1,
+			// 		order: [
+			// 			['start_date', 'DESC']
+			// 		]
+			// 	},
+			// 	{
+			// 		model: AccountModel,
+			// 		limit: 1,
+			// 		order: [
+			// 			['date', 'DESC']
+			// 		]
+			// 	},
 				{
 					model: PlanModel,
 					as: 'plan'
@@ -413,26 +410,9 @@ const AllCustomer = async (req, res) => {
 				message: "No user found"
 			});
 
-		// Transform the data to match your expected format
-		const transformedCustomers = customers.map(customer => {
-			const customerData = customer.toJSON();
-			return {
-				...customerData,
-				customer_plan_history: customerData.customer_plan_histories && customerData.customer_plan_histories.length > 0 ?
-					customerData.customer_plan_histories[0] :
-					null,
-				account: customerData.accounts && customerData.accounts.length > 0 ?
-					customerData.accounts[0] :
-					null,
-				plan: customerData.plan || null,
-				customer_plan_histories: undefined, // Remove the array
-				accounts: undefined // Remove the array
-			};
-		});
-
 		res.status(200).json({
 			status: 200,
-			data: transformedCustomers
+			data: customers
 		});
 	} catch (error) {
 		console.error('AllCustomer error:', error);
@@ -984,6 +964,8 @@ const AddRePayment = async (req, res) => {
 		amount,
 		payment_method,
 		trans_id,
+		payar_name,
+		payar_number,
 	} = req.body;
 
 	try {
@@ -1011,7 +993,7 @@ const AddRePayment = async (req, res) => {
 		// 3. Use plan info from selectedPackage or DB fallback
 		const planData = await PlanModel.findOne({
 			where: {
-				id: customer.selected_package
+				code: customer.selected_package
 			}
 		});
 
@@ -1079,6 +1061,9 @@ const AddRePayment = async (req, res) => {
 			bill_date: today,
 			balance: remainingBalance, // Updated balance after payment
 			expiry_date: expiry,
+			start_date: today,
+			payar_name: payar_name,
+			payar_number: payar_number,
 			status: 'active',
 			payment_status: remainingBalance === 0 ? true : false // Mark as paid if balance is zero
 		}, {
@@ -1170,6 +1155,7 @@ const importBulkCustomers = async (req, res) => {
 			const processedCustomer = {
 				...customer,
 				customer_id: currentCustomerId,
+				balance: customer.billing_amount || 0,
 			};
 
 			processedCustomers.push(processedCustomer);
@@ -1229,11 +1215,10 @@ const expireOldPlans = async () => {
 const RenewPlan = async (req, res) => {
 	const {
 		customer_id,
-		plan_id,
+		code,
 		renewalStartDate,
 		renewalEndDate,
-		renewalCycle,
-		selectedPackage
+		renewalCycle
 	} = req.body;
 
 	try {
@@ -1253,7 +1238,7 @@ const RenewPlan = async (req, res) => {
 		// Validate plan exists
 		const plan = await PlanModel.findOne({
 			where: {
-				id: plan_id
+				code: code
 			}
 		});
 		if (!plan) {
@@ -1264,12 +1249,12 @@ const RenewPlan = async (req, res) => {
 		}
 
 		// Get plan data from selectedPackage or database
-		const planData = selectedPackage?.days ? {
-			days: parseInt(selectedPackage.days),
-			finalPrice: parseFloat(selectedPackage.finalPrice),
-			plan: selectedPackage.plan,
-			connectionType: selectedPackage.connectionType,
-			code: selectedPackage.code
+			const planData = plan?.days ? {
+			days: parseInt(plan.days),
+			finalPrice: parseFloat(plan.finalPrice),
+			plan: plan.plan,
+			connectionType: plan.connectionType,
+			code: plan.code
 		} : plan;
 
 		if (!planData || !planData.days) {
@@ -1285,16 +1270,18 @@ const RenewPlan = async (req, res) => {
 
 		// Calculate billing amount
 		const billingAmount = parseFloat(planData.finalPrice);
-		const previousBalance = parseFloat(customer.balance || 0);
-		const totalAmount = billingAmount + previousBalance;
+		const totalAmount = parseFloat(billingAmount);
+		// const previousDues = parseFloat(customer.previous_dues + customer.balance || 0);
 
 		// Update customer with new plan details and set payment as pending
 		const updateData = {
 			bill_date: startDate,
 			balance: totalAmount, // Total amount to be paid
+			billing_amount: billingAmount,
+			// previous_dues: previousDues,
 			expiry_date: endDate,
 			payment_status: false, // Payment pending
-			selected_package: plan_id, // Store plan ID as integer (foreign key)
+			selected_package: code, // Store plan ID as integer (foreign key)
 		};
 		console.log("updateData-", updateData)
 
@@ -1308,16 +1295,6 @@ const RenewPlan = async (req, res) => {
 		res.status(200).json({
 			status: true,
 			message: "Plan renewed successfully with pending payment",
-			data: {
-				customer_id,
-				plan: planData.plan,
-				billing_amount: billingAmount,
-				total_amount: totalAmount,
-				start_date: startDate,
-				end_date: endDate,
-				payment_status: "Pending",
-				renewal_cycle: renewalCycle || '1 Month'
-			}
 		});
 
 	} catch (error) {
@@ -1536,6 +1513,35 @@ const CheckCustomer = async (req, res) => {
 	}
 };
 
+const GetCustomerPlans = async (req, res) => {
+
+	const {
+		plan_id
+	} = req.body;
+	try {
+		const plans = await PlanModel.findOne({
+			where: {
+			 code: plan_id
+			}
+		});
+		res.status(200).json({
+			status: true,
+			message: "Plans found",
+			data: plans || []
+		});
+	}
+	catch (error) {
+		console.error('Error in GetCustomerPlans:', error);
+		res.status(500).json({
+			status: false,
+			message: "Internal Server Error",
+			error: error.message
+		});
+	}
+}
+
+
+
 cron.schedule('0 0 * * *', () => {
 	console.log("🔁 Running auto-expiry for outdated plans...");
 	expireOldPlans();
@@ -1563,5 +1569,6 @@ module.exports = {
 	SetReminder,
 	GetAllReminder,
 	GetReminderByID,
-	CheckCustomer
+	CheckCustomer,
+	GetCustomerPlans
 };

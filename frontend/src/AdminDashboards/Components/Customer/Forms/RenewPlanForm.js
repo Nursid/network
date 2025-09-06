@@ -35,6 +35,7 @@ const RenewPlanForm = ({ open, onClose, onSubmit, loading = false, customerData 
         amount: '',
         trans_id: '',
         payment_method: '',
+        code: customerData?.selected_package || '',
     });
     
     const [errors, setErrors] = useState({});
@@ -80,7 +81,7 @@ const RenewPlanForm = ({ open, onClose, onSubmit, loading = false, customerData 
         if (field === 'renewalStartDate' && formData.selectedPackage) {
             const startDate = new Date(value);
             const calculatedEndDate = new Date(startDate);
-            calculatedEndDate.setDate(startDate.getDate() + parseInt(formData.selectedPackage.days));
+            calculatedEndDate.setDate(startDate.getDate() + parseInt(formData.plan.days));
             updatedData.renewalEndDate = calculatedEndDate.toISOString().split('T')[0];
         }
         
@@ -100,7 +101,7 @@ const RenewPlanForm = ({ open, onClose, onSubmit, loading = false, customerData 
             const response = await axios.get(`${API_URL}/plan/getall`);
             if (response.data.status === 200) {
                 const packageOptions = response.data.data.map(pkg => ({
-                    value: pkg.id,
+                    value: pkg.code,
                     label: `${pkg.plan} - ₹${pkg.finalPrice} - ${pkg.days} Days`,
                     ...pkg
                 }));
@@ -165,9 +166,8 @@ const RenewPlanForm = ({ open, onClose, onSubmit, loading = false, customerData 
             ...formData,
             customer_id: parseInt(formData.customer_id),
             amount: parseFloat(formData.amount),
-            plan_id: formData.plan_id ? parseInt(formData.plan_id) : null,
+            code: formData.code,
         };
-        
         onSubmit(submitData);
     };
 
@@ -175,7 +175,7 @@ const RenewPlanForm = ({ open, onClose, onSubmit, loading = false, customerData 
         setFormData({
             customer_id: customerData?.customer_id || '',
             amount: '',
-            plan_id: '',
+            code: '',
             selectedPackage: null,
             renewalStartDate: '',
             renewalEndDate: '',
@@ -240,16 +240,16 @@ const RenewPlanForm = ({ open, onClose, onSubmit, loading = false, customerData 
                                     <Col md={8}>
                                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                             <Typography variant="body2">
-                                                <strong>Name:</strong> {customerData?.name || 'John Doe'}
+                                                <strong>Name:</strong> {customerData?.name || ''}
                                             </Typography>
                                             <Typography variant="body2">
-                                                <strong>Username:</strong> {customerData?.username || 'johndoe123'}
+                                                <strong>Username:</strong> {customerData?.username || ''}
                                             </Typography>
                                             <Typography variant="body2">
-                                                <strong>Contact:</strong> {customerData?.contact || '+91-9876543210'}
+                                                <strong>Contact:</strong> {customerData?.contact || ''}
                                             </Typography>
                                             <Typography variant="body2">
-                                                <strong>Address:</strong> {customerData?.address || '123, Main Street, Mumbai, MH'}
+                                                <strong>Address:</strong> {customerData?.address || ''}
                                             </Typography>
                                             <Typography variant="body2">
                                                 <strong>Status:</strong> 
@@ -312,7 +312,7 @@ const RenewPlanForm = ({ open, onClose, onSubmit, loading = false, customerData 
                                         <FormControl fullWidth size="small">
                                             <InputLabel>Select Service Plan</InputLabel>
                                             <Select
-                                                value={formData.plan_id || ''}
+                                                value={formData.code || ''}
                                                 label="Select Service Plan"
                                                 onChange={(e) => {
                                                     const selectedPkg = packages.find(pkg => pkg.value === e.target.value);
@@ -336,7 +336,7 @@ const RenewPlanForm = ({ open, onClose, onSubmit, loading = false, customerData 
                                                         ...prev, 
                                                         selectedPackage: selectedPkg,
                                                         amount: selectedPkg ? parseFloat(selectedPkg.finalPrice).toString() : '',
-                                                        plan_id: selectedPkg ? selectedPkg.id : '',
+                                                        code: selectedPkg ? selectedPkg.code : '',
                                                         renewalStartDate: startDate || prev.renewalStartDate,
                                                         renewalEndDate: endDate || prev.renewalEndDate
                                                     }));

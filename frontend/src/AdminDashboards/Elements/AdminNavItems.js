@@ -9,7 +9,7 @@ import { MdAirplaneTicket } from "react-icons/md";
 import { useLocation } from 'react-router-dom';
 import { IoIosGitNetwork } from "react-icons/io";
 import { FaChevronDown, FaChevronRight, FaBars } from "react-icons/fa";
-import { BiTransfer, BiMoney, BiReceipt } from "react-icons/bi";
+import { BiTransfer, BiMoney, BiReceipt, BiTrash } from "react-icons/bi";
 import { FiUsers, FiUserCheck, FiUserPlus, FiLogOut, FiSettings } from "react-icons/fi";
 import { AiOutlineFileText, AiOutlineGift } from "react-icons/ai";
 import { BsTicketPerforated, BsListTask, BsGear } from "react-icons/bs";
@@ -86,6 +86,7 @@ const AdminNavItems = ({ onSidebarToggle }) => {
         { title: "All Transactions", icon: <BiTransfer size={20} />, path: "/admin/account-transactions" },
         { title: "Collection Tally", icon: <BiMoney size={20} />, path: "/admin/collection-tally" },
         { title: "Payment Pending", icon: <BiReceipt size={20} />, path: "/admin/payment-pending" },
+        { title: "Deleted Account", icon: <BiTrash size={20} />, path: "/admin/deleted-account" },
       ]
     },
     { 

@@ -15,6 +15,10 @@ router.post("/filter-amount",AccountController.FilterAmount);
 router.post("/filter-transactions",AccountController.FilterTransactions);
 router.get("/account-detail/:id",AccountController.GetAccountById);
 router.delete("/delete-account/:id",AccountController.DeleteAccount);
+router.get("/account-pending",AccountController.PendingAccount);
+router.post("/account-toggle",AccountController.ActiveAccount);
+router.get("/account-inactive",AccountController.InactiveAccount);
+
 
 
 
