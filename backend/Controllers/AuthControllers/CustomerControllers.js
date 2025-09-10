@@ -1004,16 +1004,6 @@ const AddRePayment = async (req, res) => {
 			});
 		}
 
-		// 4. Expire customer's previous active plan (if any)
-		await CustomerPlanHistory.update({
-			status: 'expired'
-		}, {
-			where: {
-				customer_id,
-				status: 'active'
-			}
-		});
-
 		// 5. Calculate dates & billing
 		const today = new Date();
 		const expiry = new Date(today);
@@ -1027,13 +1017,15 @@ const AddRePayment = async (req, res) => {
 		const account = await AccountModel.create({
 			cust_id: customer_id,
 			amount: rechargeAmount,
-			payment_method,
+			payment_mode: payment_method,
 			trans_id,
 			recharge_status: 'completed',
 			recharge_days: planData.days,
 			valid_till: expiry,
 			cust_name: customer.name,
 			date: today,
+			payar_name: payar_name,
+			payar_mobile: payar_number,
 			address: customer.address,
 			vc_no: await generateVoucherNo(),
 			balance: remainingBalance,
@@ -1042,28 +1034,12 @@ const AddRePayment = async (req, res) => {
 			collected_by: req.user?.id || null // Fix undefined collected_by
 		});
 
-		// 7. Create Plan History
-		await CustomerPlanHistory.create({
-			customer_id,
-			plan_id: customer.selected_package,
-			start_date: today,
-			end_date: expiry,
-			billing_amount: rechargeAmount,
-			discount: 0,
-			paid_amount: rechargeAmount,
-			due_amount: remainingBalance,
-			payment_method,
-			status: 'active'
-		});
-
 		// 8. Update CustomerModel
 		await CustomerModel.update({
 			bill_date: today,
 			balance: remainingBalance, // Updated balance after payment
 			expiry_date: expiry,
 			start_date: today,
-			payar_name: payar_name,
-			payar_number: payar_number,
 			status: 'active',
 			payment_status: remainingBalance === 0 ? true : false // Mark as paid if balance is zero
 		}, {
@@ -1102,12 +1078,12 @@ const GetBillingDetails = async (req, res) => {
 	} = req.body;
 
 	try {
-		const isCustomer = await CustomerPlanHistory.findAll({
+		const isCustomer = await AccountModel.findAll({
 			where: {
-				customer_id: customer_id
+				cust_id: customer_id
 			},
 			order: [
-				['end_date', 'DESC']
+				['date', 'DESC']
 			]
 		});
 
@@ -1211,6 +1187,43 @@ const expireOldPlans = async () => {
 	}
 };
 
+const GetBillingDetailsHistory = async (req, res) => {
+
+	const {
+		customer_id
+	} = req.params;
+
+	try {
+		const isCustomer = await CustomerPlanHistory.findAll({
+			where: {
+				customer_id: customer_id
+			},
+			order: [
+				['start_date', 'DESC']
+			]
+		});
+
+		if (!isCustomer) {
+			return res.status(400).json({
+				status: false,
+				message: "Customer not found"
+			});
+		}
+
+		return res.status(200).json({
+			status: true,
+			message: "Billing details found",
+			data: isCustomer
+		});
+	} catch (error) {
+		console.error("GetBillingDetails error:", error);
+		return res.status(500).json({
+			status: false,
+			message: "Internal Server Error: " + error.message
+		});
+	}
+}
+
 
 const RenewPlan = async (req, res) => {
 	const {
@@ -1264,6 +1277,18 @@ const RenewPlan = async (req, res) => {
 			});
 		}
 
+		
+		// 4. Expire customer's previous active plan (if any)
+		await CustomerPlanHistory.update({
+			status: 'expired'
+		}, {
+			where: {
+				customer_id,
+				status: 'active'
+			}
+		});
+
+
 		// Calculate dates
 		const startDate = renewalStartDate ? new Date(renewalStartDate) : new Date();
 		const endDate = renewalEndDate ? new Date(renewalEndDate) : new Date(startDate.getTime() + (planData.days * 24 * 60 * 60 * 1000));
@@ -1283,7 +1308,18 @@ const RenewPlan = async (req, res) => {
 			payment_status: false, // Payment pending
 			selected_package: code, // Store plan ID as integer (foreign key)
 		};
-		console.log("updateData-", updateData)
+	
+		// 7. Create Plan History
+		await CustomerPlanHistory.create({
+			customer_id,
+			plan_id: code,
+			start_date: startDate,
+			end_date: endDate,
+			billing_amount: billingAmount,
+			status: 'active'
+		});
+	
+
 
 		await CustomerModel.update(updateData, {
 			where: {
@@ -1570,5 +1606,6 @@ module.exports = {
 	GetAllReminder,
 	GetReminderByID,
 	CheckCustomer,
-	GetCustomerPlans
+	GetCustomerPlans,
+	GetBillingDetailsHistory
 };

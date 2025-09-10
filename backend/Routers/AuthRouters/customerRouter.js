@@ -55,6 +55,7 @@ router.get('/reminderbyid/:customer_id', customerRouter.GetReminderByID);
 router.get('/reminder/getall', customerRouter.GetAllReminder);
 router.post('/check-customer', customerRouter.CheckCustomer);
 router.post('/get-plans', customerRouter.GetCustomerPlans);
+router.get('/get-plan-details-history/:customer_id', customerRouter.GetBillingDetailsHistory);
 
 
 

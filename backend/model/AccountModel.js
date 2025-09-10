@@ -63,6 +63,14 @@ module.exports = (sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: true,
           },
+          payar_name: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          payar_mobile: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
           active: {
             type: DataTypes.BOOLEAN,
             allowNull: true,
