@@ -140,13 +140,21 @@ const CustomerProfile = ({ data, fetchData }) => {
                 <span className="fw-semibold ms-2">{data?.installation_address || ''}</span>
               </div>
             </Col>
-            <Col xs={12}>
+            <Col xs={6}>
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaHome className="text-muted me-2" />
                 <span className="text-muted">Connection Status:</span>
                 <span className="fw-semibold ms-2">{data?.status || ''}</span>
               </div>
             </Col>
+            <Col xs={6}>
+              <div className="justify-content-between align-items-center">
+                <FaIcons.FaHome className="text-muted me-2" />
+                <span className="text-muted">Activation Date:</span>
+                <span className="fw-semibold ms-2">{data?.activation_date || ''}</span>
+              </div>
+            </Col>
+
           </Row>
         </div>
       </CardBody>

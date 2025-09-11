@@ -30,11 +30,6 @@ const validateAddressInfo = (values) => {
     errors.username = 'Username can only contain letters, numbers, and underscores';
   }
 
-  // Email validation
-  if (values.email && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
-    errors.email = 'Invalid email address';
-  }
-
   // Mobile validation
   if (values.mobile && !/^[0-9]{10}$/.test(values.mobile)) {
     errors.mobile = 'Mobile number must be exactly 10 digits';
@@ -188,6 +183,8 @@ const AddressInfoCard = ({ data, isModal = false, onSave, onCancel }) => {
         email: data?.email || '',
         mobile: data?.mobile || '',
         gender: data?.gender || '',
+        activation_date: data?.activation_date || '',
+        email: data?.email || '',
         dob: data?.dob ? moment(data.dob).format('YYYY-MM-DD') : '',
         doa: data?.doa ? moment(data.doa).format('YYYY-MM-DD') : '',
       }}
@@ -257,7 +254,7 @@ const AddressInfoCard = ({ data, isModal = false, onSave, onCancel }) => {
                   setSelcted={(selected) => {
                     setGender(selected);
                     setFieldValue('gender', selected?.value || '');
-                  }} 
+                  }}  
                   initialValue={gender}
                 />
                 {errors.gender && touched.gender && (
@@ -275,13 +272,23 @@ const AddressInfoCard = ({ data, isModal = false, onSave, onCancel }) => {
                 />
               </FormGroup>
             </Col>
-            <Col md={6}>
+            <Col md={4}>
               <FormGroup>
                 <Label for="doa">Anniversary Date</Label>
                 <Field
                   as={Input}
                   type="date"
                   name="doa"
+                />
+              </FormGroup>
+            </Col>
+            <Col md={4}>
+              <FormGroup>
+                <Label for="doa">Activation Date</Label>
+                <Field
+                  as={Input}
+                  type="date"
+                  name="activation_date"
                 />
               </FormGroup>
             </Col>
@@ -332,6 +339,17 @@ const AddressInfoCard = ({ data, isModal = false, onSave, onCancel }) => {
                 {errors.apartment && touched.apartment && (
                   <span className="validationError">{errors.apartment}</span>
                 )}
+              </FormGroup>
+            </Col>
+            <Col md={4}>
+              <FormGroup>
+                <Label for="email">Email</Label>
+                <Field
+                  as={Input}
+                  type="email"
+                  name="email"
+                />
+                <ErrorMessage name="email" component="span" className="validationError" />
               </FormGroup>
             </Col>
             <Col md={12}>

@@ -20,64 +20,64 @@ const BillingDetails = ({ data }) => {
             <Col md={6}>
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaUser className="text-muted me-2" />
-                <span className="text-muted">Plan Name:</span>
-                <span className="fw-semibold ms-2">{data?.customer_id || ''}</span>
+                <span className="text-muted">Plan Code:</span>
+                <span className="fw-semibold ms-2">{data?.selected_package || ''}</span>
               </div>
             </Col>
             <Col md={6}>
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaMobile className="text-muted me-2" />
                 <span className="text-muted">Plan Amount:</span>
-                <span className="fw-semibold ms-2">{data?.mobile || ''}</span>
+                <span className="fw-semibold ms-2">{data?.billing_amount || ''}</span>
               </div>
             </Col>
             <Col md={6}>
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaMapMarkerAlt className="text-muted me-2" />
                 <span className="text-muted">Total Balance:</span>
-                <span className="fw-semibold ms-2">{data?.area || ''}</span>
+                <span className="fw-semibold ms-2">{parseFloat(data?.balance + data?.previous_dues).toFixed(2) || ''}</span>
               </div>
             </Col>
             <Col md={6}>
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaBuilding className="text-muted me-2" />
                 <span className="text-muted">Previous Recharge Balance:</span>
-                <span className="fw-semibold ms-2">{data?.block || ''}</span>
+                <span className="fw-semibold ms-2">{data?.previous_dues || ''}</span>
               </div>
             </Col>
             <Col md={6}>  
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaGenderless className="text-muted me-2" />
                 <span className="text-muted">Other Charges:</span>
-                <span className="fw-semibold ms-2">{data?.gender || ''}</span>
+                <span className="fw-semibold ms-2">{data?.other_charges || ''}</span>
               </div>
             </Col>
-            <Col md={6}>  
+            {/* <Col md={6}>  
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaHome className="text-muted me-2" />
                 <span className="text-muted">Recharge Till :</span>
-                <span className="fw-semibold ms-2">{data?.apartment || ''}</span>
+                <span className="fw-semibold ms-2">{data?.end_date || ''}</span>
               </div>  
-            </Col>
+            </Col> */}
             <Col md={6}>  
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaHome className="text-muted me-2" />
                     <span className="text-muted">Paid Till :</span>
-                <span className="fw-semibold ms-2">{data?.apartment || ''}</span>
+                <span className="fw-semibold ms-2">{data?.bill_date || ''}</span>
               </div>  
             </Col>
             <Col md={6}>  
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaHome className="text-muted me-2" />
                 <span className="text-muted">Last Payment Date :</span>
-                <span className="fw-semibold ms-2">{data?.apartment || ''}</span>
+                <span className="fw-semibold ms-2">{data?.received_date || ''}</span>
               </div>  
             </Col>
             <Col md={6}>  
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaHome className="text-muted me-2" />
                 <span className="text-muted">Last Payment Amount :</span>
-                <span className="fw-semibold ms-2">{data?.apartment || ''}</span>
+                <span className="fw-semibold ms-2">{data?.received_amount || ''}</span>
               </div>  
             </Col>
           </Row>
