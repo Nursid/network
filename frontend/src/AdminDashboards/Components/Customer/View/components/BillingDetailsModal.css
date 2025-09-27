@@ -1,0 +1,155 @@
+/* Billing Details Modal Styling */
+.billing-modal .modal-dialog {
+  max-width: 800px;
+  margin: 1.75rem auto;
+}
+
+.billing-modal .modal-content {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.billing-modal .modal-header {
+  border-bottom: 2px solid #28a745;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.billing-modal .modal-header .btn-close {
+  color: white;
+  opacity: 0.8;
+  filter: brightness(0) invert(1);
+}
+
+.billing-modal .modal-header .btn-close:hover {
+  opacity: 1;
+}
+
+.billing-modal .modal-body {
+  padding: 2rem 1.5rem;
+  background-color: #f8f9fa;
+}
+
+.billing-modal .modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa;
+}
+
+/* Form styling */
+.billing-modal .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.billing-modal .form-label {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.billing-modal .form-control {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.billing-modal .form-control:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.billing-modal .form-control.is-invalid {
+  border-color: #dc3545;
+}
+
+.billing-modal .invalid-feedback {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+/* Button styling */
+.billing-modal .btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.billing-modal .btn-success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border: none;
+}
+
+.billing-modal .btn-success:hover {
+  background: linear-gradient(135deg, #218838, #1ea085);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.billing-modal .btn-secondary {
+  background-color: #6c757d;
+  border: none;
+}
+
+.billing-modal .btn-secondary:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+/* Loading spinner */
+.billing-modal .spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Animation for modal */
+.billing-modal .modal-dialog {
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .billing-modal .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+  }
+  
+  .billing-modal .modal-body {
+    padding: 1rem;
+  }
+  
+  .billing-modal .modal-footer {
+    padding: 0.75rem 1rem;
+  }
+  
+  .billing-modal .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Icon styling */
+.billing-modal .modal-header .d-flex svg {
+  font-size: 1.1rem;
+}
+
+.billing-modal .form-label svg {
+  font-size: 0.9rem;
+  width: 16px;
+  height: 16px;
+}

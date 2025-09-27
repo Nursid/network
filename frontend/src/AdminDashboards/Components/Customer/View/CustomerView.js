@@ -16,6 +16,7 @@ import RechargeLog from './components/RechargeLog';
 import PaymentLog from './components/PaymentLog';
 import KYCInfoCard from './components/KYCInfoCard';
 import DocumentsCard from './components/DocumentsCard';
+import Swal from 'sweetalert2';
 
 export default function CustomerView() {
 
@@ -45,6 +46,24 @@ export default function CustomerView() {
     const response = await axios.get(`${API_URL}/customer/getbyid/${customer_id}`);
     const data = await response.data.data;
     setData(data);
+  };
+
+  const handleUpdate =async (updatedBillingData,message) => {
+    try{
+      const response = await axios.put(`${API_URL}/customer/getupdate/${customer_id}`, updatedBillingData);
+      if(response.data.status){
+        Swal.fire('Success', message, 'success');
+        fetchData();
+      }else{
+        fetchData();
+        Swal.fire('Error', response.data.message, 'error');
+      }
+    }catch(error){
+      console.log('error-',error)
+      fetchData();
+      Swal.fire('Error', error.response.data.message, 'error');
+      fetchData();
+    }
   };
 
   const fetchPlanDetailsHistory = async () => {
@@ -98,16 +117,16 @@ export default function CustomerView() {
             </Col>
             <Col xs={6}>
               <div className="d-flex flex-column gap-3">
-              <BillingDetails data={data} />
-              <Inventory data={data} />
+              <BillingDetails data={data} onDataUpdate={(updatedData) =>handleUpdate(updatedData,'Billing data updated successfully')} />
+              <Inventory data={data} onDataUpdate={(updatedData) =>handleUpdate(updatedData,'Inventory data updated successfully')} />
               </div>
             </Col>
             <Col xs={12}>
               <ServiceDetails data={planDetailsHistory} />
             </Col>
-            <Col xs={12}>
+            {/* <Col xs={12}>
               <RechargeLog data={data} />
-            </Col>
+            </Col> */}
             <Col xs={12}>
               <PaymentLog data={data} />
             </Col>

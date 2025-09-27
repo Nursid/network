@@ -536,7 +536,7 @@ const UpdateCustomerForm = ({prop, updateData}) => {
 
 		try {
 			console.log('Updating customer data:', finalData);
-			const apiUrl = `${API_URL}/customer/getupdate/${updateData.user_id || updateData.id}`;
+			const apiUrl = `${API_URL}/customer/getupdate/${updateData.customer_id}`;
 			const response = await axios.put(apiUrl, formDataToSend);
 			
 

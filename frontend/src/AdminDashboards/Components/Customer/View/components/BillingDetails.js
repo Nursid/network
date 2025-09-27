@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardBody, Row, Col } from "reactstrap";
 import * as BsIcons from "react-icons/bs";
 import * as FaIcons from "react-icons/fa";
 import * as IoIcons from "react-icons/io5";
+import BillingDetailsModal from './BillingDetailsModal';
 
-const BillingDetails = ({ data }) => {
+const BillingDetails = ({ data, onDataUpdate }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleEdit = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleSave = (updatedData) => {
+    if (onDataUpdate) {
+      onDataUpdate(updatedData);
+    }
+  };
+
   return (
     <Card className="shadow-sm" style={{ border: '1px solid #28a745', borderRadius: '8px' }}>
       <CardBody className="p-4">
         {/* Header with Title and Edit Icon */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h4 className="mb-0 text-center w-100">Billing & Service Details </h4>
-          <BsIcons.BsPencil className="text-warning" style={{ fontSize: '18px' }} />
+          <BsIcons.BsPencil 
+            className="text-warning" 
+            style={{ fontSize: '18px', cursor: 'pointer' }} 
+            onClick={handleEdit}
+            title="Edit billing details"
+          />
         </div>
 
         {/* Customer Information */}
@@ -52,13 +70,6 @@ const BillingDetails = ({ data }) => {
                 <span className="fw-semibold ms-2">{data?.other_charges || ''}</span>
               </div>
             </Col>
-            {/* <Col md={6}>  
-              <div className="justify-content-between align-items-center">
-                <FaIcons.FaHome className="text-muted me-2" />
-                <span className="text-muted">Recharge Till :</span>
-                <span className="fw-semibold ms-2">{data?.end_date || ''}</span>
-              </div>  
-            </Col> */}
             <Col md={6}>  
               <div className="justify-content-between align-items-center">
                 <FaIcons.FaHome className="text-muted me-2" />
@@ -83,6 +94,14 @@ const BillingDetails = ({ data }) => {
           </Row>
         </div>
       </CardBody>
+      
+      {/* Modal for editing */}
+      <BillingDetailsModal
+        isOpen={isModalOpen}
+        toggle={() => setIsModalOpen(!isModalOpen)}
+        data={data}
+        onSave={handleSave}
+      />
     </Card>
   );
 };

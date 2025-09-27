@@ -62,6 +62,7 @@ const ManageCustomer = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
     const [showFilters, setShowFilters] = useState(!isMobile)
+    const [showFilterButton, setShowFilterButton] = useState(false)
     const [globalSearch, setGlobalSearch] = useState('')
     const [billingModal, setBillingModal] = useState(false)
 
@@ -126,15 +127,6 @@ const ManageCustomer = () => {
       { value: "F", label: "F" },
       { value: "G", label: "G" },
       { value: "H", label: "H" },
-    ];
-
-    const custId_option = [
-      { value: "0", label: "Active" },
-      { value: "1", label: "Inactive" },
-    ];
-    const status_option = [
-      { value: "0", label: "Active" },
-      { value: "1", label: "Inactive" },
     ];
 
     // Auto-hide filters on mobile when screen size changes
@@ -223,7 +215,6 @@ const ManageCustomer = () => {
     }
 
     const handleRenewalSubmit = async (formData) => {
-      console.log("formData-",formData)
         setFormLoading(true);
         try {
             const response = await axios.post(`${API_URL}/customer/renew-plan`, formData);
@@ -1304,112 +1295,6 @@ const handleRePaymentSubmit = async (formData) => {
         {/* Main Content */}
         <div className="main-content" style={getMainContentStyle()}>
 
-        <Paper 
-              elevation={1} 
-              style={{
-                margin: isMobile ? '5px 5px 5px 5px' : '5px 10px 5px 10px',
-                borderRadius: '6px'
-              }}
-            >
-              <Box sx={{ p: isMobile ? 0.5 : 1 }}>
-        <div className="row align-items-center">
-                  <div className={`${isMobile ? 'col-12' : 'col-md-3'} col-12 mb-1`}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel shrink sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}>Cust. Id</InputLabel>
-                      <Select
-                        value={filters.status}
-                        label="Cust. Id"
-                        displayEmpty
-                        notched
-                        onChange={(e) => {
-                          const value = e.target.value
-                          handleFilterChange('status', { value })
-                        }}
-                        sx={{ 
-                          height: isMobile ? '40px' : '36px',
-                          '& .MuiSelect-select': {
-                            fontSize: isMobile ? '0.8rem' : '0.875rem',
-                            padding: isMobile ? '10px 12px' : '8px 12px'
-                          }
-                        }}
-                      >
-                        <MenuItem value="" sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}>All</MenuItem>
-                        <MenuItem value="0" sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}>Active</MenuItem>
-                        <MenuItem value="1" sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}>Inactive</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </div>
-                  
-                  <div className={`${isMobile ? 'col-12' : 'col-md-6'} col-12 mb-1`}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder="Type here for a Global Search"
-                      value={globalSearch}
-                      onChange={(e) => {
-                        const value = e.target.value
-                        handleGlobalSearchChange(value)
-                      }}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleSearchButtonClick()
-                        }
-                      }}
-                      sx={{ 
-                        '& .MuiInputBase-root': {
-                          height: isMobile ? '40px' : '36px',
-                          fontSize: isMobile ? '0.8rem' : '0.875rem'
-                        },
-                        '& .MuiInputBase-input': {
-                          padding: isMobile ? '10px 12px' : '8px 12px'
-                        }
-                      }}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <SearchIcon sx={{ fontSize: isMobile ? '16px' : '18px' }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </div>
-                  
-                  <div className={`${isMobile ? 'col-12' : 'col-md-3'} col-12 mb-1`}>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <Button
-                        variant="contained"
-                        onClick={handleSearchButtonClick}
-                        size="small"
-                        sx={{ 
-                          flex: 1,
-                          height: isMobile ? '40px' : '32px',
-                          fontSize: isMobile ? '0.8rem' : '0.75rem',
-                          backgroundColor:  '#ff9800',
-                          '&:hover': {
-                            backgroundColor: '#f57c00'
-                          }
-                        }}
-                      >
-                        Search
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        onClick={handleClearFilters}
-                        size="small"
-                        sx={{ 
-                          flex: 1,
-                          height: isMobile ? '40px' : '32px',
-                          fontSize: isMobile ? '0.8rem' : '0.75rem'
-                        }}
-                      >
-                        Clear
-                      </Button>
-                    </Box>
-                  </div>
-                </div>
-              </Box>
-            </Paper>
-
           {/* Top Header Section */}
           <Paper 
             elevation={2} 
@@ -1497,7 +1382,30 @@ const handleRePaymentSubmit = async (formData) => {
                         'Import'
                       )}
                     </Button>
-                  </Box>
+
+                    <Button
+                      variant="contained"
+                      onClick={() => setShowFilterButton(!showFilterButton)}
+                      size="small"
+                      sx={{
+                        backgroundColor: showFilterButton ? '#ccc' : 'red',
+                        borderRadius: '6px',
+                        textTransform: 'none',
+                        fontWeight: '500',
+                        fontSize: isMobile ? '0.75rem' : '0.8rem',
+                        height: isMobile ? '36px' : '32px',
+                        padding: isMobile ? '6px 16px' : '4px 12px',
+                        minWidth: isMobile ? '100%' : '80px',
+                        color: 'white',
+                        '&:hover': { 
+                          backgroundColor: showFilterButton ? '#ccc' : '#b71c1c', 
+                          color: 'white' 
+                        },
+                      }}
+                    >
+                      {showFilterButton ? 'Hide Filter' : 'Show Filter'}
+                    </Button>
+                  </Box>  
                 </div>
               </div>
             </Box>
@@ -1513,6 +1421,7 @@ const handleRePaymentSubmit = async (formData) => {
             paddingRight: '5px' 
           }}>
             {/* Search and Filter Section */}
+            {showFilterButton && (
             <Paper 
               elevation={1} 
               style={{
@@ -1794,6 +1703,7 @@ const handleRePaymentSubmit = async (formData) => {
                 </div>
               </Box>
             </Paper>
+            )}
                   
             {/* Data Table */}
             <Paper style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
