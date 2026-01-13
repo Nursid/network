@@ -38,6 +38,49 @@ const InventoryModal = ({ isOpen, toggle, data, onSave }) => {
     fetchInventoryItems();
   }, [data, isOpen]);
 
+
+
+  const normalizeInventoryItems = (items) => {
+    if (!items) return [];
+  
+    if (typeof items === 'string') {
+      try {
+        items = JSON.parse(items);
+      } catch {
+        return [];
+      }
+    }
+  
+    return Array.isArray(items) ? items : [];
+  };
+
+  
+  useEffect(() => {
+    if (data && isOpen) {
+      const existingItems = normalizeInventoryItems(data.inventory_items);
+  
+      setFormData({
+        inventory_items: existingItems
+      });
+  
+      setErrors({});
+    }
+  
+    fetchInventoryItems();
+  }, [data, isOpen]);
+
+  
+  const handleCancel = () => {
+    if (data) {
+      setFormData({
+        inventory_items: normalizeInventoryItems(data.inventory_items)
+      });
+    }
+    setErrors({});
+    toggle();
+  };
+  
+
   // Update form data when inventory items are loaded to set default selections
   useEffect(() => {
     if (inventoryItems.length > 0 && formData.inventory_items.length > 0) {
@@ -169,27 +212,27 @@ const InventoryModal = ({ isOpen, toggle, data, onSave }) => {
     }
   };
 
-  const handleCancel = () => {
-    // Reset form data to original values
-    if (data) {
-      let existingItems = [];
-      try {
-        if (data.inventory_items) {
-          existingItems = typeof data.inventory_items === 'string' 
-            ? JSON.parse(data.inventory_items) 
-            : data.inventory_items;
-        }
-      } catch (error) {
-        console.error('Error parsing inventory_items:', error);
-        existingItems = [];
-      }
-      setFormData({
-        inventory_items: existingItems
-      });
-    }
-    setErrors({});
-    toggle();
-  };
+  // const handleCancel = () => {
+  //   // Reset form data to original values
+  //   if (data) {
+  //     let existingItems = [];
+  //     try {
+  //       if (data.inventory_items) {
+  //         existingItems = typeof data.inventory_items === 'string' 
+  //           ? JSON.parse(data.inventory_items) 
+  //           : data.inventory_items;
+  //       }
+  //     } catch (error) {
+  //       console.error('Error parsing inventory_items:', error);
+  //       existingItems = [];
+  //     }
+  //     setFormData({
+  //       inventory_items: existingItems
+  //     });
+  //   }
+  //   setErrors({});
+  //   toggle();
+  // };
 
   return (
     <Modal 
@@ -316,24 +359,26 @@ const InventoryModal = ({ isOpen, toggle, data, onSave }) => {
           )}
 
           {/* Summary Section */}
-          {formData.inventory_items.length > 0 && (
+          {Array.isArray(formData.inventory_items)  && formData.inventory_items.length > 0 && (
             <Row className="mt-4">
               <Col md={12}>
                 <div className="bg-light p-3 rounded">
                   <h6 className="mb-3">Inventory Summary</h6>
                   <Row>
-                    {formData.inventory_items.map((item, index) => (
+                  {Array.isArray(formData.inventory_items) &&
+                    formData.inventory_items.map((item, index) => (
                       <Col md={6} key={index} className="mb-2">
                         <div className="d-flex justify-content-between">
                           <span className="text-muted">
-                            {item.item ? item.item.label || item.item.name : 'No item selected'}
+                            {item?.item?.label || item?.item?.name || 'No item selected'}
                           </span>
                           <span className="fw-semibold">
-                            {item.quantity}x
+                            {item?.quantity || 0}x
                           </span>
                         </div>
                       </Col>
                     ))}
+
                   </Row>
                 </div>
               </Col>

@@ -58,7 +58,7 @@ const BillingDetailsModal = ({ isOpen, toggle, data, onSave }) => {
     const newErrors = {};
     
     if (!formData.selected_package.trim()) {
-      newErrors.selected_package = 'Plan Code is required';
+      newErrors.selected_package = 'Package Name is required';
     }
     
     if (!formData.billing_amount || isNaN(formData.billing_amount)) {
@@ -160,8 +160,7 @@ const BillingDetailsModal = ({ isOpen, toggle, data, onSave }) => {
             <Col md={6}>
               <FormGroup>
                 <Label className="d-flex align-items-center fw-semibold">
-                  <FaIcons.FaUser className="text-muted me-2" />
-                  Plan Code
+                  Package Name
                 </Label>
                 <Input
                   type="text"
@@ -169,7 +168,7 @@ const BillingDetailsModal = ({ isOpen, toggle, data, onSave }) => {
                   value={formData.selected_package}
                   onChange={handleInputChange}
                   invalid={!!errors.selected_package}
-                  placeholder="Enter plan code"
+                  placeholder="Enter Package Name"
                 />
                 {errors.selected_package && (
                   <div className="invalid-feedback d-block">{errors.selected_package}</div>
@@ -222,8 +221,7 @@ const BillingDetailsModal = ({ isOpen, toggle, data, onSave }) => {
             <Col md={6}>
               <FormGroup>
                 <Label className="d-flex align-items-center fw-semibold">
-                  <FaIcons.FaBuilding className="text-muted me-2" />
-                  Previous Recharge Balance
+                  Pre Recharge Balance
                 </Label>
                 <Input
                   type="number"
@@ -243,7 +241,6 @@ const BillingDetailsModal = ({ isOpen, toggle, data, onSave }) => {
             <Col md={6}>
               <FormGroup>
                 <Label className="d-flex align-items-center fw-semibold">
-                  <FaIcons.FaGenderless className="text-muted me-2" />
                   Other Charges
                 </Label>
                 <Input
@@ -264,7 +261,6 @@ const BillingDetailsModal = ({ isOpen, toggle, data, onSave }) => {
             <Col md={6}>
               <FormGroup>
                 <Label className="d-flex align-items-center fw-semibold">
-                  <FaIcons.FaHome className="text-muted me-2" />
                   Paid Till
                 </Label>
                 <Input
@@ -279,8 +275,7 @@ const BillingDetailsModal = ({ isOpen, toggle, data, onSave }) => {
             <Col md={6}>
               <FormGroup>
                 <Label className="d-flex align-items-center fw-semibold">
-                  <FaIcons.FaHome className="text-muted me-2" />
-                  Last Payment Date
+                  Last Pay Date
                 </Label>
                 <Input
                   type="date"
@@ -294,8 +289,7 @@ const BillingDetailsModal = ({ isOpen, toggle, data, onSave }) => {
             <Col md={6}>
               <FormGroup>
                 <Label className="d-flex align-items-center fw-semibold">
-                  <FaIcons.FaHome className="text-muted me-2" />
-                  Last Payment Amount
+                  Last Pay Amt
                 </Label>
                 <Input
                   type="number"

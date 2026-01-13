@@ -19,6 +19,7 @@ const Attendance = require("./Routers/AttendanceRouters")
 const Plan = require("./Routers/Services/PlansRouters")
 const SalaryRoutes = require("./Routers/SalaryRouters/SalaryRoutes")
 const app = express();
+
 const route= require("./Routers/index")
 app.use(cors());
 app.use(express.json());

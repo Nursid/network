@@ -309,6 +309,12 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const [inventoryItems, setInventoryItems] = useState([]);
 	const [employees, setEmployees] = useState([]);
 
+	const [connectionTypes, setConnectionTypes] = useState([]);
+	const [selectedConnectionType, setSelectedConnectionType] = useState(null);
+
+	const [allPackages, setAllPackages] = useState([]);
+
+
 	// Fetch packages and inventory on component mount
 	useEffect(() => {
 		fetchPackages();
@@ -332,19 +338,56 @@ const AddNewCustomerForm = ({prop, data}) => {
 
 	const fetchPackages = async () => {
 		try {
-			const response = await axios.get(`${API_URL}/plan/getall`);
-			if (response.data.status === 200) {
-				const packageOptions = response.data.data.map(pkg => ({
-					value: pkg.id,
-					label: `${pkg.plan} - ₹${pkg.finalPrice} - ${pkg.days} Days`,
-					...pkg
-				}));
-				setPackages(packageOptions);
-			}
+		  const response = await axios.get(`${API_URL}/plan/getall`);
+		  if (response.data.status === 200) {
+			const data = response.data.data;
+	  
+			setAllPackages(data);
+	  
+			// 🔹 Unique connection types
+			const uniqueTypes = [
+			  ...new Map(
+				data.map(item => [
+				  item.connectionType,
+				  {
+					value: item.connectionType,
+					label: item.connectionType
+				  }
+				])
+			  ).values()
+			];
+	  
+			setConnectionTypes(uniqueTypes);
+		  }
 		} catch (error) {
-			console.error('Error fetching packages:', error);
+		  console.error('Error fetching packages:', error);
 		}
-	};
+	  };
+
+	  const handleConnectionTypeSelect = (type) => {
+		setSelectedConnectionType(type);
+		setFormData(prev => ({
+		  ...prev,
+		  selected_package: null
+		}));
+	  
+		if (!type) {
+		  setPackages([]);
+		  return;
+		}
+	  
+		const filteredPackages = allPackages
+		  .filter(pkg => pkg.connectionType === type.value)
+		  .map(pkg => ({
+			value: pkg.id,
+			label: `${pkg.plan} - ₹${pkg.finalPrice} - ${pkg.days} Days`,
+			...pkg
+		  }));
+	  
+		setPackages(filteredPackages);
+	  };
+	  
+	  
 
 	const fetchInventoryItems = async () => {
 		try {
@@ -588,24 +631,31 @@ const AddNewCustomerForm = ({prop, data}) => {
 		switch(currentStep) {
 			case 1: return 'Basic Information';
 			case 2: return 'Package Selection';
-			case 3: return 'Inventory Items';
-			case 4: return 'Billing & KYC Details';
+			case 3: return 'Inventory Items & KYC Details';
+			case 4: return 'Billing Details';
 			default: return 'Customer Registration';
 		}
 	};
 
-	const renderProgressBar = () => {
-		const progress = (currentStep / 4) * 100;
+	const totalSteps = 4;
+
+		const renderProgressBar = () => {
+		const progress = ((currentStep - 1) / totalSteps) * 100;
+
 		return (
 			<div className="mb-4">
-				<div className="d-flex justify-content-between mb-2">
-					<span className="small">Step {currentStep} of 4</span>
-					{/* <span className="small">{Math.round(progress)}% Complete</span> */}
-				</div>
-				<Progress value={progress} color="primary" />
+			<div className="d-flex justify-content-between mb-2">
+				<span className="small">
+				Step {currentStep} of {totalSteps}
+				</span>
+				{/* <span className="small">{Math.round(progress)}% Complete</span> */}
+			</div>
+
+			<Progress value={progress} color="primary" />
 			</div>
 		);
-	};
+		};
+
 
 	// Step 1: Basic Information
 	const renderBasicInfoStep = () => (
@@ -879,29 +929,41 @@ const AddNewCustomerForm = ({prop, data}) => {
 	const renderPackageStep = () => (
 		<div>
 			<Row>
-				<Col md={6}>
-					<FormGroup>
-						<Label for="selected_package">Select Package</Label>
-						<SelectBox 
-							options={packages} 
-							setSelcted={(value) => {
-								console.log('Package selected:', value);
-								const newEndDate = calculateEndDate(
-									formData.start_date,
-									formData.billing_cycle
-								);
-								
-								setFormData(prev => ({ 
-									...prev, 
-									selected_package: value,
-									billing_amount: value ? value.finalPrice : '',
-									end_date: newEndDate
-								}));
-							}} 
-							initialValue={formData.selected_package}
-						/>
-					</FormGroup>
+			<Col md={6}>
+				<FormGroup>
+					<Label>Select Connection Type</Label>
+					<SelectBox
+					options={connectionTypes}
+					setSelcted={handleConnectionTypeSelect}
+					initialValue={selectedConnectionType}
+					/>
+				</FormGroup>
 				</Col>
+
+				<Col md={6}>
+  <FormGroup>
+    <Label>Select Package</Label>
+    <SelectBox
+      options={packages}
+	   menuPosition="fixed"
+      setSelcted={(value) => {
+        const newEndDate = calculateEndDate(
+          formData.start_date,
+          formData.billing_cycle
+        );
+
+        setFormData(prev => ({
+          ...prev,
+          selected_package: value,
+          billing_amount: value ? value.finalPrice : '',
+          end_date: newEndDate
+        }));
+      }}
+      initialValue={formData.selected_package}
+      isDisabled={!selectedConnectionType}
+    />
+  </FormGroup>
+</Col>
 				{formData.selected_package && (
 					<Col md={12}>
 						<Card>
@@ -1156,10 +1218,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 			{({ values, errors, touched, handleChange, handleBlur, isSubmitting, setFieldValue }) => (
 				<Form>
 					<Row>
-						<Col md={12}>
-							<h5>Billing Details</h5>
-							<p className="text-muted">Collect payment and optionally KYC documentation.</p>
-						</Col>
 						<Col md={4}>
 							<FormGroup>
 								<Label for="billing_amount">Billing Amount <span style={{color: "red"}}>*</span></Label>
@@ -1373,7 +1431,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 									type="text"
 									name="payar_name"
 									placeholder="Enter Payar Name"
-									value={formData.payar_name}
 								/>
 							</FormGroup>
 						</Col>
@@ -1385,7 +1442,6 @@ const AddNewCustomerForm = ({prop, data}) => {
 									type="text"
 									name="payar_number"
 									placeholder="Enter Payar Number"
-									value={formData.payar_number}
 								/>
 							</FormGroup>
 						</Col>

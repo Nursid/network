@@ -9,14 +9,29 @@ const Inventory = ({ data, onDataUpdate }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inventoryItems, setInventoryItems] = useState([]);
 
+
+  // useEffect(() => {
+  //   if(data && data.inventory_items.length > 0 ){
+  //     console.log("data.inventory_items-",data.inventory_items)
+  //     setInventoryItems(JSON.parse(data.inventory_items));
+  //   }else{
+  //     setInventoryItems([]);
+  //   } 
+  // }, [data]);
+
+
   useEffect(() => {
-    if(data && data.inventory_items.length > 0 ){
-      console.log("data.inventory_items-",data.inventory_items)
-      setInventoryItems(JSON.parse(data.inventory_items));
-    }else{
+    try {
+      const items = typeof data?.inventory_items === 'string'
+        ? JSON.parse(data.inventory_items)
+        : [];
+  
+      setInventoryItems(Array.isArray(items) ? items : []);
+    } catch {
       setInventoryItems([]);
-    } 
+    }
   }, [data]);
+  
 
   const handleEdit = () => {
     setIsModalOpen(true);

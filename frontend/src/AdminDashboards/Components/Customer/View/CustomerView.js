@@ -26,9 +26,8 @@ export default function CustomerView() {
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const { id } = useParams();
-  // Decode URL-encoded parameter and extract customer ID
   const decodedId = decodeURIComponent(id);
-  const customer_id = decodedId.split('-').pop(); // Get the last part after splitting by '-'
+  const customer_id = decodedId.split('-').pop();
  
   const [data, setData] = useState(null);
   const [planDetailsHistory, setPlanDetailsHistory] = useState(null);

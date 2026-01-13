@@ -398,7 +398,6 @@ const AddressInfoCard = ({ data, isModal = false, onSave, onCancel }) => {
   return (
     <Card className="border-0 h-100">
       <CardHeader className="d-flex justify-content-between align-items-center">
-        <h5 className="mb-0">Address Information</h5>
         {!isEditing && !isModal && (
           <Button color="primary" size="sm" onClick={handleEditClick}>
             <BsIcons.BsPencil className="me-1" />
