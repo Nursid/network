@@ -57,6 +57,10 @@ router.post('/check-customer', customerRouter.CheckCustomer);
 router.post('/get-plans', customerRouter.GetCustomerPlans);
 router.get('/get-plan-details-history/:customer_id', customerRouter.GetBillingDetailsHistory);
 
+router.put('/update-inventory/:customer_id', customerRouter.UpdateCustomerInventory);
+
+
+
 
 
 module.exports = router;

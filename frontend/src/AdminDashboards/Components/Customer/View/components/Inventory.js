@@ -4,8 +4,11 @@ import * as BsIcons from "react-icons/bs";
 import * as FaIcons from "react-icons/fa";
 import * as IoIcons from "react-icons/io5";
 import InventoryModal from './InventoryModal';
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import { API_URL } from '../../../../../config';
 
-const Inventory = ({ data, onDataUpdate }) => {
+const Inventory = ({ data, onDataUpdate, customer_id, fetchData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inventoryItems, setInventoryItems] = useState([]);
 
@@ -37,11 +40,31 @@ const Inventory = ({ data, onDataUpdate }) => {
     setIsModalOpen(true);
   };
 
-  const handleSave = (updatedData) => {
-    if (onDataUpdate) {
-      onDataUpdate(updatedData);
+  const handleSave = async (updatedData) => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/customer/update-inventory/${customer_id}`,
+        {
+          inventory_items: JSON.parse(updatedData.inventory_items)
+        }
+      );
+  
+      if (response.data.status) {
+        Swal.fire("Success", "Inventory updated successfully", "success");
+        fetchData(); // refresh customer data
+      } else {
+        Swal.fire("Error", response.data.message, "error");
+      }
+    } catch (error) {
+      console.error("Inventory update error:", error);
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "Something went wrong",
+        "error"
+      );
     }
   };
+  
 
   return (
     <Card className="shadow-sm" style={{ border: '1px solid #28a745', borderRadius: '8px' }}>

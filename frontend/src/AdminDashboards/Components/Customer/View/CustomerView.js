@@ -117,7 +117,7 @@ export default function CustomerView() {
             <Col xs={6}>
               <div className="d-flex flex-column gap-3">
               <BillingDetails data={data} onDataUpdate={(updatedData) =>handleUpdate(updatedData,'Billing data updated successfully')} />
-              <Inventory data={data} onDataUpdate={(updatedData) =>handleUpdate(updatedData,'Inventory data updated successfully')} />
+              <Inventory data={data} onDataUpdate={(updatedData) =>handleUpdate(updatedData,'Inventory data updated successfully')} customer_id={customer_id} fetchData={fetchData} />
               </div>
             </Col>
             <Col xs={12}>

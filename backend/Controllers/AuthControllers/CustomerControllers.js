@@ -10,6 +10,7 @@ const AccountModel = db.AccountModel
 const PlanModel = db.PlanModel
 const CustomerPlanHistory = db.CustomerPlanHistory
 const CustomerReminderModel = db.CustomerReminderModel
+const InventoryModel = db.InventoryModel
 const generateCustomerID = require("../misc/customeridgenerator");
 const generateVoucherNo = require("../misc/voucherGenerator");
 require("dotenv").config;
@@ -193,6 +194,69 @@ const SignupUser = async (req, res) => {
 			})
 		]);
 
+			// 🔹 Parse inventory items
+			let inventoryItems = [];
+
+			if (data.inventory_items) {
+			try {
+				inventoryItems =
+				typeof data.inventory_items === "string"
+					? JSON.parse(data.inventory_items)
+					: data.inventory_items;
+			} catch (err) {
+				await transaction.rollback();
+				return res.status(400).json({
+				status: false,
+				message: "Invalid inventory_items format"
+				});
+			}
+			}
+
+			// 🔹 Handle inventory deduction
+		for (const inv of inventoryItems) {
+			const inventoryId = inv?.item?.id;
+			const usedQty = Number(inv.quantity);
+		
+			if (!inventoryId || usedQty <= 0) {
+			await transaction.rollback();
+			return res.status(400).json({
+				status: false,
+				message: "Invalid inventory item or quantity"
+			});
+			}
+		
+			const inventory = await InventoryModel.findOne({
+			where: { id: inventoryId },
+			transaction,
+			lock: transaction.LOCK.UPDATE // 🔒 prevents race condition
+			});
+		
+			if (!inventory) {
+			await transaction.rollback();
+			return res.status(404).json({
+				status: false,
+				message: `Inventory not found (ID: ${inventoryId})`
+			});
+			}
+		
+			const availableQty = Number(inventory.qty);
+		
+			if (usedQty > availableQty) {
+			await transaction.rollback();
+			return res.status(400).json({
+				status: false,
+				message: `Insufficient stock for ${inventory.item}. Available: ${availableQty}`
+			});
+			}
+		
+			// 🔹 Deduct stock
+			await inventory.update(
+			{ qty: availableQty - usedQty },
+			{ transaction }
+			);
+		}
+  
+
 		if (serviceProvider) {
 			await transaction.rollback();
 			return res.status(200).json({
@@ -277,6 +341,9 @@ const SignupUser = async (req, res) => {
 		}, {
 			transaction
 		});
+
+
+		
 
 		// Commit transaction
 		await transaction.commit();
@@ -1584,6 +1651,111 @@ cron.schedule('0 0 * * *', () => {
 });
 
 
+const UpdateCustomerInventory = async (req, res) => {
+	const transaction = await sequelize.transaction();
+  
+	try {
+	  const { customer_id } = req.params;
+	  const { inventory_items } = req.body;
+  
+	  if (!Array.isArray(inventory_items)) {
+		return res.status(400).json({
+		  status: false,
+		  message: "inventory_items must be an array"
+		});
+	  }
+  
+	  const customer = await CustomerModel.findOne({
+		where: { customer_id },
+		transaction
+	  });
+  
+	  if (!customer) {
+		await transaction.rollback();
+		return res.status(404).json({
+		  status: false,
+		  message: "Customer not found"
+		});
+	  }
+  
+	  /**
+	   * 🔹 Loop through inventory items
+	   */
+	  for (const inv of inventory_items) {
+		const inventoryId = inv?.item?.id;
+		const usedQty = Number(inv.quantity);
+  
+		if (!inventoryId || usedQty <= 0) {
+		  await transaction.rollback();
+		  return res.status(400).json({
+			status: false,
+			message: "Invalid inventory item or quantity"
+		  });
+		}
+  
+		const inventory = await InventoryModel.findOne({
+		  where: { id: inventoryId },
+		  transaction,
+		  lock: transaction.LOCK.UPDATE
+		});
+  
+		if (!inventory) {
+		  await transaction.rollback();
+		  return res.status(404).json({
+			status: false,
+			message: `Inventory not found (ID: ${inventoryId})`
+		  });
+		}
+  
+		const availableQty = Number(inventory.qty);
+  
+		if (usedQty > availableQty) {
+		  await transaction.rollback();
+		  return res.status(400).json({
+			status: false,
+			message: `Insufficient stock for ${inventory.item}. Available: ${availableQty}`
+		  });
+		}
+  
+		/**
+		 * 🔹 Deduct inventory quantity
+		 */
+		await inventory.update(
+		  { qty: availableQty - usedQty },
+		  { transaction }
+		);
+	  }
+  
+	  /**
+	   * 🔹 Update customer inventory_items
+	   */
+	  await customer.update(
+		{
+		  inventory_items: JSON.stringify(inventory_items)
+		},
+		{ transaction }
+	  );
+  
+	  await transaction.commit();
+  
+	  return res.status(200).json({
+		status: true,
+		message: "Inventory updated successfully"
+	  });
+  
+	} catch (error) {
+	  await transaction.rollback();
+	  console.error("Update inventory error:", error);
+  
+	  return res.status(500).json({
+		status: false,
+		message: "Internal Server Error",
+		error: error.message
+	  });
+	}
+  };
+
+
 module.exports = {
 	SignupUser,
 	LoginUser,
@@ -1607,5 +1779,6 @@ module.exports = {
 	GetReminderByID,
 	CheckCustomer,
 	GetCustomerPlans,
-	GetBillingDetailsHistory
+	GetBillingDetailsHistory,
+	UpdateCustomerInventory
 };
