@@ -264,7 +264,7 @@ const ManageCustomer = () => {
         console.log("formData--",formData)
         setFormLoading(true);
         try {
-            const response = await axios.post(`${API_URL}/api/complain/add`, formData);
+            await axios.post(`${API_URL}/api/complain/add`, formData);
 
             Swal.fire('Success', 'Complaint registered successfully!', 'success');
             setComplaintModal(false);

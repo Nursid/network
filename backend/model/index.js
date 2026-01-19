@@ -50,6 +50,8 @@ db.TicketHead = require("./ServiceModal/TicketHead")(sequelize, DataTypes)
 db.SalaryModel = require("./SalaryModel/SalaryModel")(sequelize, DataTypes)
 db.CustomerPlanHistory = require("./AuthModels/CustomerPlanHistory")(sequelize, DataTypes)
 db.CustomerComplaintModel = require("./CustomerComplaintModel")(sequelize, DataTypes)
+db.CustomerComplain = require("./CustomerComplaint")(sequelize, DataTypes)
+db.ComplaintTaskModel = require("./ComplaintTaskModel")(sequelize, DataTypes)
 
 // Fix associations - Customer has many plan histories and account entries
 db.CustomerModel.hasMany(db.CustomerPlanHistory, { foreignKey: 'customer_id', sourceKey: 'customer_id' });
@@ -86,6 +88,20 @@ db.EmployeeModel.hasMany(db.AccountModel, { foreignKey: 'collected_by', sourceKe
 db.TicketModel.belongsTo(db.CustomerModel, { foreignKey: 'mobileNo', targetKey: 'mobile' });
 
 db.TicketModel.belongsTo(db.ServiceProviderModel, { foreignKey: 'technician', targetKey: 'id' });
+
+// Complaint ↔ Task relationship
+db.CustomerComplaintModel.hasMany(db.ComplaintTaskModel, {
+  foreignKey: "complaintId",
+  sourceKey: "id",
+  as: "tasks"
+});
+
+db.ComplaintTaskModel.belongsTo(db.CustomerComplaintModel, {
+  foreignKey: "complaintId",
+  targetKey: "id",
+  as: "complaint"
+});
+
 
 // Salary model associations
 // db.SalaryModel.belongsTo(db.EmployeeModel, { foreignKey: 'employee_id', as: 'employee' });
