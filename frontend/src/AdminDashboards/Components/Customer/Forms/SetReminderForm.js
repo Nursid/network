@@ -86,7 +86,7 @@ const SetReminderForm = ({ open, onClose, onSubmit, loading = false, customerDat
             reminder_date: combinedDateTime.toISOString(),
             note: formData.note,
             created_by: 1, // This should be the logged-in user ID
-            customer_id: customerId || customerData?.id || 2 // Use customerId prop or extract from customerData
+            customer_id: customerId
         };
         
         onSubmit(submitData);
@@ -102,6 +102,12 @@ const SetReminderForm = ({ open, onClose, onSubmit, loading = false, customerDat
         setErrors({});
         onClose();
     };
+
+    const configDate = (date) => {
+        if (!date) return '';
+        return new Date(date).toISOString().split('T')[0];
+    };
+    
 
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -209,7 +215,7 @@ const SetReminderForm = ({ open, onClose, onSubmit, loading = false, customerDat
                                         }}
                                     >
                                         <Typography variant="body2" sx={{ fontSize: '0.85rem', mb: 0.5 }}>
-                                            {log.reminder_date} - {log.reminder_type}
+                                            {configDate(log.reminder_date)} - {log.reminder_type}
                                         </Typography>
                                     </Box>
                                 ))
